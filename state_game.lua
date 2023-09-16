@@ -4,6 +4,8 @@ victory_time = 0
 defeat = false
 defeat_time = 0
 
+
+
 function draw_gameplay()
     cls()
     fillp(0b0)
@@ -21,6 +23,8 @@ function draw_gameplay()
             for k = 1, #gridspace do
                 gridspace[k].draw()
             end
+            local pp =tp(j, i)
+            --print(#gridspace, pp[1], pp[2], 7)
         end
         for o in all(bins[i]) do o.draw() end
     end
@@ -30,7 +34,7 @@ function draw_gameplay()
         local abil = pl.die[pl.current_ability]
         abil.draw_face(die3d.x - 8, die3d.y - 8)
 
-        local line1 = descriptions[abil.base]
+        local line1 = abil.description
         print(line1, 64 - #line1 * 2, 114, 11)
         if abil.animal1 != nil then
             local line2 = descriptions[abil.base .. "/" .. abil.animal1]
@@ -143,10 +147,10 @@ function update_gameplay()
             pl.animate_time = 5
             throw()
         end
-        --[[if btnp(4) then
+        if btnp(2,1) then
             victory = true
-            victory_time = 0
-        end]]
+            victory_time = 90
+        end
     end
     tf += 1
     if die3d.visible then

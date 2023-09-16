@@ -16,3 +16,23 @@ end
 function clamp(a,b,c)
     return min(max(a,b),c)
 end
+
+function addfields(tbl,add)
+    for k,v in pairs(add) do
+        tbl[k] = v
+    end
+end
+
+function lookup_ability(name)
+    for def in all(abilities) do
+        if def[5] == name then
+            return def
+        end
+    end
+end
+
+function parse_ability(s)
+    local args = split(s)
+    local abil_def = lookup_ability(args[1])
+    return make_ability(abil_def, args[2], args[3])
+end

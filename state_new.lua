@@ -1,4 +1,3 @@
-abilities = {}
 function parse_class(name, wins, s)
     local class = {
         name=name,
@@ -11,11 +10,11 @@ function parse_class(name, wins, s)
     return class
 end
 classes = {
-    parse_class("commander", 0, "gun,1/gun,1/sword,2/shield,1/bomb,1/bomb,1"),
-    parse_class("vanguard", 0, "sword,1/sword,2/spear,2/spear,1/shield,2/bomb,1"),
-    parse_class("wizard", 0, "wave,1/wave,2/wave,1/sword,1/bomb,2/shield,1"),
-    parse_class("engineer", 0, "turret,1/turret,2/bomb,2/bomb,1/gun,1/shield,1"),
-    parse_class("druid", 3, "gun,1/sword,1,leaf/shield,1/none,1/shield,1,leaf/bomb,1,leaf"),
+    parse_class("commander", 0, "Gun,1/Gun,1/Sword,2/Shield,1/Bomb,1/Bomb,1"),
+    parse_class("vanguard", 0, "Sword,1/Sword,2/Spear,2/Spear,1/Shield,2/Bomb,1"),
+    parse_class("wizard", 0, "Wave,1/Wave,2/Wave,1/Sword,1/Bomb,2/Shield,1"),
+    --parse_class("engineer", 0, "Turret,1/Turret,2/Bomb,2/Bomb,1/Gun,1/Shield,1"),
+    --parse_class("druid", 3, "Gun,1/Sword,1/Shield,1/None,1/Shield,1/Bomb,1"),
 }
 selected_class_index = 1
 function update_newgame()
@@ -27,10 +26,11 @@ function update_newgame()
     end    
     if btnp(5) and dget(0) >= classes[selected_class_index].wins_needed then
         state = "gameplay"
+        local abilities = {}
         for i = 1,6 do
-            abilities[i] = classes[selected_class_index].abilities[i]
+            player_abilities[i] = classes[selected_class_index].abilities[i]
         end
-        start_level(1)
+        start_level()
     end
 end
 

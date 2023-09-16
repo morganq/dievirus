@@ -2,6 +2,7 @@ titlef = 0
 function update_title()
     titlef += 1
     if btnp(5) then
+        player_abilities = {}
         state = "newgame"
     end
 end

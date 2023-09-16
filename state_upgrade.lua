@@ -3,11 +3,47 @@ selected_upgrade_index = 1
 applied = {}
 faces_options1 = split("xx____,xx____,xx____,____xx,____xx,__x___,__x___,___x__,___x__")
 faces_options2 = split("x_____,_x____,__x___,___x__,____x_,_____x")
+upgrade_bases = split"Wave,Gun,Shield"
+upgrade_mods = split"Growth,Fast,Claim"
+
+function make_upgrade(faces, mod)
+    local up = {
+        faces = {},
+        mod = mod
+    }
+    for i = 1,6 do up.faces[i] = faces[i] == 'x' end
+    local positions = {
+        {0,3},{3,3},{6,3},{9,3},{3,0},{3,6}
+    }
+    up.draw = function(x,y)
+        if up.mod == "hp" then
+            spr(122, x + 5, y)
+            print("+1 hp", x-1, y + 9, 7)
+        else
+            for i = 1, 6 do
+                local px, py = positions[i][1] + x, positions[i][2] + y + 6
+                local color = 5
+                if up.faces[i] then color = 11 end
+                rectfill(px,py,px+1,py+1,color)
+            end        
+            if sub(up.mod,1,1) == "+" then
+                print(up.mod, x + 8, y, 10)
+            elseif count(upgrade_bases, up.mod) > 0 then
+                spr(lookup_ability(up.mod).image, x + 6, y - 5,2,2)
+            else
+                --spr(spranimals[up.mod], x+8, y)
+            end        
+        end
+    end
+    return up
+end
+
 function update_upgrade()
     tf += 1
     if current_upgrades == nil then
         current_upgrades = {}
-        local options = {"+1", "hp", rnd(enabled_animals), rnd(bases)}
+        --local options = {"+1", "hp", rnd(upgrade_mods), rnd(upgrade_bases)}
+        local options = {"+1", "hp", rnd(upgrade_bases)}
         for i = 1, 3 do
             local ind = flr(rnd(#options) + 1)
             local v = options[ind]
@@ -50,24 +86,20 @@ function draw_upgrade()
         local upgrade = current_upgrades[selected_upgrade_index]
         applied = {}
         for i = 1, 6 do
-            applied[i] = abilities[i].copy()
+            applied[i] = player_abilities[i].copy()
             if upgrade.faces[i] then
-                if upgrade.animal == "hp" then
+                if upgrade.mod == "hp" then
                     --
-                elseif sub(upgrade.animal,1,1) == "+" then
-                    applied[i].pips += sub(upgrade.animal,2,2)
-                elseif count(bases, upgrade.animal) > 0 then
-                    applied[i].base = upgrade.animal
+                elseif sub(upgrade.mod,1,1) == "+" then
+                    applied[i].pips += sub(upgrade.mod,2,2)
+                elseif count(upgrade_bases, upgrade.mod) > 0 then
+                    applied[i].base = upgrade.mod
                 else
-                    applied[i].animal1 = upgrade.animal
-                    local animal_descriptions = {
-                        leaf="leaf: growth",
-                        fox="fox: fire or speed",
-                        elephant="elephant: drop tiles or stun",
-                        rabbit="rabbit: quick roll or angular"
+                    applied[i].mods[1] = upgrade.mod
+                    local mod_descriptions = {
                     }
-                    local desc = animal_descriptions[upgrade.animal]
-                    print(desc, 64 - #desc * 2, 112, 6)
+                    --local desc = mod_descriptions[upgrade.animal]
+                    --print(desc, 64 - #desc * 2, 112, 6)
                 end
             end
         end
@@ -79,6 +111,6 @@ function draw_upgrade()
             end
             rect(i * 30 - 10, 22, i * 30 - 6 + 24, 45, color)
         end
-        draw_die2d(abilities,30,56,applied,upgrade)
+        draw_die2d(player_abilities,30,56,applied,upgrade)
     end
 end

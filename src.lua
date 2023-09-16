@@ -7,6 +7,14 @@ states = {
     win = {update=update_win, draw=draw_win}
 }
 
+function _init()
+    state = "title"
+    cartdata("dievirus")
+    menuitem(1, "clear wins", function()
+        dset(0,0)
+    end)
+end
+
 function _draw()
     states[state].draw()
 end

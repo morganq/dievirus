@@ -1,3 +1,48 @@
+function make_ability(base, pips, mods)
+    local a = {
+        base = base,
+        image = base[1],
+        grid_image = base[2],
+        type = base[3],
+        speed = base[4],
+        name = base[5],
+        description = base[6],
+        pips = pips,
+    }
+    a.mods = {}
+    for m in all(mods) do add(a.mods, m) end
+    a.copy = function()
+        return make_ability(a.base, a.pips, a.mods)
+    end
+    a.draw_face = function(x,y)
+        spr(a.image, x, y, 2, 2)
+        modspots = { {1,1}, {1, 8} }
+        for i = 1, #a.mods do
+            spr(mod_defs[a.mods[i]], modspots[i][1] + x, modspots[i][2] + y)
+        end
+
+        rect(x, y, x + 15, y + 15, 12)
+
+        local fives = a.pips \ 5
+        local ones = a.pips - (fives * 5)
+        local iy = 0
+        for i = 1,fives do
+            rectfill(x + 11, y + 13 - iy - 2, x + 13, y + 13 - iy, 10)
+            iy += 4
+        end
+        for i = 1, ones do
+            rectfill(x + 11, y + 13 - iy, x + 13, y + 13 - iy, 10)
+            iy += 2
+        end
+    end    
+    a.use = function(user, gx, gy, side)
+        printh("use " .. side)
+        if a.base == "none" then return end
+        _ENV["abil_" .. a.type](user, a, gx, gy, side)
+    end
+    return a
+end
+
 function abil_grid_spaces(img, x, y, dir)
     local spaces = {}
     local imgx, imgy = img % 16 * 8, img \ 16 * 8
@@ -74,4 +119,24 @@ function abil_instant(user, a, x, y, side)
     for space in all(abil_grid_spaces(a.grid_image, x, y, dir)) do
         make_damage_spot(space[1], space[2], damage, side, 0, a)
     end
+end
+
+function make_turret(x, y, a, side)
+    local spri = 33
+    if side == 'blue' then spri = 136 end
+    local t = make_creature(x, y, side, a.pips, spri, 2, 2)
+    local baseupdate = t.update
+    t.rate = 80
+    t.time = 0
+    t.update = function()
+        baseupdate()
+        t.time += 1
+        if t.time % t.rate == t.rate \ 2 then    
+            abil.use(t, x, y, t.side)
+        end
+        if t.time >= 750 then
+            t.kill()
+        end
+    end
+    return t
 end

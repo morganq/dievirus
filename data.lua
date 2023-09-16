@@ -20,7 +20,7 @@ abilities_str = split([[
 72,0,shield,0,Shield,
 ]],"\n")
 
-mods = {Growth = 208, Fast = 209, Claim = 210}
+mod_defs = {Growth = 208, Fast = 209, Claim = 210}
 
 abilities = {}
 for i = 2, #abilities_str-1 do

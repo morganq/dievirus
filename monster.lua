@@ -1,0 +1,120 @@
+
+-- supported special properties:
+-- flies (can teleport when moving)
+-- move_pattern (table of bools, move on index or not)
+-- abil_pattern (table of bools, use abil on index or not)
+
+function make_monster(spri, palette_index, x, y, abilities, health, speed, special_properties)
+    local needs_push = false
+    if grid[y][x].creature then needs_push = true end
+    local c = make_creature(x,y,"blue", health, spri, 2, 2)
+    c.palette = monster_palettes[palette_index]
+    c.abilities = abilities
+    c.speed = speed
+    c.time = 0
+    c.next_ability = rnd(c.abilities)
+    addfields(c, special_properties or {})
+    if special_properties.move_pattern then
+        c.move_pattern = {}
+        for i = 1, #special_properties.move_pattern do
+            add(c.move_pattern, special_properties.move_pattern[i] == 'x')
+        end
+        c.move_pattern_i = 1
+    end
+    if special_properties.abil_pattern then
+        c.abil_pattern = {}
+        for i = 1, #special_properties.abil_pattern do
+            add(c.abil_pattern, special_properties.abil_pattern[i] == 'x')
+        end    
+        c.abil_pattern_i = 1
+    end
+
+    local baseupdate = c.update
+    c.update = function()
+        baseupdate()
+        if c.stun_time > 0 then return end
+        c.time += 1
+        if c.time % c.speed == 0 then
+            local will_move = true
+            if c.move_pattern then
+                if not c.move_pattern[c.move_pattern_i] then will_move = false end
+                c.move_pattern_i = c.move_pattern_i % #c.move_pattern + 1
+            end
+            if will_move then -- Move pattern allows move
+                local abiltx = {Sword=0, Gun=8, Bomb=6}
+                local tx = nil
+                local ty = nil
+                if rnd() < 0.4 then tx = abiltx[c.next_ability.base] end
+                if c.favor_row and rnd() < 0.25 then ty = c.favor_row end
+                if c.flies then
+                    local rx = tx or flr(rnd(4)) + 5
+                    local ry = ty or flr(rnd(4)) + 1            
+                    if valid_move_target(rx, ry, c.side) then
+                        c.move(rx, ry)
+                    end
+                else
+                    local spots = {}
+                    for i = -1,1 do for j = -1,1 do add(spots, {i,j}) end end
+                    for i = 1,9 do
+                        local spot = rnd(spots)
+                        del(spots, spot)
+                        local dx,dy = nil,nil
+                        if tx then dx = clamp(tx - c.pos[1], -1, 1) end
+                        if ty then dy = clamp(ty - c.pos[2], -1, 1) end
+                        local rx = (dx or spot[1]) + c.pos[1]
+                        local ry = (dy or spot[2]) + c.pos[2]
+                        if valid_move_target(rx, ry, c.side) then
+                            c.move(rx, ry)
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        if c.time % c.speed == (c.speed \ 2) then
+            local will_abil = true
+            if c.abil_pattern then
+                if not c.abil_pattern[c.abil_pattern_i] then will_abil = false end
+                c.abil_pattern_i = c.abil_pattern_i % #c.abil_pattern + 1
+            end        
+            if will_abil then
+                c.next_ability.use(c, c.pos[1], c.pos[2], c.side)        
+                c.animate_time = 5
+                c.next_ability = rnd(c.abilities)
+            end
+        end
+    end
+    local basedraw = c.draw
+    c.draw = function()
+        if c.palette != nil then
+            pal(c.palette)
+            basedraw()
+            pal()
+        else
+            basedraw()
+        end
+        local pp = tp(c.pos[1], c.pos[2])
+        local hpx = pp[1] + 3
+        local hpy = pp[2] + 10
+        
+        line(hpx, hpy, hpx + 9, hpy, 6)
+        line(hpx, hpy, hpx + 9 * (c.health / c.max_health), hpy, 8)
+    end
+    if needs_push then
+        push_to_open_square(c)
+    end
+    return c
+end
+
+function parse_monster(s)
+    local parts = split(s, "|")
+    local abils_s = split(parts[5],"/")
+    local abilities = {}
+    for abil_s in all(abils_s) do add(abilities, parse_ability(abil_s)) end
+    local special_properties = {}
+    for i = 8, #parts do
+        local kv = split(parts[i],"=")
+        special_properties[kv[1]] = kv[2]
+    end
+    return make_monster(parts[1], parts[2], parts[3], parts[4], abilities, parts[6], parts[7], special_properties)
+end

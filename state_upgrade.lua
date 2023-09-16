@@ -6,17 +6,18 @@ faces_options2 = split("x_____,_x____,__x___,___x__,____x_,_____x")
 upgrade_bases = split"Wave,Gun,Shield"
 upgrade_mods = split"Growth,Fast,Claim"
 
-function make_upgrade(faces, mod)
+function make_upgrade(faces, kind)
     local up = {
         faces = {},
-        mod = mod
+        kind = kind
     }
+    printh(kind)
     for i = 1,6 do up.faces[i] = faces[i] == 'x' end
     local positions = {
         {0,3},{3,3},{6,3},{9,3},{3,0},{3,6}
     }
     up.draw = function(x,y)
-        if up.mod == "hp" then
+        if up.kind == "hp" then
             spr(122, x + 5, y)
             print("+1 hp", x-1, y + 9, 7)
         else
@@ -26,12 +27,12 @@ function make_upgrade(faces, mod)
                 if up.faces[i] then color = 11 end
                 rectfill(px,py,px+1,py+1,color)
             end        
-            if sub(up.mod,1,1) == "+" then
-                print(up.mod, x + 8, y, 10)
-            elseif count(upgrade_bases, up.mod) > 0 then
-                spr(lookup_ability(up.mod).image, x + 6, y - 5,2,2)
+            if sub(up.kind,1,1) == "+" then
+                print(up.kind, x + 8, y, 10)
+            elseif count(upgrade_bases, up.kind) > 0 then
+                spr(lookup_ability(up.kind)[1], x + 6, y - 5,2,2)
             else
-                --spr(spranimals[up.mod], x+8, y)
+                spr(mod_defs[up.kind], x+8, y)
             end        
         end
     end
@@ -42,8 +43,8 @@ function update_upgrade()
     tf += 1
     if current_upgrades == nil then
         current_upgrades = {}
-        --local options = {"+1", "hp", rnd(upgrade_mods), rnd(upgrade_bases)}
-        local options = {"+1", "hp", rnd(upgrade_bases)}
+        local options = {"+1", "hp", rnd(upgrade_mods), rnd(upgrade_bases)}
+        --local options = {"+1", "hp", rnd(upgrade_bases)}
         for i = 1, 3 do
             local ind = flr(rnd(#options) + 1)
             local v = options[ind]
@@ -64,8 +65,8 @@ function update_upgrade()
         selected_upgrade_index = selected_upgrade_index % #current_upgrades + 1
     end    
     if btnp(5) then
-        abilities = applied
-        if current_upgrades[selected_upgrade_index].animal == "hp" then
+        player_abilities = applied
+        if current_upgrades[selected_upgrade_index].kind == "hp" then
             max_hp += 1
         end
         current_upgrades = nil
@@ -88,14 +89,16 @@ function draw_upgrade()
         for i = 1, 6 do
             applied[i] = player_abilities[i].copy()
             if upgrade.faces[i] then
-                if upgrade.mod == "hp" then
+                if upgrade.kind == "hp" then
                     --
-                elseif sub(upgrade.mod,1,1) == "+" then
-                    applied[i].pips += sub(upgrade.mod,2,2)
-                elseif count(upgrade_bases, upgrade.mod) > 0 then
-                    applied[i].base = upgrade.mod
+                elseif sub(upgrade.kind,1,1) == "+" then
+                    applied[i].pips += sub(upgrade.kind,2,2)
+                elseif count(upgrade_bases, upgrade.kind) > 0 then
+                    --applied[i].base = upgrade.kind
+                    applied[i] = make_ability(lookup_ability(upgrade.kind), applied[i].pips, applied[i].mods)
                 else
-                    applied[i].mods[1] = upgrade.mod
+                    applied[i].mods[#player_abilities[i].mods + 1] = upgrade.kind
+                    --add(applied[i].mods, upgrade.kind)
                     local mod_descriptions = {
                     }
                     --local desc = mod_descriptions[upgrade.animal]

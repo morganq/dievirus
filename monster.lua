@@ -12,6 +12,8 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
     c.abilities = abilities
     c.speed = speed
     c.time = 0
+    c.abil_timer = speed \ 2
+    c.move_timer = speed
     c.next_ability = rnd(c.abilities)
     addfields(c, special_properties or {})
     if special_properties.move_pattern then
@@ -34,7 +36,8 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         baseupdate()
         if c.stun_time > 0 then return end
         c.time += 1
-        if c.time % c.speed == 0 then
+        c.move_timer -= 1
+        if c.move_timer <= 0 then
             local will_move = true
             if c.move_pattern then
                 if not c.move_pattern[c.move_pattern_i] then will_move = false end
@@ -70,8 +73,10 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
                     end
                 end
             end
+            c.move_timer = c.speed
         end
-        if c.time % c.speed == (c.speed \ 2) then
+        c.abil_timer -= 1
+        if c.abil_timer <= 0 then
             local will_abil = true
             if c.abil_pattern then
                 if not c.abil_pattern[c.abil_pattern_i] then will_abil = false end
@@ -81,7 +86,9 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
                 c.next_ability.use(c, c.pos[1], c.pos[2], c.side)        
                 c.animate_time = 5
                 c.next_ability = rnd(c.abilities)
+                
             end
+            c.abil_timer = c.speed
         end
     end
     local basedraw = c.draw
@@ -99,6 +106,13 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         
         line(hpx, hpy, hpx + 9, hpy, 6)
         line(hpx, hpy, hpx + 9 * (c.health / c.max_health), hpy, 8)
+
+        if c.abil_pattern and c.abil_timer < 6 and c.abil_pattern[c.abil_pattern_i] then
+            spr(62, hpx + 2, hpy - 16) 
+        end
+        if c.move_pattern and c.move_timer < 6 and c.move_pattern[c.move_pattern_i] then
+            spr(61, hpx + 2, hpy - 16) 
+        end        
     end
     if needs_push then
         push_to_open_square(c)
@@ -106,15 +120,15 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
     return c
 end
 
-function parse_monster(s)
+function parse_monster(s, x, y)
     local parts = split(s, "|")
-    local abils_s = split(parts[5],"/")
+    local abils_s = split(parts[3],"/")
     local abilities = {}
     for abil_s in all(abils_s) do add(abilities, parse_ability(abil_s)) end
     local special_properties = {}
-    for i = 8, #parts do
+    for i = 6, #parts do
         local kv = split(parts[i],"=")
         special_properties[kv[1]] = kv[2]
     end
-    return make_monster(parts[1], parts[2], parts[3], parts[4], abilities, parts[6], parts[7], special_properties)
+    return make_monster(parts[1], parts[2], x, y, abilities, parts[4], parts[5], special_properties)
 end

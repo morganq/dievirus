@@ -1,12 +1,30 @@
 tf = 0
+draw_time = 0
 victory = false
 victory_time = 0
 defeat = false
 defeat_time = 0
 
+time_scale = 1
+move_target = nil
 
+function draw_debug()
+    for i = 1,4 do
+        for j = 1,8 do
+            local gs = grid[i][j]
+            if gs.creature then
+                
+                local pp1 = tp(j, i)
+                circ(pp1[1], pp1[2], 2, 10)
+                local pp2 = tp(gs.creature.pos[1], gs.creature.pos[2])
+                line(pp1[1], pp1[2], pp2[1] + 8, pp2[2] + 8, 7)
+            end
+        end
+    end
+end
 
 function draw_gameplay()
+    draw_time = (draw_time + 1) % 1024
     cls()
     fillp(0b0)
     -- Sort by binning grid objs and non-grid objs by y grid space
@@ -72,33 +90,24 @@ function draw_gameplay()
         rect(34, y - 5, 94, y + 9, 2)
         print("defeat", 52, y, 8)
     end
+
+    --draw_debug()
+
+    if time_scale < 1 and not victory then
+        poke(0X5F54, 0x60)
+        for i = 0, 63 do
+            local x = sin(i / 21 + draw_time / 90)
+            sspr(0,i,128,1,x * 1.25, i)
+        end
+        poke(0X5F54, 0x00)        
+        if draw_time % 20 > 10 then
+            spr(45, 60, 40)
+        end
+    end
 end
 
-function update_gameplay()
-    if victory then
-        victory_time += 1
-        if victory_time > 90 then
-            if level == 15 then
-                dset(0, dget(0) + 1)
-                state = "win"
-            else
-                state = "upgrade"
-            end
-        end
-    end
-    if defeat then
-        defeat_time += 1
-        if defeat_time > 120 then
-            --
-        end
-    end
-
-    if pl.health <= 0 and not defeat then 
-        defeat = true
-        defeat_time = 0
-    end
+function gameplay_tick()
     local living_monsters = 0
-
     local need_update = {}
     for i = 1, 8 do
         for j = 1, 4 do
@@ -122,36 +131,11 @@ function update_gameplay()
         victory_time = 0
     end
 
-    if pl.stun_time <= 0 and not victory and not defeat then
-        local target = nil
-        if btnp(0) and pl.pos[1] > 1 then
-            target = {pl.pos[1] - 1, pl.pos[2]}
-        end
-        if btnp(1) and pl.pos[1] < 8 then
-            target = {pl.pos[1] + 1, pl.pos[2]}
-        end
-        if btnp(2) and pl.pos[2] > 1 then
-            target = {pl.pos[1], pl.pos[2] - 1}
-        end        
-        if btnp(3) and pl.pos[2] < 4 then
-            target = {pl.pos[1], pl.pos[2] + 1}
-        end        
-        if target then
-            if valid_move_target(target[1], target[2], pl.side) then
-                pl.move(target[1], target[2])
-            end
-        end
-        if btnp(5) and pl.current_ability != nil then
-            pl.die[pl.current_ability].use(pl, pl.pos[1], pl.pos[2], 'red')
-            pl.current_ability = nil
-            pl.animate_time = 5
-            throw()
-        end
-        if btnp(2,1) then
-            victory = true
-            victory_time = 90
-        end
-    end
+    if pl.health <= 0 and not defeat then 
+        defeat = true
+        defeat_time = 0
+    end    
+
     tf += 1
     if die3d.visible then
         die3d.yv += 0.1 * pl.die_speed
@@ -167,6 +151,7 @@ function update_gameplay()
                 die3d.xv = 0
                 die3d.yv = 0
                 pl.current_ability = flr(rnd(6)) + 1
+                time_scale = 0
             end
         end
         die3d.xv *= 0.975
@@ -176,12 +161,76 @@ function update_gameplay()
         drb += dvrb / 10
         drc += dvrc / 10
         gen_die(die3d, dra,drb,drc)
+    end    
+
+    make_effect_simple(rnd(128) + 30, rnd(64) - 64, 0, 46, -0.5, 2, 33)
+end
+
+function update_gameplay()
+    if victory then
+        victory_time += 1
+        if victory_time > 90 then
+            if level == 15 then
+                dset(0, dget(0) + 1)
+                state = "win"
+            else
+                state = "upgrade"
+            end
+        end
+        time_scale = 0
+    end
+    if defeat then
+        defeat_time += 1
+        if defeat_time > 120 then
+            --
+        end
+        time_scale = 1
+    end
+
+    if pl.stun_time <= 0 and not victory and not defeat then
+        move_target = nil    
+        if btnp(0) and pl.pos[1] > 1 then
+            move_target = {pl.pos[1] - 1, pl.pos[2]}
+        end
+        if btnp(1) and pl.pos[1] < 8 then
+            move_target = {pl.pos[1] + 1, pl.pos[2]}
+        end
+        if btnp(2) and pl.pos[2] > 1 then
+            move_target = {pl.pos[1], pl.pos[2] - 1}
+        end        
+        if btnp(3) and pl.pos[2] < 4 then
+            move_target = {pl.pos[1], pl.pos[2] + 1}
+        end
+        if move_target then
+            if valid_move_target(move_target[1], move_target[2], pl.side) then
+                pl.move(move_target[1], move_target[2])
+                time_scale = 1
+            end
+        end    
+            
+        
+        if btnp(5) and pl.current_ability != nil then
+            pl.die[pl.current_ability].use(pl, pl.pos[1], pl.pos[2], 'red')
+            pl.current_ability = nil
+            pl.animate_time = 5
+            throw()
+            time_scale = 1
+        end
+        if btnp(2,1) then
+            victory = true
+            victory_time = 90
+        end
+    end
+
+    if time_scale > 0 then
+        gameplay_tick()
     end
 end
 
 level = 0
 function start_level()
     level += 1
+    time_scale = 1
     nongrid = {}
     grid = { }
     for i = 1,4 do
@@ -216,29 +265,13 @@ function start_level()
     gen_die(die3d, 0, 0, 0)
     pl = make_player()
     for i = 1,6 do
-        pl.die[i] = player_abilities[i]
-        --pl.die[i] = make_ability(lookup_ability("Wave"))
+        pl.die[i] = player_abilities[i].copy()
     end
-
-    local monsters = {
-        mage1 = "164|0|6|1|Wave,1|3|40|move_pattern=xx_|abil_pattern=__x",
-        fighter1 = "41|0|6|1|Sword,1|3|25|move_pattern=xx_|abil_pattern=__x",
-        duelist1 = "168|0|6|1|Wave,1,fox/Sword,2|5|25|move_pattern=xxx_|abil_pattern=___x",
-        engineer1 = "9|0|6|1|turret,2/gun,1|8|55|flies=1|abil_pattern=_x",
-        boss1 = "132|0|6|1|bomb,2,monster/Wave,1,elephant/shield,1/Sword,3|20|15|flies=1|abil_pattern=____x_x_|move_pattern=xxxx____",
-        bomber1 = "5|0|6|1|bomb,2|10|99",
-        mage2 = "164|1|6|1|Wave,2,rabbit|8|40|move_pattern=xx_|abil_pattern=__x",
-        fighter2 = "41|1|6|1|Sword,3,fox/spear,3,fox|10|30|abil_pattern=_x",
-        boss2 = "132|1|6|1|gun,3,monster/turret,3,tiger/shield,3/Wave,3,rabbit|30|20|flies=1|abil_pattern=______x_x_x_|move_pattern=xxxx___x_x_x",
-        bomber2 = "5|2|6|1|bomb,2,fox|15|39|abil_pattern=_x_",
-        engineer2 = "9|2|6|1|turret,4,rabbit/gun,2/shield,2|10|45|flies=1|abil_pattern=_x",
-        duelist2 = "168|2|6|1|Wave,3,elephant,rabbit/Sword,4/spear,4/shield,2|14|21|move_pattern=xxx_|abil_pattern=___x",
-        mage3 = "164|2|6|1|Wave,4,rabbit/Wave,4|15|40|move_pattern=xx_|abil_pattern=__x",
-        boss3 = "168|2|6|1|Wave,3,rabbit/Wave,1,fox,leaf/shield,1,leaf/spear,1,tiger,leaf|40|21|move_pattern=xxx_|abil_pattern=___x",
-    }
     function place_monster(name, x, y, favor_row)
-        local mon = parse_monster(monsters[name])
-        mon.move(x or flr(rnd(4)) + 5,y or flr(rnd(4)) + 1)
+        x = x or flr(rnd(4)) + 5
+        y = y or flr(rnd(4)) + 1
+        local mon = parse_monster(monster_defs[name], x, y)
+        mon.move(x,y)
         mon.favor_row = favor_row
         return mon
     end  

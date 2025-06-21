@@ -1,16 +1,38 @@
-function make_effect_simple(x, y, num, spri)
+function make_effect_simple(x, y, num, spri, xv, yv, lifetime)
+    if xv == nil then xv = 0 end
+    if yv == nil then yv = -0.2 end
+    lifetime = lifetime or 30
     local ng = make_nongrid(x,y)
     ng.time = 0
     ng.draw = function()
         if spri != nil then
-            spr(spri, x, y - ng.time \ 5)
+            spr(spri, ng.pos[1], ng.pos[2])
         else
-            print("-"..num, x, y - ng.time \ 5, 7)
+            print("-"..num, x, y, 7)
         end
     end
     ng.update = function()
+        ng.pos[1] += xv
+        ng.pos[2] += yv
         ng.time += 1
-        if ng.time > 30 then del(nongrid, ng) end
+        if ng.time > lifetime then del(nongrid, ng) end
+    end
+    return ng
+end
+
+function make_effect_laser(x1, y1, x2, y2, side)
+    local ng = make_nongrid(x1,y1)
+    ng.time = 0
+    ng.draw = function()
+        local color = 8
+        if side != 'red' then color = 12 end
+        
+        rectfill(x1,y1 -1 ,x2,y2 + 1, color)
+        line(x1,y1,x2,y2,7)
+    end
+    ng.update = function()
+        ng.time += 1
+        if ng.time > 10 then del(nongrid, ng) end
     end
     return ng
 end

@@ -34,5 +34,5 @@ end
 function parse_ability(s)
     local args = split(s)
     local abil_def = lookup_ability(args[1])
-    return make_ability(abil_def, args[2], args[3])
+    return make_ability(abil_def, args[2], {args[3]})
 end

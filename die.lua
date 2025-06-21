@@ -1,3 +1,31 @@
+function draw_die2d(die,x,y, die2, upgrade)
+    local d1 = true
+    if die2 and upgrade.kind != "hp" then
+        d1 = (tf \ 14) % 2 == 0
+    end
+    if d1 then
+        die[1].draw_face(x,y + 18)
+        die[2].draw_face(x + 18,y + 18)
+        die[3].draw_face(x + 36,y + 18)
+        die[4].draw_face(x + 54,y + 18)
+        die[5].draw_face(x + 18,y)
+        die[6].draw_face(x + 18,y + 36)
+    else
+        die2[1].draw_face(x,y + 18)
+        if upgrade.faces[1] then rect(x-1,y+17,x+16,y+34,7) end
+        die2[2].draw_face(x + 18,y + 18)
+        if upgrade.faces[2] then rect(x+17,y+17,x+34,y+34,7) end
+        die2[3].draw_face(x + 36,y + 18)
+        if upgrade.faces[3] then rect(x+35,y+17,x+52,y+34,7) end
+        die2[4].draw_face(x + 54,y + 18)
+        if upgrade.faces[4] then rect(x+53,y+17,x+70,y+34,7) end
+        die2[5].draw_face(x + 18,y)
+        if upgrade.faces[5] then rect(x+17,y-1,x+34,y+16,7) end
+        die2[6].draw_face(x + 18,y + 36)        
+        if upgrade.faces[6] then rect(x+17,y+35,x+34,y+52,7) end
+    end
+end
+
 -- front faces = 1,2,3,4, top left cw
 -- back faces = 5,6,7,8, top left cw
 die3d = {}

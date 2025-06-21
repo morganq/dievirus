@@ -66,13 +66,16 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
     local basemove = go.move
     go.move = function(x,y)
         if not go.alive then return end
+
         local pp = tp(go.pos[1],go.pos[2])
         make_effect_ghost(pp[1], pp[2] + go.yo, go.spri, go.sprw, go.sprh)
         grid[go.pos[2]][go.pos[1]].creature = nil
+        printh("cleared creature from " .. go.pos[1] .. "," .. go.pos[2])
         go.lastpos = {go.pos[1], go.pos[2]}
         go.movetime = 3
         basemove(x,y)
         grid[y][x].creature = go
+        printh("added creature to " .. x .. "," .. y)
     end
 
     go.take_damage = function(damage)
@@ -111,5 +114,6 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
     end
 
     grid[go.pos[2]][go.pos[1]].creature = go
+    printh("(end of init) added creature to " .. go.pos[1] .. "," .. go.pos[2])
     return go
 end

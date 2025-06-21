@@ -11,9 +11,10 @@ function parse_class(name, wins, s)
 end
 classes = {
     parse_class("commander", 0, "Gun,1/Gun,1/Sword,2/Shield,1/Bomb,1/Bomb,1"),
-    parse_class("vanguard", 0, "Sword,1/Sword,2/Spear,2/Spear,1/Shield,2/Bomb,1"),
-    parse_class("wizard", 0, "Wave,1/Wave,2/Wave,1/Sword,1/Bomb,2/Shield,1"),
-    --parse_class("engineer", 0, "Turret,1/Turret,2/Bomb,2/Bomb,1/Gun,1/Shield,1"),
+    parse_class("fencer", 0, "Sword,1/Slap,1,Growth/Spear,1/Shield,1/Scythe,1,Claim/Scythe,2"),
+    parse_class("wizard", 0, "Wave,1/Wave,2/Wall,1/Sword,1/Bomb,2/Shield,1"),
+    --parse_class("vanguard", 0, "Sword,1/Sword,2/Spear,2/Spear,1/Shield,2/Bomb,1"),
+    parse_class("engineer", 0, "Turret,1/Turret,2/Bomb,2/Bomb,1/Gun,1/Shield,1"),
     --parse_class("druid", 3, "Gun,1/Sword,1/Shield,1/None,1/Shield,1/Bomb,1"),
 }
 selected_class_index = 1
@@ -29,6 +30,7 @@ function update_newgame()
         local abilities = {}
         for i = 1,6 do
             player_abilities[i] = classes[selected_class_index].abilities[i]
+            --player_abilities[i].mods = {"Claim"}
         end
         start_level()
     end

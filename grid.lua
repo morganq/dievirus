@@ -61,23 +61,30 @@ function make_gridobj(x,y,layer,spri,sprw,sprh)
     return go
 end
 
-function push_to_open_square(c)
-    local gx, gy = c.pos[1], c.pos[2]
+function find_open_square_for(side, gx, gy, attempt_squares)
     local spot = grid[gy][gx]
     local dir = 1
-    if c.side != 'red' then dir = -1 end
-    local attempts = {
+    if side != 'red' then dir = -1 end
+    local attempts = attempt_squares or {
         {0,0}, {-dir,-1}, {-dir,1}, {dir,-1}, {dir,1}, {-dir, 0}, {dir, 0}, {0,-1}, {0,1}
     }
     for offset in all(attempts) do
         local tx, ty = gx + offset[1], gy + offset[2]
         if tx >= 1 and tx <= 8 and ty >= 1 and ty <= 4 then
             local new_spot = grid[ty][tx]
-            if new_spot.space.side == c.side and new_spot.creature == nil and not new_spot.space.dropped then
-                c.move(tx,ty)
-                return
+            if new_spot.space.side == side and new_spot.creature == nil and not new_spot.space.dropped then
+                
+                return {tx, ty}
             end
         end
+    end
+    return nil
+end
+
+function push_to_open_square(c)
+    local pos = find_open_square_for(c.side, c.pos[1], c.pos[2])
+    if pos then
+        c.move(pos[1],pos[2])
     end
 end
 
@@ -99,16 +106,10 @@ function make_damage_spot(x,y,damage,side,warning,abil)
             if spot.creature and spot.creature.side != go.side then
                 spot.creature.take_damage(go.damage)
             end
-            go.countdown -= 1             
-            if go.hit_drop and go.hit_drop > 0 then
-                spot.space.drop(go.hit_drop)
-            end
-            if go.hit_fire and go.hit_fire > 0 then
-                spot.space.fire_time = go.hit_fire
-            end           
-            if go.hit_fire_enemy and go.side != spot.space.side and go.hit_fire_enemy > 0 then
-                spot.space.fire_time = go.hit_fire_enemy
+            if has_mod(go.abil, "Claim") then
+                spot.space.flip(go.side, 30 * 8)
             end            
+            go.countdown -= 1                   
         else
             go.decay += 1
             if go.decay > 4 then
@@ -224,32 +225,4 @@ function make_gridspace(x,y)
         go.flip_time = time
     end
     return go
-end
-
-function draw_die2d(die,x,y, die2, upgrade)
-    local d1 = true
-    if die2 and upgrade.mod != "hp" then
-        d1 = (tf \ 14) % 2 == 0
-    end
-    if d1 then
-        die[1].draw_face(x,y + 18)
-        die[2].draw_face(x + 18,y + 18)
-        die[3].draw_face(x + 36,y + 18)
-        die[4].draw_face(x + 54,y + 18)
-        die[5].draw_face(x + 18,y)
-        die[6].draw_face(x + 18,y + 36)
-    else
-        die2[1].draw_face(x,y + 18)
-        if upgrade.faces[1] then rect(x-1,y+17,x+16,y+34,7) end
-        die2[2].draw_face(x + 18,y + 18)
-        if upgrade.faces[2] then rect(x+17,y+17,x+34,y+34,7) end
-        die2[3].draw_face(x + 36,y + 18)
-        if upgrade.faces[3] then rect(x+35,y+17,x+52,y+34,7) end
-        die2[4].draw_face(x + 54,y + 18)
-        if upgrade.faces[4] then rect(x+53,y+17,x+70,y+34,7) end
-        die2[5].draw_face(x + 18,y)
-        if upgrade.faces[5] then rect(x+17,y-1,x+34,y+16,7) end
-        die2[6].draw_face(x + 18,y + 36)        
-        if upgrade.faces[6] then rect(x+17,y+35,x+34,y+52,7) end
-    end
 end

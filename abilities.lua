@@ -1,3 +1,7 @@
+function has_mod(abil, name)
+    return count(abil.mods, name) > 0
+end
+
 function make_ability(base, pips, mods)
     local a = {
         base = base,
@@ -36,9 +40,14 @@ function make_ability(base, pips, mods)
         end
     end    
     a.use = function(user, gx, gy, side)
-        printh("use " .. side)
         if a.base == "none" then return end
         _ENV["abil_" .. a.type](user, a, gx, gy, side)
+        if has_mod(a, "Growth") then
+            a.pips += 1
+        end
+        if has_mod(a, "Fast") then
+            pl.die_speed = 3
+        end
     end
     return a
 end
@@ -69,24 +78,25 @@ function abil_shield(user, a, x, y, side)
 end
 
 function abil_bullet(user, a, x, y, side)
-    printh("bullet " .. side)
-    --make_effect_laser(lstart[1] + 8, lstart[2] + 3, lend[1] + 8, lend[2] + 3, side)
+    
     local dir = (side == 'red' and 1 or -1)
     
     local damage = a.pips
+    local lstart = tp(x, y)
+    local lend = tp(x + dir * 10,y)
 
     for space in all(abil_grid_spaces(a.grid_image, x, y, dir)) do
         local creature = grid[space[2]][space[1]].creature
-        printh(space[1] .. "," .. space[2] .. " - " .. (creature != nil and 1 or 0))
         if creature and creature.side != side then
             make_damage_spot(space[1], space[2], damage, side, 0, a)
+            lend = tp(space[1], space[2])
             break
         end
     end    
+    make_effect_laser(lstart[1] + 8, lstart[2] + 3, lend[1] + 8, lend[2] + 3, side)
 end
 
 function abil_wave(user, a, x, y, side)
-    printh("wave " .. side)
     local dir = (side == 'red' and 1 or -1)
     
     local damage = a.pips
@@ -96,10 +106,11 @@ function abil_wave(user, a, x, y, side)
         make_damage_spot(space[1], space[2], damage, side, time, a)
         time += 30 \ a.speed
     end
+    local pp = tp(x,y)
+    make_effect_simple(pp[1] + 4 + dir * 8, pp[2] - 1, nil, 160, a.speed * 16 / 30 * dir, 0, 60)
 end
 
 function abil_bomb(user, a, x, y, side)
-    printh("bomb " .. side)
     local dir = (side == 'red' and 1 or -1)
     
     local damage = a.pips
@@ -111,11 +122,9 @@ function abil_bomb(user, a, x, y, side)
 end
 
 function abil_instant(user, a, x, y, side)
-    printh("instant " .. side)
     local dir = (side == 'red' and 1 or -1)
     
     local damage = a.pips
-
     for space in all(abil_grid_spaces(a.grid_image, x, y, dir)) do
         make_damage_spot(space[1], space[2], damage, side, 0, a)
     end
@@ -132,11 +141,20 @@ function make_turret(x, y, a, side)
         baseupdate()
         t.time += 1
         if t.time % t.rate == t.rate \ 2 then    
-            abil.use(t, x, y, t.side)
+            a.use(t, x, y, t.side)
         end
-        if t.time >= 750 then
+        if t.time >= (30 * 15) then
             t.kill()
         end
     end
     return t
+end
+
+function abil_turret(user, a, x, y, side)
+    local dir = (side == 'red' and 1 or -1)
+    local turret_abil = make_ability(lookup_ability("Wave"), a.pips, a.mods)
+    local p = find_open_square_for(side, x, y, {{dir,0}, {-dir,0}, {0,-1}, {0,1}, {dir,-1}, {dir,1}, {-dir,-1}, {-dir,1}})
+    if p then
+        local t = make_turret(p[1], p[2], turret_abil, side)
+    end
 end

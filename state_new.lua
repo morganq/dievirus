@@ -10,11 +10,12 @@ function parse_class(name, wins, s)
     return class
 end
 classes = {
-    parse_class("commander", 0, "Gun,1/Gun,1/Sword,2/Shield,1/Bomb,1/Bomb,1"),
+    --parse_class("test", 0, "Wave,1/Wave,1/Wave,1/Wave,1/Wave,1/Wave,1"),
+    parse_class("commander", 0, "Sling,1/Sling,1/Sword,2/Shield,1/Bomb,1/Bomb,1"),
     parse_class("fencer", 0, "Sword,1/Slap,1,Growth/Spear,1/Shield,1/Scythe,1,Claim/Scythe,2"),
     parse_class("wizard", 0, "Wave,1/Wave,2/Wall,1/Sword,1/Bomb,2/Shield,1"),
     --parse_class("vanguard", 0, "Sword,1/Sword,2/Spear,2/Spear,1/Shield,2/Bomb,1"),
-    parse_class("engineer", 0, "Turret,1/Turret,2/Bomb,2/Bomb,1/Gun,1/Shield,1"),
+    parse_class("engineer", 0, "Turret,1/Turret,2/Bomb,2/Bomb,1/Sling,1/Shield,1"),
     --parse_class("druid", 3, "Gun,1/Sword,1/Shield,1/None,1/Shield,1/Bomb,1"),
 }
 selected_class_index = 1
@@ -25,7 +26,7 @@ function update_newgame()
     if btnp(1) then
         selected_class_index = selected_class_index % #classes + 1
     end    
-    if btnp(5) and dget(0) >= classes[selected_class_index].wins_needed then
+    if true or btnp(5) and dget(0) >= classes[selected_class_index].wins_needed then
         state = "gameplay"
         local abilities = {}
         for i = 1,6 do
@@ -37,20 +38,20 @@ function update_newgame()
 end
 
 function draw_newgame()
-    cls()
-    print("⬅️", 4, 20, 7)    
-    print("➡️", 120, 20, 7)
+    cls(15)
+    print("⬅️", 4, 20, 0)
+    print("➡️", 120, 20, 0)
     local cl = classes[selected_class_index]
-    local color = 7
+    local color = 1
     if dget(0) < cl.wins_needed then
-        color = 6
-        print("unlocked after " .. cl.wins_needed .. " wins", 22, 28, 6)
+        color = 8
+        print("unlocked after " .. cl.wins_needed .. " wins", 22, 28, color)
     else
         local s = "❎ to choose "..cl.name
-        print(s, 64 - #s * 2, 96, 7)
+        print(s, 64 - #s * 2, 96, 0)
     end
     print(cl.name, 64 - #cl.name * 2, 20, color)
-    draw_die2d(cl.abilities, 30, 36)
+    draw_die2d(cl.abilities, 37, 36)
     
     
 end

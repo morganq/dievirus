@@ -16,7 +16,9 @@ function _init()
 end
 
 function _draw()
+    palreset()
     states[state].draw()
+    pal(split"129,2,141,4,134,6,7,136,9,10,142,139,13,14,15,0",1)
 end
 function _update()
     states[state].update()

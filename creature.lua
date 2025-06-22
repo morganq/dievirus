@@ -7,7 +7,7 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
         animate_time = 0,
         yo = -7,
         side = side,
-        dir = side == 'red' and 1 or -1,
+        dir = side,
         damage_time = 0,
         health = health,
         max_health = health,
@@ -16,6 +16,7 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
         stun_time = 0,
         stun_co = 1,
         alive=true,
+        overextended_timer=0,
         index=creature_index
     })
     creature_index += 1
@@ -31,12 +32,11 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
             hit = -go.damage_time * go.dir
         end
         if go.animate_time > 0 then
-            spri = go.spri + go.sprw
+            --spri = go.spri + go.sprw
         end
         
         spr(spri, pp[1] - 1 + hit, pp[2] + go.yo, go.sprw, go.sprh)
         fillp()
-        pal()
         if go.stun_time > 0 then
             spr(144 + (tf \ 10) % 2, pp[1] + 3, pp[2] - 6)
             print(go.stun_time, 100, go.index * 5 + 64, 7 + go.index)
@@ -46,8 +46,18 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
     local baseupdate = go.update
     go.update = function()
         local space = grid[go.pos[2]][go.pos[1]].space
-        if space.dropped or space.side != go.side then
+        if space.dropped then
             push_to_open_square(go)
+        end
+        if space.side != go.side then
+            go.overextended_timer += 1
+            if go.overextended_timer >= 30 then
+                go.overextended_timer = 0
+                push_to_open_square(go)
+                --go.stun_time = 30
+            end
+        else
+            go.overextended_timer = 0
         end
         if space.fire_time > 0 and space.fire_time % 20 == 0 then
             go.take_damage(1)
@@ -70,12 +80,10 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
         local pp = tp(go.pos[1],go.pos[2])
         make_effect_ghost(pp[1], pp[2] + go.yo, go.spri, go.sprw, go.sprh)
         grid[go.pos[2]][go.pos[1]].creature = nil
-        printh("cleared creature from " .. go.pos[1] .. "," .. go.pos[2])
         go.lastpos = {go.pos[1], go.pos[2]}
         go.movetime = 3
         basemove(x,y)
         grid[y][x].creature = go
-        printh("added creature to " .. x .. "," .. y)
     end
 
     go.take_damage = function(damage)
@@ -104,7 +112,7 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
             for y = 0, go.sprh * 8 - 1 do 
                 local c = sget(sx + x, sy + y)
                 local pp = tp(go.pos[1], go.pos[2])
-                if c > 0 then
+                if c != 14 then
                     make_creature_particle(pp[1] + x, pp[2] + y + go.yo, c, xv / 2, pp[2] + 6 + rnd(4))
                 end
             end

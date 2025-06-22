@@ -3,7 +3,10 @@ selected_upgrade_index = 1
 applied = {}
 faces_options1 = split("xx____,xx____,xx____,____xx,____xx,__x___,__x___,___x__,___x__")
 faces_options2 = split("x_____,_x____,__x___,___x__,____x_,_____x")
-upgrade_bases = split"Wave,Gun,Shield"
+upgrade_bases = {}--split"Wave,Sling,Shield,Spear,BounceWave,Scythe,Slap,Poke,Split,Sword,Wall"
+for a in all(abilities) do
+    add(upgrade_bases,a.name)
+end
 upgrade_mods = split"Growth,Fast,Claim"
 
 function make_upgrade(faces, kind)
@@ -19,18 +22,18 @@ function make_upgrade(faces, kind)
     up.draw = function(x,y)
         if up.kind == "hp" then
             spr(122, x + 5, y)
-            print("+1 hp", x-1, y + 9, 7)
+            print("+1 hp", x-1, y + 9, 0)
         else
             for i = 1, 6 do
                 local px, py = positions[i][1] + x, positions[i][2] + y + 6
                 local color = 5
-                if up.faces[i] then color = 11 end
+                if up.faces[i] then color = 12 end
                 rectfill(px,py,px+1,py+1,color)
             end        
             if sub(up.kind,1,1) == "+" then
-                print(up.kind, x + 8, y, 10)
+                print(up.kind, x + 12, y-1, 12)
             elseif count(upgrade_bases, up.kind) > 0 then
-                spr(lookup_ability(up.kind)[1], x + 6, y - 5,2,2)
+                spr(lookup_ability(up.kind)[1], x + 13, y - 3)
             else
                 spr(mod_defs[up.kind], x+8, y)
             end        
@@ -77,12 +80,12 @@ function update_upgrade()
 end
 
 function draw_upgrade()
-    cls()
+    cls(15)
     local ls = "level "..(level + 1).."/15"
-    print(ls, 64 - #ls * 2, 2, 6)
-    print("⬅️", 4, 30, 7)    
-    print("➡️", 120, 30, 7)    
-    print("- choose upgrade -", 28, 12, 7)
+    print(ls, 64 - #ls * 2, 2, 2)
+    print("⬅️", 4, 30, 1)
+    print("➡️", 120, 30, 1)    
+    print("- choose upgrade -", 28, 12, 1)
     if current_upgrades != nil then
         local upgrade = current_upgrades[selected_upgrade_index]
         applied = {}
@@ -110,10 +113,10 @@ function draw_upgrade()
             current_upgrades[i].draw(i * 30 - 4, 27)
             local color = 5
             if i == selected_upgrade_index then
-                color = 7
+                color = 0
             end
             rect(i * 30 - 10, 22, i * 30 - 6 + 24, 45, color)
         end
-        draw_die2d(player_abilities,30,56,applied,upgrade)
+        draw_die2d(player_abilities,37,56,applied,upgrade)
     end
 end

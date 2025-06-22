@@ -13,7 +13,17 @@ end
 function valid_move_target(x,y,side)
     if x < 1 or x > 8 or y < 1 or y > 4 then return false end
     local spot = grid[y][x]
-    return spot.space.side == side and not spot.space.dropped and not spot.creature
+    if spot.space.dropped or spot.creature then
+        return false
+    end
+    if spot.space.side != side then
+        if x - side < 1 or x - side > 8 then return false end
+        local spot2 = grid[y][x - side]
+        if spot2.space.side != side then
+            return false
+        end
+    end
+    return true
 end
 
 function add_go_to_grid(go)
@@ -64,9 +74,9 @@ end
 function find_open_square_for(side, gx, gy, attempt_squares)
     local spot = grid[gy][gx]
     local dir = 1
-    if side != 'red' then dir = -1 end
+    if side != 1 then dir = -1 end
     local attempts = attempt_squares or {
-        {0,0}, {-dir,-1}, {-dir,1}, {dir,-1}, {dir,1}, {-dir, 0}, {dir, 0}, {0,-1}, {0,1}
+        {0,0}, {-dir, 0}, {-dir,-1}, {-dir,1}, {0,-1}, {0,1}, {dir, 0}, {dir,-1}, {dir,1}, 
     }
     for offset in all(attempts) do
         local tx, ty = gx + offset[1], gy + offset[2]
@@ -119,8 +129,8 @@ function make_damage_spot(x,y,damage,side,warning,abil)
     end
     go.draw = function()
         local pp = tp(go.pos[1], go.pos[2])
-        local color = 7
-        if go.side != 'red' then color = 10 end
+        local color = 10
+        if go.side != 1 then color = 10 end
         if go.countdown > 0 then
             local t = 1 - (go.countdown / go.countdown_max)
             local hw = 6 * t + 2
@@ -147,11 +157,11 @@ function make_damage_spot(x,y,damage,side,warning,abil)
 end
 
 function make_gridspace(x,y)
-    local spri = 1
-    local side = 'red'
+    local spri = 64
+    local side = 1
     if x > 4 then
-        spri = 3
-        side = 'blue'
+        spri = 64
+        side = -1
     end
     local go = make_gridobj(x,y,0,spri,2,2)
     go.side = side
@@ -172,16 +182,16 @@ function make_gridspace(x,y)
         end
         if go.flip_time > 0 then
             local dir = 1
-            if go.main_side != 'red' then dir = -1 end
+            if go.main_side != 1 then dir = -1 end
             local can_revert = false
-            if go.pos[1] == 8 or go.side == 'red' and grid[go.pos[2]][go.pos[1] + 1].space.side == 'blue' then
+            if go.pos[1] == 8 or go.side == 1 and grid[go.pos[2]][go.pos[1] + 1].space.side == -1 then
                 can_revert = true
             end
-            if go.pos[1] == 1 or go.side == 'blue' and grid[go.pos[2]][go.pos[1] - 1].space.side == 'red' then
+            if go.pos[1] == 1 or go.side == -1 and grid[go.pos[2]][go.pos[1] - 1].space.side == 1 then
                 can_revert = true
             end
             if can_revert then            
-                go.flip_time -= 1
+                --go.flip_time -= 1
                 if go.flip_time <= 0 then
                     go.side = go.main_side
                 end
@@ -194,13 +204,16 @@ function make_gridspace(x,y)
     local basedraw = go.draw
     go.draw = function()
         local pp = tp(go.pos[1], go.pos[2])
-        local spri = 1
-        if go.side == 'blue' then spri = 3 end
+        local spri = 64
+        if go.side == -1 then
+            pal(split"0,2,3,4,5,3,13,8,9,10,11,12,1,14,15,0")
+        else
+            palreset()
+        end
         spr(spri, pp[1], pp[2] + (go.drop_time / 2.5) ^ 2, go.sprw, go.sprh)
         if go.dropped and go.drop_time > go.drop_finish_time - 4 then
             pal({7,7,7,7,7,7,7,7,7,7,7,7,7,7,7})
             spr(go.spri, pp[1], pp[2], go.sprw, go.sprh)
-            pal()
         end
         if go.fire_time > 0 and go.fire_time % 5 == 0 then
             make_effect_fire(pp[1] + rnd() * 12, pp[2] + rnd() * 8 - 2)

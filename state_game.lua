@@ -21,6 +21,7 @@ function draw_gameplay()
     -- Background
     sfn([[
 rectfill,0,0,128,32,7
+spr,222,64,9
 spr,199,-8,16,2,2
 spr,199,4,16,2,2
 spr,199,16,16,2,2
@@ -40,7 +41,29 @@ spr,220,84,13
 spr,220,94,13
 spr,221,107,13
 spr,221,116,13
+spr,228,2,20,2,2
+spr,211,37,24,2,1
+spr,213,76,24,2,1
+spr,214,108,24,1,1
+spr,222,72,9
+spr,223,113,9
+spr,222,121,9
+rectfill,61,12,62,13,12
+fillp,0b1100110011001100.1
+line,110,10,124,10,6
+line,70,10,82,10,6
+fillp,0b1101110111011101.1
+line,34,9,82,9,6
+fillp,0
 ]])
+    local game_seconds = (game_frames_frac / 30) / 0x0.0001 
+    if game_seconds < 20 then
+        center_print(20 - game_seconds, 64, 1, 0)
+    else
+        spr(231, 60, 1)
+        night_palette_imm = true
+        is_night = true
+    end
     -- Sort by binning grid objs and non-grid objs by y grid space
     -- then draw them top to bottom. ez.
     local bins = {{},{},{},{}}
@@ -62,6 +85,13 @@ spr,221,116,13
     end
     palreset()
 
+    if temp_runner then
+        for fh in all(temp_runner.fake_hit) do
+            local pxy = tp(fh[1], fh[2])
+            spr(137 + (draw_time \ 2) % 4, pxy[1] + 4, pxy[2] + 2)
+        end
+    end
+
     sfn([[
 line,5,86,29,86,15
 line,49,86,79,86,15
@@ -78,14 +108,27 @@ sspr,32,100,24,4,25,91
 ]])
 
     if die3d.visible then
-        draw_die3d(die3d)
+        rectfill(die3d.x, 105, die3d.x + 14, 107, 5)
+        rectfill(die3d.x-1, 106, die3d.x + 15, 106, 5)
+        local f, x, y = die_frames[(die_time \ die_spin) % 8 + 1], die3d.x - 8, die3d.y - 8
+        pal(split"0,0,0,0,0,0,0")
+        spr(f, x + 1, y, 2, 2)
+        spr(f, x - 1, y, 2, 2)
+        spr(f, x, y + 1, 2, 2)
+        spr(f, x, y - 1, 2, 2)
+        palreset()
+        spr(f, x, y, 2, 2)
+        
+        die_time += 1
     elseif pl.current_ability != nil then
         local abil = pl.die[pl.current_ability]
-        spr(37, die3d.x - 7, die3d.y - 9, 3, 2)
-        abil.draw_face(die3d.x - 5, die3d.y - 5)
+        spr(76, die3d.x - 7, die3d.y - 7, 3, 2)
+        abil.draw_face(die3d.x - 5, die3d.y - 3)
 
-        --local line1 = abil.description
-        --print(line1, 64 - #line1 * 2, 114, 11)
+        local line1 = abil.name
+        local lx = print(line1,0,-100)
+        print(line1, 64 - lx / 2 + 5, 114, 1)
+        spr(130, 64 - lx / 2 - 5, 114)
         if abil.animal1 != nil then
             --local line2 = descriptions[abil.base .. "/" .. abil.animal1]
             --print(line2, 64 - #line2 * 2, 122, 10)
@@ -139,7 +182,7 @@ sspr,32,100,24,4,25,91
     --draw_debug()
 
     -- Screen wobble on pause
-    if time_scale < 1 and not victory then
+    if (time_scale < 1 or pause_extend > 0) and not victory then
         
         poke(0X5F54, 0x60)
         for i = 11, 90 do
@@ -155,6 +198,8 @@ sspr,32,100,24,4,25,91
 end
 
 function gameplay_tick()
+    game_frames_frac += 0x0.0001
+    
     local living_monsters = 0
     local need_update = {}
     for i = 1, 8 do
@@ -174,9 +219,11 @@ function gameplay_tick()
         ng.update()
     end
 
-    for runner in all(attack_runners) do
-        runner:update()
-        if not runner.alive then del(attack_runners, runner) end
+    if not victory and not defeat then
+        for runner in all(attack_runners) do
+            runner:update()
+            if not runner.alive then del(attack_runners, runner) end
+        end
     end
 
     if living_monsters == 0 and not victory then
@@ -190,38 +237,23 @@ function gameplay_tick()
     end    
 
     tf += 1
-    if die3d.visible then
-        die3d.yv += 0.1 * pl.die_speed
-        if die3d.y > 100 then
-            die3d.yv = die3d.yv * -0.5
-            die3d.y = 100
-            dvra = (0.5 - rnd()) * die3d.yv * die3d.xv
-            dvrb = (0.5 - rnd()) * die3d.yv * die3d.xv
-            dvrc = (0.5 - rnd()) * die3d.yv * die3d.xv
-            if die3d.xv < 0.4 + pl.die_speed * 0.1 then
-                pl.die_speed = 1
-                
-                die3d.xv = 0
-                die3d.yv = 0
-                if pl.stun_time <= 0 then
-                    die3d.visible = false
-                    pl.current_ability = flr(rnd(6)) + 1
-                    time_scale = 0
-                end
-            end
-        end
-        die3d.xv *= 0.975
-        die3d.x += die3d.xv
-        die3d.y += die3d.yv
-        dra += dvra / 10
-        drb += dvrb / 10
-        drc += dvrc / 10
-        gen_die(die3d, dra,drb,drc)
-    end    
+
 
     --make_effect_simple(rnd(128) + 30, rnd(64) - 64, 0, 46, -0.5, 2, 33)
     if rnd() < 0.5 then
         make_creature_particle(128, rnd(60) + 20, 15, -3, rnd(52) + 28)
+    end
+
+    local side_total = 0
+    for y = 1, 4 do
+        for x = 1, 8 do
+            side_total += grid[y][x].space.side
+        end
+    end
+    if side_total == 32 then
+        victory = true
+    elseif side_total == -32 then
+        defeat = true
     end
 end
 
@@ -233,6 +265,9 @@ function update_gameplay()
                 dset(0, dget(0) + 1)
                 state = "win"
             else
+                for i = 1, 6 do
+                    player_abilities[i] = player_abilities[i].copy()
+                end
                 state = "upgrade"
             end
         end
@@ -246,6 +281,7 @@ function update_gameplay()
         time_scale = 1
     end
 
+    temp_runner = nil
     if pl.stun_time <= 0 and not victory and not defeat then
         move_target = nil    
         if btnp(0) and pl.pos[1] > 1 then
@@ -271,10 +307,16 @@ function update_gameplay()
                 time_scale = 1
             end
         end    
-            
         
+        local abil = pl.die[pl.current_ability]
+        if abil != nil then
+            if abil.type == "attack" then
+                temp_runner = make_attack_runner(abil.def, 1, abil, pl.pos[1], pl.pos[2], 1, true)
+            end
+        end
         if btnp(5) and pl.current_ability != nil then
-            pl.die[pl.current_ability].use(pl, pl.pos[1], pl.pos[2], 1)
+            abil.use(pl, pl.pos[1], pl.pos[2], 1)
+            pl.die[pl.current_ability] = abil.copy()
             pl.current_ability = nil
             pl.animate_time = 5
             throw()
@@ -287,12 +329,57 @@ function update_gameplay()
     end
 
     if time_scale > 0 then
-        gameplay_tick()
+        if pause_extend > 0 then
+            pause_extend -= 1
+        else
+            gameplay_tick()
+        end
+        
     end
+
+    if die3d.visible then
+        die3d.yv += 0.3 * pl.die_speed
+        if die3d.y > 100 then
+            if die3d.yv > 0.5 then
+                for i = 1, die3d.yv * 10 do 
+                    local p = make_creature_particle(die3d.x + rnd(10) - 5, 106, 5, rnd(1)-0.5, 106 + rnd(3))
+                    p.yv = rnd(2) * -0.5
+                end            
+            end
+            die3d.yv = die3d.yv * -0.35
+            die3d.y = 100
+            die3d.xv *= 0.5
+            die_spin *= 2
+        end
+        if die_time > 45 then
+            pl.die_speed = 1
+            
+            die3d.xv = 0
+            die3d.yv = 0
+            if pl.stun_time <= 0 then
+                die3d.visible = false
+                
+                pl.current_ability = flr(rnd(6)) + 1
+
+                if is_night and pl.current_ability == 4 then
+                    pl.current_ability = -1
+                end
+                time_scale = 0
+                if has_mod(pl.die[pl.current_ability], "pause") then
+                    pause_extend += 30
+                end                    
+            end
+        end        
+        die3d.xv *= 0.975
+        die3d.x += die3d.xv
+        die3d.y += die3d.yv
+    end    
 end
 
 level = 0
 function start_level()
+    
+    is_night = false
     tf = 0
     draw_time = 0
     victory = false
@@ -307,9 +394,11 @@ function start_level()
     attack_runners = {}
     nongrid = {}
     grid = { }
+    game_frames_frac = 0
+    pause_extend = 0
 
-    victory = true
-    victory_time = 90
+    --victory = true
+    --victory_time = 90
     for i = 1,4 do
         grid[i] = {}
         for j = 1, 8 do
@@ -337,11 +426,11 @@ function start_level()
         yv = 0,
         visible = false,
     }
-    gen_die(die3d, 0, 0, 0)
     pl = make_player()
     for i = 1,6 do
         pl.die[i] = player_abilities[i].copy()
     end
+    pl.die[-1] = make_ability(lookup_ability("curse"), 1, {}).copy()
     function place_monster(name, x, y, favor_row)
         x = x or flr(rnd(4)) + 5
         y = y or flr(rnd(4)) + 1
@@ -411,10 +500,20 @@ end
 dra, drb, drc, dvra, dvrb, dvrc = 0,0,0,0,0,0
 
 function throw()
+    local all_frames = {160,162,164,166,168,170,172,174}
+    die_frames = {}
+    for i = 1, 8 do
+        local j = rnd(#all_frames)\1 + 1
+        add(die_frames, all_frames[j])
+        deli(all_frames,j)
+    end
+    --die_frames = {34,36,42,44,40,32,38,46}
+    die_time = 0
+    die_spin = 2
     die3d.visible = true
     die3d.x = 20
-    die3d.y = 84
-    die3d.xv = 1.5
+    die3d.y = 64
+    die3d.xv = 2.5
     die3d.yv = 0
     dvra = (0.5 - rnd())
     dvrb = (0.5 - rnd())

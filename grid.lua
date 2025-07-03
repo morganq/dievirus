@@ -108,16 +108,26 @@ function make_damage_spot(x,y,damage,side,warning,abil)
         decay = 0,
         abil = abil
     })
+    printh(go.side)
     go.update = function()
         local spot = grid[go.pos[2]][go.pos[1]]
         if go.countdown > 0 then
             go.countdown -= 1
         elseif go.countdown == 0 then
             if spot.creature and spot.creature.side != go.side then
-                spot.creature.take_damage(go.damage)
+                if has_mod(go.abil, "stun") then
+                    spot.creature.stun_time = 90
+                end                
+                if has_mod(go.abil, "poison") then
+                    spot.creature.poison_timer = 120 * go.damage
+                else
+                    spot.creature.take_damage(go.damage)
+                end
             end
-            if has_mod(go.abil, "Claim") then
+            local claims = count(abil.mods, "claim") * 2
+            if spot.space.side != go.side and abil.tiles_claimed < claims then
                 spot.space.flip(go.side, 30 * 8)
+                abil.tiles_claimed += 1
             end            
             go.countdown -= 1                   
         else
@@ -129,8 +139,8 @@ function make_damage_spot(x,y,damage,side,warning,abil)
     end
     go.draw = function()
         local pp = tp(go.pos[1], go.pos[2])
-        local color = 10
-        if go.side != 1 then color = 10 end
+        local color = 9
+        if go.side != 1 then color = 8 end
         if go.countdown > 0 then
             local t = 1 - (go.countdown / go.countdown_max)
             local hw = 6 * t + 2
@@ -157,10 +167,8 @@ function make_damage_spot(x,y,damage,side,warning,abil)
 end
 
 function make_gridspace(x,y)
-    local spri = 64
     local side = 1
     if x > 4 then
-        spri = 64
         side = -1
     end
     local go = make_gridobj(x,y,0,spri,2,2)

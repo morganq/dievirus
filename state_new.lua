@@ -1,6 +1,7 @@
-function parse_class(name, wins, s)
+function parse_class(name,spri, wins, s)
     local class = {
         name=name,
+        spri=spri,
         wins_needed=wins,
         abilities = {},
     }
@@ -10,13 +11,14 @@ function parse_class(name, wins, s)
     return class
 end
 classes = {
-    --parse_class("test", 0, "Wave,1/Wave,1/Wave,1/Wave,1/Wave,1/Wave,1"),
-    parse_class("commander", 0, "Sling,1/Sling,1/Sword,2/Shield,1/Bomb,1/Bomb,1"),
-    parse_class("fencer", 0, "Sword,1/Slap,1,Growth/Spear,1/Shield,1/Scythe,1,Claim/Scythe,2"),
-    parse_class("wizard", 0, "Wave,1/Wave,2/Wall,1/Sword,1/Bomb,2/Shield,1"),
-    --parse_class("vanguard", 0, "Sword,1/Sword,2/Spear,2/Spear,1/Shield,2/Bomb,1"),
-    parse_class("engineer", 0, "Turret,1/Turret,2/Bomb,2/Bomb,1/Sling,1/Shield,1"),
-    --parse_class("druid", 3, "Gun,1/Sword,1/Shield,1/None,1/Shield,1/Bomb,1"),
+    --parse_class("test", 0, 0, "pinch,2/mortar,2/pinch,2/bouncer,1,stun/sling,1,stun/sword,1,stun"),
+    --parse_class("test", 0, "wall,1/wall,1/wall,1/wall,1/wall,1/wall,1"),
+    parse_class("commander",0, 0, "sling,1,stun/sling,1/sword,2/shield,1/spear,1/bomb,1"),
+    parse_class("fencer",36, 0, "sword,1/shield,1/spear,1/slap,1/scythe,1,claim/scythe,2"),
+    parse_class("wizard",34, 0, "wave,1/wave,1/wall,1,stun/sword,1/bomb,2/shield,1"),
+    --parse_class("vanguard", 0, "sword,1/sword,2/spear,2/spear,1/shield,2/bomb,1"),
+    parse_class("engineer",32, 0, "turret,1/turret,1/bomb,1/bomb,1/sling,1/shield,1"),
+    --parse_class("druid", 3, "gun,1/sword,1/shield,1/none,1/shield,1/bomb,1"),
 }
 selected_class_index = 1
 function update_newgame()
@@ -26,13 +28,15 @@ function update_newgame()
     if btnp(1) then
         selected_class_index = selected_class_index % #classes + 1
     end    
-    if true or btnp(5) and dget(0) >= classes[selected_class_index].wins_needed then
+    if btnp(5) and dget(0) >= classes[selected_class_index].wins_needed then
         state = "gameplay"
         local abilities = {}
         for i = 1,6 do
             player_abilities[i] = classes[selected_class_index].abilities[i]
-            --player_abilities[i].mods = {"Claim"}
+            --player_abilities[i].mods = {"claim"}
         end
+        --level = 4
+        player_sprite = classes[selected_class_index].spri
         start_level()
     end
 end
@@ -48,7 +52,8 @@ function draw_newgame()
         print("unlocked after " .. cl.wins_needed .. " wins", 22, 28, color)
     else
         local s = "❎ to choose "..cl.name
-        print(s, 64 - #s * 2, 96, 0)
+        print(s, 64 - #s * 2, 116, 0)
+        spr(cl.spri, 56, 86, 2, 2)
     end
     print(cl.name, 64 - #cl.name * 2, 20, color)
     draw_die2d(cl.abilities, 37, 36)

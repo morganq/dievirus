@@ -17,7 +17,8 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
         stun_co = 1,
         alive=true,
         overextended_timer=0,
-        index=creature_index
+        index=creature_index,
+        poison_timer = 0,
     })
     creature_index += 1
     go.draw = function()
@@ -35,11 +36,15 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
             --spri = go.spri + go.sprw
         end
         
-        spr(spri, pp[1] - 1 + hit, pp[2] + go.yo, go.sprw, go.sprh)
+        if go.poison_timer > 0 then
+            pal(split"1,2,3,4,5,6,7,8,9,10,12,12,13,14,15,0")
+        end
+        spr(spri, pp[1] + hit, pp[2] + go.yo, go.sprw, go.sprh, go.side == -1)
         fillp()
+        palreset()
         if go.stun_time > 0 then
-            spr(144 + (tf \ 10) % 2, pp[1] + 3, pp[2] - 6)
-            print(go.stun_time, 100, go.index * 5 + 64, 7 + go.index)
+            spr(143 + (tf \ 10) % 2, pp[1] + 3, pp[2] - 6)
+            --print(go.stun_time, 100, go.index * 5 + 64, 7 + go.index)
         end
     end
 
@@ -62,6 +67,7 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
         if space.fire_time > 0 and space.fire_time % 20 == 0 then
             go.take_damage(1)
         end
+        go.poison_timer = max(go.poison_timer - 1, 0)
         go.damage_time -= 1
         go.movetime -= 1
         go.animate_time -= 1
@@ -76,14 +82,18 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
     local basemove = go.move
     go.move = function(x,y)
         if not go.alive then return end
-
-        local pp = tp(go.pos[1],go.pos[2])
+        local pp = tp(go.pos[1],go.pos[2])     
         make_effect_ghost(pp[1], pp[2] + go.yo, go.spri, go.sprw, go.sprh)
         grid[go.pos[2]][go.pos[1]].creature = nil
         go.lastpos = {go.pos[1], go.pos[2]}
         go.movetime = 3
         basemove(x,y)
         grid[y][x].creature = go
+        if go.poison_timer > 0 then
+            go.take_damage(1)
+            local npp = tp(x,y)
+            --make_effect_simple(npp[1] + 8, npp[2] - 9, 0, 126)
+        end        
     end
 
     go.take_damage = function(damage)
@@ -122,6 +132,6 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
     end
 
     grid[go.pos[2]][go.pos[1]].creature = go
-    printh("(end of init) added creature to " .. go.pos[1] .. "," .. go.pos[2])
+    
     return go
 end

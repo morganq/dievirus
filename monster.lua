@@ -46,7 +46,7 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
                 c.move_pattern_i = c.move_pattern_i % #c.move_pattern + 1
             end
             if will_move then -- Move pattern allows move
-                local abiltx = {Sword=0, Sling=8, Bomb=6}
+                local abiltx = {sword=0, sling=8, bomb=6}
                 local tx = nil
                 local ty = nil
                 if rnd() < 0.4 then tx = abiltx[c.next_ability.base] end
@@ -95,8 +95,9 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
     end
     local basedraw = c.draw
     c.draw = function()
+        palreset()
         if c.palette != nil then
-            pal(c.palette)
+            --pal(c.palette)
             basedraw()
         else
             basedraw()
@@ -109,11 +110,11 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         line(hpx, hpy, hpx + 9 * (c.health / c.max_health), hpy, 15)
 
         palreset()
-        if c.abil_pattern and c.abil_timer < 6 and c.abil_pattern[c.abil_pattern_i] then
-            spr(134, hpx + 2, hpy - 16) 
+        if c.abil_pattern and c.abil_timer < 9 and c.abil_pattern[c.abil_pattern_i] then
+            spr(134, hpx + 2, hpy - 21) 
         end
-        if c.move_pattern and c.move_timer < 6 and c.move_pattern[c.move_pattern_i] then
-            spr(135, hpx + 2, hpy - 16) 
+        if c.move_pattern and c.move_timer < 9 and c.move_pattern[c.move_pattern_i] then
+            spr(135, hpx + 2, hpy - 21) 
         end        
     end
     if needs_push then

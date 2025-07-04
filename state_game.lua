@@ -397,8 +397,8 @@ function start_level()
     game_frames_frac = 0
     pause_extend = 0
 
-    --victory = true
-    --victory_time = 90
+    victory = true
+    victory_time = 90
     for i = 1,4 do
         grid[i] = {}
         for j = 1, 8 do
@@ -430,7 +430,7 @@ function start_level()
     for i = 1,6 do
         pl.die[i] = player_abilities[i].copy()
     end
-    pl.die[-1] = make_ability(lookup_ability("curse"), 1, {}).copy()
+    pl.die[-1] = make_ability(all_abilities["curse"], 1, {}).copy()
     function place_monster(name, x, y, favor_row)
         x = x or flr(rnd(4)) + 5
         y = y or flr(rnd(4)) + 1

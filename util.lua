@@ -1,10 +1,3 @@
-function count_animal(a, name)
-    local num = 0
-    if a.animal1 == name then num += 1 end
-    if a.animal2 == name then num += 1 end
-    return num
-end
-
 function tp(gx,gy)
     return {gx * 16 - 16, gy * 13 + 19}
 end
@@ -19,21 +12,6 @@ function addfields(tbl,add)
     end
 end
 
-function lookup_ability(name)
-    for def in all(abilities) do
-        if def[4] == name then
-            return def
-        end
-    end
-    printh("FAIL TO FIND " .. name)
-end
-
-function parse_ability(s)
-    local args = split(s)
-    local abil_def = lookup_ability(args[1])
-    return make_ability(abil_def, args[2], {args[3]})
-end
-
 function sfn(s)
     for line in all(split(s, "\n")) do
         if #line > 3 then
@@ -44,7 +22,7 @@ function sfn(s)
         end
     end
 end
-
+--[[
 function populate_table(o, s)
 	for kv in all(split(s)) do
 		local k,v = unpack(split(kv, "="))
@@ -71,9 +49,21 @@ function string_multitable(s)
     end
     return mt
 end
+]]
+
+function string_multilookup(s)
+    local mt = {}
+    for line in all(split(s,"\n")) do
+        if #line > 3 then
+            local vals = split(line, ",")
+            mt[vals[1]] = vals
+        end
+    end
+    return mt
+end
 
 function center_print(s, x, y, color, bgcolor, outlinecolor, rounded)
-	for s in all(split(s,"\n")) do
+	for s in all(split(s,"%")) do
 		local w = print(s,0,-600) 
 		local xo = (w - 0.5) \ 2
 		if bgcolor then

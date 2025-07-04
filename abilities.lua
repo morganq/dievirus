@@ -1,3 +1,9 @@
+function parse_ability(s)
+    local args = split(s,";")
+    local abil_def = all_abilities[args[1]]
+    return make_ability(abil_def, args[2], {args[3]})
+end
+
 function has_mod(abil, name)
     return count(abil.mods, name) > 0
 end
@@ -5,12 +11,11 @@ end
 function make_ability(base, pips, mods)
     local a = {
         base = base,
-        image = base[1],
-        type = base[2],
-        def = base[3],
-        name = base[4],
-        --level = base[5],
-        rarity = base[5],
+        name = base[1],
+        image = base[2],
+        type = base[3],
+        def = base[4],
+        rarity = base[6],
         pips = pips,
     }
     a.mods = {}
@@ -38,7 +43,7 @@ function make_ability(base, pips, mods)
         spr(a.image, x + 1, y + 1, 1, 1)
         modspots = { {0,0}, {0, 6} }
         for i = 1, #a.mods do
-            spr(mod_defs[a.mods[i]], modspots[i][1] + x, modspots[i][2] + y)
+            spr(all_mods[a.mods[i]][2], modspots[i][1] + x, modspots[i][2] + y)
         end
 
         local pips = a.get_pips()
@@ -135,7 +140,7 @@ end
 
 function abil_turret(user, pips, a, x, y, side)
     local dir = side
-    local turret_abil = make_ability(lookup_ability("wave"), pips, a.mods)
+    local turret_abil = make_ability(all_abilities["wave"], pips, a.mods)
     local p = find_open_square_for(side, x, y, {{dir,0}, {-dir,0}, {0,-1}, {0,1}, {dir,-1}, {dir,1}, {-dir,-1}, {-dir,1}})
     if p then
         local t = make_turret(pips, p[1], p[2], turret_abil, side)

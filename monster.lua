@@ -123,15 +123,15 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
     return c
 end
 
-function parse_monster(s, x, y)
-    local parts = split(s, "|")
-    local abils_s = split(parts[3],"/")
+function parse_monster(parts, x, y)
+    local abils_s = split(parts[4],"/")
     local abilities = {}
     for abil_s in all(abils_s) do add(abilities, parse_ability(abil_s)) end
     local special_properties = {}
-    for i = 6, #parts do
+    -- can simplify
+    for i = 7, #parts do
         local kv = split(parts[i],"=")
         special_properties[kv[1]] = kv[2]
     end
-    return make_monster(parts[1], parts[2], x, y, abilities, parts[4], parts[5], special_properties)
+    return make_monster(parts[2], parts[3], x, y, abilities, parts[5], parts[6], special_properties)
 end

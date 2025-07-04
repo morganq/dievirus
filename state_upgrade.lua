@@ -4,10 +4,6 @@ applied = {}
 
 --faces_options1 = split("x_____,_x____,__x___,___x__,____x_,_____x")
 faces_options2 = split("x_____,_x____,__x___,___x__,____x_,_____x")
-upgrade_bases = {}
-for a in all(abilities) do
-    add(upgrade_bases,a[4])
-end
 upgrade_mods = split"growth,claim,pause,stun,poison,rage,invasion"
 
 function make_upgrade(faces, kind)
@@ -33,13 +29,15 @@ function make_upgrade(faces, kind)
             end        
             if sub(up.kind,1,1) == "+" then
                 print("up", x + 8, y-1, 12)
-            elseif count(upgrade_bases, up.kind) > 0 then
-                local abil = lookup_ability(up.kind)
-                spr(abil[1], x + 8, y - 3)
+            elseif all_abilities[up.kind] != nil then
+                local abil = all_abilities[up.kind]
+                spr(abil[2], x + 8, y - 3)
                 spr(abil[5] + 149, x - 4, y - 4)
                 --print(abil[5], x - 2, y - 3, 0)
             else
-                spr(mod_defs[up.kind], x+8, y)
+                --printh(up.kind)
+                --printh(#all_mods[up.kind])
+                spr(all_mods[up.kind][2], x+8, y)
             end        
         end
     end
@@ -52,9 +50,10 @@ function draw_random_abil()
     for i = -1, 5 do
         abils_by_rarity[i] = {}
     end
-    for a in all(upgrade_bases) do
-        --printh(a .. ", " .. lookup_ability(a)[5])
-        add(abils_by_rarity[lookup_ability(a)[5]], a)
+    for k,v in pairs(all_abilities) do
+        --printh(k)
+        printh(k .. ": " .. v[5])
+        add(abils_by_rarity[v[5]], k)
     end
     if rnd() > 0.35 or level_rarity == 5 then
         --printh("at level "..level_rarity)
@@ -79,7 +78,6 @@ function update_upgrade()
         if level % 3 == 0 then
             options = {"+1", "+1", "+1", "+1"}
         end
-        --local options = {"+1", "hp", rnd(upgrade_bases)}
         local faces_options1 = split("11____,____11,__11__,1__1__,_2____,2_____,___2__,3-____")
         for i = 1, 4 do
             local ind = flr(rnd(#options) + 1)
@@ -92,7 +90,8 @@ function update_upgrade()
                 current_upgrades[i] = make_upgrade(faces_options1[j], v)
                 deli(faces_options1,j)
             else
-                printh(v)
+                printh(ind)
+                printh("here: " .. v)
                 rndfc = rnd(faces_options2)
                 current_upgrades[i] = make_upgrade(rndfc, v)
             end
@@ -135,15 +134,15 @@ function draw_upgrade()
                 elseif sub(upgrade.kind,1,1) == "+" then
                     local delta = ({["3"]=3, ["2"]=2, ["-"]=-1, ["1"]=1, [false]=0})[upgrade.faces[i]]
                     applied[i].pips = max(applied[i].pips + delta, 0)
-                elseif count(upgrade_bases, upgrade.kind) > 0 then
+                elseif all_abilities[upgrade.kind] != nil then
                     --applied[i].base = upgrade.kind
-                    local abil = lookup_ability(upgrade.kind)
+                    local abil = all_abilities[upgrade.kind]
                     applied[i] = make_ability(abil, applied[i].pips, applied[i].mods)
                     center_print(applied[i].name, 64, 112, 1)                    
                 else
                     applied[i].mods[#player_abilities[i].mods + 1] = upgrade.kind
                     --add(applied[i].mods, upgrade.kind)
-                    local desc = mod_descriptions[upgrade.kind]
+                    local desc = all_mods[upgrade.kind][4]
                     center_print(desc, 64, 112, 1)
                 end
             end

@@ -4,8 +4,8 @@ __lua__
 -- bn2
 -- by morganquirk
 
-#include data.lua
 #include util.lua
+#include data.lua
 #include die.lua
 #include grid.lua
 #include abilities.lua

@@ -92,6 +92,13 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
             end
             c.abil_timer = c.speed
         end
+
+        if c.abil_pattern and c.abil_timer == 8 and c.abil_pattern[c.abil_pattern_i] then
+            ssfx(18)
+        end
+        if c.move_pattern and c.move_pattern == 8 and c.move_pattern[c.move_pattern_i] then
+            ssfx(17)
+        end        
     end
     local basedraw = c.draw
     c.draw = function()
@@ -102,6 +109,7 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         else
             basedraw()
         end
+        if c.clay_time > 0 then return end
         local pp = tp(c.pos[1], c.pos[2])
         local hpx = pp[1] + 3
         local hpy = pp[2] + 10

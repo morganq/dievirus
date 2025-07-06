@@ -4,7 +4,7 @@
 ;
 ]]
 
-shield_time = 30 * 15
+shield_time = 30 * 10
 max_hp = 4
 monster_palettes = {
     split("1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"),
@@ -48,36 +48,38 @@ mortar,114,attack,  0/0b0000000000000000.0000011001100000/0/0/0/35/4/0/0/1/1,2
 double,111,attack,  0/0b0000010000000000.0000000000000000/4/0/0/15/8/0/0;15/0b0000010000000000.0000000000000000/4/0/0/15/8/0/0,3
 pinch,116,attack,   0/0b0000000000000001.0000000000000000/0/-30/0/10/4/0/0/0/1;10/0b0000000000000000.1000000000000000/0/30/0/10/4/0/0/0/1,3
 shield,98,shield,,1
-turret,99,turret,,2
+turret,99,turret,wave,2
+s.turret,117,turret,split,3
 curse,119,curse,,-1
 ]])
 
 all_mods = string_multilookup([[
 growth,120,3,gets stronger each use%in battle
 fast,121,0,roll the next die faster
-claim,122,10,claim up to 2 of the tiles hit
+claim,122,8,claim up to 2 of the tiles hit
 pause,123,4,time stands still for%a moment longer
 invasion,124,2,+1 pip if standing%in enemy territory
 rage,125,2,+2 pips if less than%half health
-poison,126,1,deals poison damage instead
+poison,126,2,deals poison damage instead
 stun,127,2,stuns the enemy for%a moment
 ]])
 
 local monster_defs = string_multilookup([[
-mage1,12,0,wave;1,3,60,move_pattern=xx_,abil_pattern=__x
-fighter1,8,0,sword;1;claim/sword;1,5,28,move_pattern=xx_,abil_pattern=__x
+mage1,38,0,wave;1,4,60,move_pattern=xx_,abil_pattern=__x
+fighter1,36,0,sword;1;claim/sword;1,5,28,move_pattern=xx_,abil_pattern=__x
 duelist1,14,0,wave;1/sword;2/sword;1;claim,7,32,move_pattern=xxx_,abil_pattern=___x
-engineer1,6,0,turret;2/sling;1,8,65,flies=1,abil_pattern=_x
-boss1,10,0,bomb;2/wave;1/shield;1/sword;3,20,15,flies=1,abil_pattern=____x_x__,move_pattern=xxxx_____
-bomber1,4,0,bomb;2,10,99
-mage2,12,1,wave;2,8,40,move_pattern=xx_,abil_pattern=__x
-fighter2,8,1,sword;3/spear;3,10,30,abil_pattern=_x
-boss2,10,1,sling;3/turret;3/shield;3/wave;3,30,20,flies=1,abil_pattern=______x_x_x_,move_pattern=xxxx___x_x_x
-bomber2,4,2,bomb;2,15,39,abil_pattern=_x_
-engineer2,6,2,turret;4/sling;2/shield;2,10,45,flies=1,abil_pattern=_x
+engineer1,34,0,turret;2/sling;1,8,65,flies=1,abil_pattern=_x
+boss1,40,0,bomb;2/wave;1/shield;1/sword;3,20,15,flies=1,abil_pattern=____x_x__,move_pattern=xxxx_____
+bomber1,32,0,bomb;2,10,99
+mage2,38,1,wave;2,8,40,move_pattern=xx_,abil_pattern=__x
+fighter2,36,1,sword;3/spear;3,10,30,abil_pattern=_x
+boss2,42,1,sling;3/turret;3/shield;3/wave;3,30,20,flies=1,abil_pattern=______x_x_x_,move_pattern=xxxx___x_x_x
+bomber2,32,2,bomb;2,15,39,abil_pattern=_x_
+engineer2,34,2,turret;4/sling;2/shield;2,10,45,flies=1,abil_pattern=_x
 duelist2,14,2,wave;3/sword;4/spear;4/shield;2,14,21,move_pattern=xxx_,abil_pattern=___x
-mage3,12,2,wave;4/wave;4,15,40,move_pattern=xx_,abil_pattern=__x
-boss3,10,2,wave;3/wave;1/shield;1/spear;1,40,21,move_pattern=xxx_,abil_pattern=___x
+mage3,38,2,wave;4/wave;4,15,40,move_pattern=xx_,abil_pattern=__x
+boss3,44,2,wave;3/wave;1/shield;1/spear;1,40,21,move_pattern=xxx_,abil_pattern=___x
+boss4,48,2,wave;3/wave;1/shield;1/spear;1,40,21,move_pattern=xxx_,abil_pattern=___x
 ]])
 
 

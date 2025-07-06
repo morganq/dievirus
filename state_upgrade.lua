@@ -4,7 +4,13 @@ applied = {}
 
 --faces_options1 = split("x_____,_x____,__x___,___x__,____x_,_____x")
 faces_options2 = split("x_____,_x____,__x___,___x__,____x_,_____x")
-upgrade_mods = split"growth,claim,pause,stun,poison,rage,invasion"
+upgrade_mods_names = split"growth,claim,pause,stun,poison,rage,invasion"
+upgrade_mods = {}
+for mn in all(upgrade_mods_names) do
+    for i = 1, all_mods[mn][3] do
+        add(upgrade_mods, mn)
+    end
+end
 
 function make_upgrade(faces, kind)
     local up = {
@@ -45,14 +51,12 @@ function make_upgrade(faces, kind)
 end
 
 function draw_random_abil()
-    local level_rarity = level \ 4 + 1
+    local level_rarity = min(level \ 4 + 1, 3)
     local abils_by_rarity = {}
     for i = -1, 5 do
         abils_by_rarity[i] = {}
     end
     for k,v in pairs(all_abilities) do
-        --printh(k)
-        printh(k .. ": " .. v[5])
         add(abils_by_rarity[v[5]], k)
     end
     if rnd() > 0.35 or level_rarity == 5 then
@@ -74,7 +78,7 @@ function update_upgrade()
     tf += 1
     if current_upgrades == nil then
         current_upgrades = {}
-        local options = {"hp", rnd(upgrade_mods), draw_random_abil(), draw_random_abil()}
+        local options = {"hp", rnd(upgrade_mods), rnd(upgrade_mods), rnd(upgrade_mods), draw_random_abil(), draw_random_abil(), draw_random_abil()}
         if level % 3 == 0 then
             options = {"+1", "+1", "+1", "+1"}
         end
@@ -100,9 +104,11 @@ function update_upgrade()
     end
     if btnp(0) then
         selected_upgrade_index = (selected_upgrade_index - 2) % #current_upgrades + 1
+        ssfx(14)
     end
     if btnp(1) then
         selected_upgrade_index = selected_upgrade_index % #current_upgrades + 1
+        ssfx(14)
     end    
     if btnp(5) then
         player_abilities = applied
@@ -134,6 +140,7 @@ function draw_upgrade()
                 elseif sub(upgrade.kind,1,1) == "+" then
                     local delta = ({["3"]=3, ["2"]=2, ["-"]=-1, ["1"]=1, [false]=0})[upgrade.faces[i]]
                     applied[i].pips = max(applied[i].pips + delta, 0)
+                    applied[i].original_pips = applied[i].pips
                 elseif all_abilities[upgrade.kind] != nil then
                     --applied[i].base = upgrade.kind
                     local abil = all_abilities[upgrade.kind]

@@ -36,7 +36,7 @@ function make_ability(base, pips, mods)
         return a.pips
     end
 
-    a.draw_face = function(x,y,i)
+    a.draw_face = function(x,y,n)
         local color = a.name == "curse" and 8 or 7
         rectfill(x, y-1, x + 9, y + 10, color)
         rectfill(x-1, y, x + 10, y + 9, color)
@@ -59,7 +59,7 @@ function make_ability(base, pips, mods)
             rectfill(x + 7, y + 9 - iy, x + 9, y + 9 - iy, 12)
             iy += 2
         end
-        if i == 4 then
+        if n == 4 then
             spr(141, x - 2, y + 4)
         end
     end    
@@ -99,6 +99,7 @@ function abil_shield(user, pips, a, x, y, side)
     user.shield = max(user.shield, shield)
     user.shield_timer = shield_time
     local pp = tp(x,y)
+    if user == pl then ssfx(15) end
     make_effect_simple(pp[1] + 4, pp[2] - 14, 0, 136)
 end
 
@@ -116,10 +117,11 @@ function abil_curse()
             if cursed >= 2 then return end
         end
     end
+    ssfx(19)
 end
 
 function make_turret(pips, x, y, a, side)
-    local spri = 2
+    local spri = 12
     if side == -1 then spri = 2 end
     local t = make_creature(x, y, side, pips, spri, 2, 2)
     local baseupdate = t.update
@@ -140,7 +142,7 @@ end
 
 function abil_turret(user, pips, a, x, y, side)
     local dir = side
-    local turret_abil = make_ability(all_abilities["wave"], pips, a.mods)
+    local turret_abil = make_ability(all_abilities[a.def], pips, a.mods)
     local p = find_open_square_for(side, x, y, {{dir,0}, {-dir,0}, {0,-1}, {0,1}, {dir,-1}, {dir,1}, {-dir,-1}, {-dir,1}})
     if p then
         local t = make_turret(pips, p[1], p[2], turret_abil, side)

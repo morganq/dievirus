@@ -1,0 +1,8 @@
+Die: has 6 Faces
+Face: has an Ability, #pips, and Mods.
+Ability: has name, sprite, type, list of Patterns, +more
+Pattern: has bitstring defining layout, +more
+Mod: has name, sprite, +more
+
+Monster: has sprite, list of Faces, Ability Timings and Movement Timings
+Ability/Movement Timing: list of booleans representing if the abil or movement happens at that index of time

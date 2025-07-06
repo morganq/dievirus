@@ -22,34 +22,6 @@ function sfn(s)
         end
     end
 end
---[[
-function populate_table(o, s)
-	for kv in all(split(s)) do
-		local k,v = unpack(split(kv, "="))
-		if v == "false" then o[k] = false
-		elseif v == "true" then o[k] = true
-		else
-			o[k] = v
-		end
-	end
-end
-
-function string_table(s)
-    local z = {}
-    populate_table(z, s)
-    return z
-end
-
-function string_multitable(s)
-    local mt = {}
-    for line in all(split(s,"\n")) do
-        if #line > 3 then
-            add(mt, string_table(line))
-        end
-    end
-    return mt
-end
-]]
 
 function string_multilookup(s)
     local mt = {}
@@ -94,4 +66,8 @@ end
 
 function get_bit(bs, n)
     return (bs & (0b1000000000000000 >>> n)) != 0
+end
+
+function ssfx(i)
+    sfx(i,0)
 end

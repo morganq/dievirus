@@ -57,8 +57,8 @@ line,34,9,82,9,6
 fillp,0
 ]])
     local game_seconds = (game_frames_frac / 30) / 0x0.0001 
-    if game_seconds < 20 then
-        center_print(20 - game_seconds, 64, 1, 0)
+    if game_seconds < night_time then
+        center_print(night_time - game_seconds, 64, 1, 0)
     else
         spr(231, 60, 1)
         night_palette_imm = true
@@ -93,6 +93,7 @@ fillp,0
     end
 
     sfn([[
+rectfill,0,86,128,96,15
 line,5,86,29,86,15
 line,49,86,79,86,15
 line,90,86,128,86,15
@@ -106,6 +107,7 @@ sspr,32,96,24,4,42,120
 sspr,32,100,24,4,74,111
 sspr,32,100,24,4,25,91
 ]])
+    if not pl then return end
 
     if die3d.visible then
         rectfill(die3d.x, 105, die3d.x + 14, 107, 5)
@@ -152,12 +154,15 @@ sspr,32,100,24,4,25,91
         hpx += 7
     end
     if pl.shield_timer > 0 then
+        local fx = 1 - (pl.shield_timer / shield_time)
         for i = 1, pl.shield do
-            spr(136, hpx, 3)
+            spr(145, hpx, 3)
+            local yo = fx * 6
+            sspr(64, 64 + yo, 8, 6 - yo, hpx, 3 + yo)
             hpx += 7
         end
-        --local frame = flr((pl.shield_timer / shield_time) * 9) + 195
-        --spr(frame, hpx - 1, -2)
+        
+        
     end   
 
     -- Victory and Defeat
@@ -258,6 +263,8 @@ function gameplay_tick()
 end
 
 function update_gameplay()
+    if btnp(4) then victory = true end
+
     if victory then
         victory_time += 1
         if victory_time > 90 then
@@ -334,7 +341,8 @@ function update_gameplay()
         else
             gameplay_tick()
         end
-        
+    else   
+        -- enable/disable a music track
     end
 
     if die3d.visible then
@@ -376,6 +384,88 @@ function update_gameplay()
     end    
 end
 
+function do_level_intro()
+    for i = 1, 60 do
+
+        if i == 30 then
+            pl = make_player()
+            for i = 1,6 do
+                pl.die[i] = player_abilities[i].copy()
+            end
+            pl.die[-1] = make_ability(all_abilities["curse"], 1, {}).copy()            
+        end
+
+
+        if i == 1 then
+            function place_monster(name, x, y, favor_row)
+                x = x or flr(rnd(4)) + 5
+                y = y or flr(rnd(4)) + 1
+                local mon = parse_monster(monster_defs[name], x, y)
+                mon.move(x,y)
+                mon.favor_row = favor_row
+                return mon
+            end  
+            if level == 1 then
+                place_monster("mage1", 6, 2, 2)
+                --place_monster("mage1", 6, 4, 3)
+            elseif level == 2 then
+                place_monster("mage1")
+                place_monster("fighter1")
+            elseif level == 3 then
+                place_monster("duelist1")
+                place_monster("duelist1")
+            elseif level == 4 then
+                place_monster("engineer1")
+            elseif level == 5 then
+                place_monster("boss1")
+            elseif level == 6 then
+                place_monster("mage2")
+                place_monster("mage2").abil_pattern_i = 2
+            elseif level == 7 then
+                place_monster("fighter2")
+                place_monster("fighter1")
+                place_monster("fighter1")
+            elseif level == 8 then
+                place_monster("engineer1")
+                place_monster("engineer1")
+                place_monster("fighter1")
+            elseif level == 9 then
+                place_monster("bomber1")
+                place_monster("bomber1").time = 33
+                place_monster("bomber1").time = 66
+            elseif level == 10 then
+                place_monster("boss2")
+            elseif level == 11 then
+                place_monster("bomber2")
+                place_monster("engineer2")
+            elseif level == 12 then
+                place_monster("duelist2")
+            elseif level == 13 then
+                place_monster("mage1")
+                local m2 = place_monster("mage2")
+                m2.abil_pattern_i = 2
+                m2.move_pattern_i = 2
+                local m3 = place_monster("mage3")
+                m3.abil_pattern_i = 3
+                m3.move_pattern_i = 3        
+            elseif level == 14 then
+                place_monster("fighter2")
+                local m2 = place_monster("fighter2")
+                m2.abil_pattern_i = 2
+                m2.move_pattern_i = 2    
+                place_monster("boss2")
+            elseif level == 15 then
+                place_monster("boss3")
+                place_monster("engineer1")
+                place_monster("fighter1")
+            end            
+        end
+
+        _draw()
+        flip()
+    end
+end
+
 level = 0
 function start_level()
     
@@ -397,8 +487,10 @@ function start_level()
     game_frames_frac = 0
     pause_extend = 0
 
-    victory = true
-    victory_time = 90
+    night_time = max(65 - level * 5, 25)
+
+    --victory = true
+    --victory_time = 90
     for i = 1,4 do
         grid[i] = {}
         for j = 1, 8 do
@@ -411,95 +503,19 @@ function start_level()
         end
     end    
     die3d = {
-        pts = {},
-        faces = {
-            {1,2,3,4}, -- front
-            {2,1,5,6}, -- top
-            {3,4,8,7}, -- bottom
-            {1,4,8,5}, -- left
-            {2,3,7,6}, -- right
-            {5,6,7,8} -- back
-        },
         x = 10, 
         y = 84,
         xv = 0,
         yv = 0,
         visible = false,
     }
-    pl = make_player()
-    for i = 1,6 do
-        pl.die[i] = player_abilities[i].copy()
-    end
-    pl.die[-1] = make_ability(all_abilities["curse"], 1, {}).copy()
-    function place_monster(name, x, y, favor_row)
-        x = x or flr(rnd(4)) + 5
-        y = y or flr(rnd(4)) + 1
-        local mon = parse_monster(monster_defs[name], x, y)
-        mon.move(x,y)
-        mon.favor_row = favor_row
-        return mon
-    end  
-    if level == 1 then
-        place_monster("mage1", 6, 1, 2)
-        place_monster("mage1", 6, 4, 3)
-    elseif level == 2 then
-        place_monster("mage1")
-        place_monster("fighter1")
-    elseif level == 3 then
-        place_monster("duelist1")
-        place_monster("duelist1")
-    elseif level == 4 then
-        place_monster("engineer1")
-    elseif level == 5 then
-        place_monster("boss1")
-    elseif level == 6 then
-        place_monster("mage2")
-        place_monster("mage2").abil_pattern_i = 2
-    elseif level == 7 then
-        place_monster("fighter2")
-        place_monster("fighter1")
-        place_monster("fighter1")
-    elseif level == 8 then
-        place_monster("engineer1")
-        place_monster("engineer1")
-        place_monster("fighter1")
-    elseif level == 9 then -- too easy
-        place_monster("bomber1")
-        place_monster("bomber1").time = 33
-        place_monster("bomber1").time = 66
-    elseif level == 10 then
-        place_monster("boss2")
-    elseif level == 11 then
-        place_monster("bomber2")
-        place_monster("engineer2")
-    elseif level == 12 then
-        place_monster("duelist2")
-    elseif level == 13 then
-        place_monster("mage1")
-        local m2 = place_monster("mage2")
-        m2.abil_pattern_i = 2
-        m2.move_pattern_i = 2
-        local m3 = place_monster("mage3")
-        m3.abil_pattern_i = 3
-        m3.move_pattern_i = 3        
-    elseif level == 14 then
-        place_monster("fighter2")
-        local m2 = place_monster("fighter2")
-        m2.abil_pattern_i = 2
-        m2.move_pattern_i = 2    
-        place_monster("boss2")
-    elseif level == 15 then
-        place_monster("boss3")
-        place_monster("engineer1")
-        place_monster("fighter1")
-    end
 
+    do_level_intro()
     throw()
 end
 
-dra, drb, drc, dvra, dvrb, dvrc = 0,0,0,0,0,0
-
 function throw()
+    sfx(16,1)
     local all_frames = {160,162,164,166,168,170,172,174}
     die_frames = {}
     for i = 1, 8 do
@@ -519,3 +535,18 @@ function throw()
     dvrb = (0.5 - rnd())
     dvrc = (0.5 - rnd())  
 end
+
+
+-- weaken/slow down fighter 1
+-- more consistent fighter ai
+-- duelist more punish time. less often take tiles
+-- early game no curse? or longer time to curse
+-- plan some intentional difficulty jumps
+-- boss kinda similar to duelist, maybe easier? but with shield? seems not perfect
+-- higher level enemies needs palette swaps
+-- level 2 mage isn't feeling distinct
+-- melee x3 feels cool and scary
+
+-- build out of clay /  / fly down from space
+
+-- incarnations : poison, growth, claim

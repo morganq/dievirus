@@ -108,7 +108,6 @@ function make_damage_spot(x,y,damage,side,warning,abil)
         decay = 0,
         abil = abil
     })
-    printh(go.side)
     go.update = function()
         local spot = grid[go.pos[2]][go.pos[1]]
         if go.countdown > 0 then
@@ -129,7 +128,9 @@ function make_damage_spot(x,y,damage,side,warning,abil)
                 spot.space.flip(go.side, 30 * 8)
                 abil.tiles_claimed += 1
             end            
-            go.countdown -= 1                   
+            spot.space.bounce_timer = 13
+            go.countdown -= 1               
+            ssfx((go.side == 1) and 8 or 9)
         else
             go.decay += 1
             if go.decay > 4 then
@@ -139,6 +140,8 @@ function make_damage_spot(x,y,damage,side,warning,abil)
     end
     go.draw = function()
         local pp = tp(go.pos[1], go.pos[2])
+        local spot = grid[go.pos[2]][go.pos[1]]
+        pp[2] += spot.space.offset_y
         local color = 9
         if go.side != 1 then color = 8 end
         if go.countdown > 0 then
@@ -152,6 +155,7 @@ function make_damage_spot(x,y,damage,side,warning,abil)
                 rectfill(pp[1] + 1, pp[2] + 1, pp[1] + 14, pp[2] + 11, color)
                 fillp()
             end]]
+            
             line(x1, y1, x1 + hw, y1, color)
             line(x1, y1, x1, y1 + hh, color)
             line(x1, y2, x1 + hw, y2, color)
@@ -159,7 +163,7 @@ function make_damage_spot(x,y,damage,side,warning,abil)
             line(x2, y1, x2 - hw, y1, color)
             line(x2, y1, x2, y1 + hh, color)
             line(x2, y2, x2 - hw, y2, color)
-            line(x2, y2, x2, y2 - hh, color)            
+            line(x2, y2, x2, y2 - hh, color)         
         else
             rectfill(pp[1] + 1, pp[2] + 1, pp[1] + 14, pp[2] + 11, color)
         end
@@ -179,6 +183,8 @@ function make_gridspace(x,y)
     go.flip_time = 0
     go.drop_finish_time = 0
     go.fire_time = 0
+    go.bounce_timer = 15 + x + y
+    go.offset_y = 0
     local baseupdate = go.update
     go.update = function()
         if go.dropped then
@@ -188,30 +194,16 @@ function make_gridspace(x,y)
                 go.drop_time = 0
             end
         end
-        if go.flip_time > 0 then
-            local dir = 1
-            if go.main_side != 1 then dir = -1 end
-            local can_revert = false
-            if go.pos[1] == 8 or go.side == 1 and grid[go.pos[2]][go.pos[1] + 1].space.side == -1 then
-                can_revert = true
-            end
-            if go.pos[1] == 1 or go.side == -1 and grid[go.pos[2]][go.pos[1] - 1].space.side == 1 then
-                can_revert = true
-            end
-            if can_revert then            
-                --go.flip_time -= 1
-                if go.flip_time <= 0 then
-                    go.side = go.main_side
-                end
-            end
-        end
         if go.fire_time > 0 then
             go.fire_time -= 1
         end
     end
     local basedraw = go.draw
     go.draw = function()
+        go.offset_y = -(cos(go.bounce_timer / 10) - 0.5) * (go.bounce_timer / 5)
+        go.bounce_timer = max(go.bounce_timer - 1, 0)
         local pp = tp(go.pos[1], go.pos[2])
+        pp[2] += go.offset_y
         local spri = 64
         if go.side == -1 then
             pal(split"0,2,3,4,5,3,13,8,9,10,11,12,1,14,15,0")

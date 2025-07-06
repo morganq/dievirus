@@ -1,4 +1,4 @@
-function make_effect_simple(x, y, num, spri, xv, yv, lifetime)
+function make_effect_simple(x, y, color, spri, xv, yv, lifetime)
     if xv == nil then xv = 0 end
     if yv == nil then yv = -0.2 end
     lifetime = lifetime or 30
@@ -8,7 +8,7 @@ function make_effect_simple(x, y, num, spri, xv, yv, lifetime)
         if spri != nil then
             spr(spri, ng.pos[1], ng.pos[2])
         else
-            print("-"..num, x, y, 7)
+            pset(ng.pos[1], ng.pos[2], color)
         end
     end
     ng.update = function()

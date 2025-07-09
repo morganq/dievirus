@@ -1,5 +1,4 @@
-    --parse_class("test", 0, 0, "pinch,2/mortar,2/pinch,2/bouncer,1,stun/sling,1,stun/sword,1,stun"),
-    --parse_class("test", 0, "wall,1/wall,1/wall,1/wall,1/wall,1/wall,1"),
+
     --parse_class("vanguard", 0, "sword,1/sword,2/spear,2/spear,1/shield,2/bomb,1"),
     --parse_class("druid", 3, "gun,1/sword,1/shield,1/none,1/shield,1/bomb,1"),
 
@@ -31,6 +30,7 @@ function update_newgame()
     end    
     local cl = classes[selected_class_index]
     if btnp(5) and dget(0) >= cl[4] then
+        screen_transition(false)
         state = "gameplay"
         player_abilities = make_die(cl[5])
         --level = 4
@@ -40,18 +40,21 @@ function update_newgame()
 end
 
 function draw_newgame()
-    cls(15)
-sfn([[
+    cls(5)
+
+--[[
 rectfill,56,100,71,128,6
 rectfill,56,100,71,122,5
-rectfill,56,100,71,114,3
+rectfill,56,100,71,114,3    
+]]
+sfn([[
 pal,6,7
 spr,64,56,92,2,2
 palreset
 ]])
 
-    print("⬅️", 4, 20, 0)
-    print("➡️", 120, 20, 0)
+    print("⬅️", 4, 20, 1)
+    print("➡️", 120, 20, 1)
     local cl = classes[selected_class_index]
     local color = 1
     if dget(0) < cl[4] then
@@ -59,7 +62,7 @@ palreset
         print("unlocked after " .. cl[4] .. " wins", 22, 28, color)
     else
         local s = "❎ to choose "..cl[2]
-        print(s, 64 - #s * 2, 116, 0)
+        print(s, 64 - #s * 2, 116, 1)
         spr(cl[3], 56, 86, 2, 2)
     end
     print(cl[2], 64 - #cl[2] * 2, 20, color)

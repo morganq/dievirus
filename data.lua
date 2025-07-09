@@ -54,14 +54,13 @@ curse,119,curse,,-1
 ]])
 
 all_mods = string_multilookup([[
-growth,120,3,gets stronger each use%in battle
-fast,121,0,roll the next die faster
-claim,122,8,claim up to 2 of the tiles hit
-pause,123,4,time stands still for%a moment longer
-invasion,124,2,+1 pip if standing%in enemy territory
-rage,125,2,+2 pips if less than%half health
-poison,126,2,deals poison damage instead
-stun,127,2,stuns the enemy for%a moment
+growth,120,3,gets stronger each%use in battle
+claim,122,8,claim up to 2%of the tiles hit
+pause,123,4,time stands still%for a moment
+invasion,124,2,+1 if standing%in enemy tile
+rage,125,2,+2 if less than%half health
+poison,126,2,deals poison damage%instead of normal
+stun,127,2,stuns the enemy%for a moment
 ]])
 
 local monster_defs = string_multilookup([[

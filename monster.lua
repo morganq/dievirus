@@ -7,15 +7,14 @@
 function make_monster(spri, palette_index, x, y, abilities, health, speed, special_properties)
     local needs_push = false
     if grid[y][x].creature then needs_push = true end
-    local c = make_creature(x,y,-1, health, spri, 2, 2)
+    local c = make_creature(x,y,-1, health, spri)
     c.palette = monster_palettes[palette_index]
     c.abilities = abilities
     c.speed = speed
-    c.time = 0
     c.abil_timer = speed \ 2
     c.move_timer = speed
     c.next_ability = rnd(c.abilities)
-    addfields(c, special_properties or {})
+    addfields(c, "time=0", special_properties or {})
     if special_properties.move_pattern then
         c.move_pattern = {}
         for i = 1, #special_properties.move_pattern do
@@ -104,8 +103,9 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
     c.draw = function()
         palreset()
         if c.palette != nil then
-            --pal(c.palette)
+            pal(c.palette)
             basedraw()
+            palreset()
         else
             basedraw()
         end
@@ -136,7 +136,6 @@ function parse_monster(parts, x, y)
     local abilities = {}
     for abil_s in all(abils_s) do add(abilities, parse_ability(abil_s)) end
     local special_properties = {}
-    -- can simplify
     for i = 7, #parts do
         local kv = split(parts[i],"=")
         special_properties[kv[1]] = kv[2]

@@ -1,9 +1,6 @@
-local nongrid = {}
 function make_nongrid(x,y)
     local ng = {
         pos = {x,y},
-        draw = function() end,
-        update = function() end,
     }
     add(nongrid, ng)
     return ng
@@ -13,7 +10,7 @@ end
 function valid_move_target(x,y,side)
     if x < 1 or x > 8 or y < 1 or y > 4 then return false end
     local spot = grid[y][x]
-    if spot.space.dropped or spot.creature then
+    if spot.creature then
         return false
     end
     if spot.space.side != side then
@@ -28,7 +25,6 @@ end
 
 function add_go_to_grid(go)
     local newgrid = grid[go.pos[2]][go.pos[1]]
-    -- Add the obj to the grid location. But add based on layer.
     if #newgrid == 0 then
         add(newgrid, go)
     else
@@ -46,15 +42,11 @@ function add_go_to_grid(go)
     end
 end
 
-function make_gridobj(x,y,layer,spri,sprw,sprh) 
+function make_gridobj(x,y,layer,spri) 
     local go = {
         pos = {x,y},
         layer = layer or 10,
         spri = spri,
-        sprw = sprw,
-        sprh = sprh,
-        draw = function() end,
-        update = function() end,
     }
     add_go_to_grid(go)
     go.move = function(x,y)
@@ -62,11 +54,9 @@ function make_gridobj(x,y,layer,spri,sprw,sprh)
         go.pos = {x,y}
         add_go_to_grid(go)
     end
-    if spri != nil then
-        go.draw = function()
-            local pp = tp(go.pos[1], go.pos[2])
-            spr(go.spri, pp[1], pp[2], go.sprw, go.sprh)
-        end
+    go.draw = function()
+        local pp = tp(go.pos[1], go.pos[2])
+        spr(go.spri, pp[1], pp[2], 2, 2)
     end
     return go
 end
@@ -82,8 +72,7 @@ function find_open_square_for(side, gx, gy, attempt_squares)
         local tx, ty = gx + offset[1], gy + offset[2]
         if tx >= 1 and tx <= 8 and ty >= 1 and ty <= 4 then
             local new_spot = grid[ty][tx]
-            if new_spot.space.side == side and new_spot.creature == nil and not new_spot.space.dropped then
-                
+            if new_spot.space.side == side and new_spot.creature == nil then
                 return {tx, ty}
             end
         end
@@ -100,12 +89,11 @@ end
 
 function make_damage_spot(x,y,damage,side,warning,abil)
     local go = make_gridobj(x,y,1)
-    addfields(go, {
+    addfields(go,"decay=0", {
         side=side,
         damage=damage,
         countdown_max = warning or 0,
         countdown = warning or 0,
-        decay = 0,
         abil = abil
     })
     go.update = function()
@@ -150,12 +138,6 @@ function make_damage_spot(x,y,damage,side,warning,abil)
             local hh = 4 * t + 2
             local x1,y1,x2,y2 = pp[1] + 1, pp[2] + 1, pp[1] + 14, pp[2] + 11
             
-            --[[if go.countdown < 5 then
-                fillp(0b0101101001011010.1)
-                rectfill(pp[1] + 1, pp[2] + 1, pp[1] + 14, pp[2] + 11, color)
-                fillp()
-            end]]
-            
             line(x1, y1, x1 + hw, y1, color)
             line(x1, y1, x1, y1 + hh, color)
             line(x1, y2, x1 + hw, y2, color)
@@ -175,30 +157,17 @@ function make_gridspace(x,y)
     if x > 4 then
         side = -1
     end
-    local go = make_gridobj(x,y,0,spri,2,2)
+    local go = make_gridobj(x,y,0,spri)
     go.side = side
-    go.dropped = false
-    go.drop_time = 0
     go.main_side = side
-    go.flip_time = 0
-    go.drop_finish_time = 0
     go.fire_time = 0
     go.bounce_timer = 15 + x + y
     go.offset_y = 0
-    local baseupdate = go.update
     go.update = function()
-        if go.dropped then
-            go.drop_time += 1
-            if go.drop_time >= go.drop_finish_time then
-                go.dropped = false
-                go.drop_time = 0
-            end
-        end
         if go.fire_time > 0 then
             go.fire_time -= 1
         end
     end
-    local basedraw = go.draw
     go.draw = function()
         go.offset_y = -(cos(go.bounce_timer / 10) - 0.5) * (go.bounce_timer / 5)
         go.bounce_timer = max(go.bounce_timer - 1, 0)
@@ -210,32 +179,20 @@ function make_gridspace(x,y)
         else
             palreset()
         end
-        spr(spri, pp[1], pp[2] + (go.drop_time / 2.5) ^ 2, go.sprw, go.sprh)
-        if go.dropped and go.drop_time > go.drop_finish_time - 4 then
-            pal({7,7,7,7,7,7,7,7,7,7,7,7,7,7,7})
-            spr(go.spri, pp[1], pp[2], go.sprw, go.sprh)
-        end
+        spr(spri, pp[1], pp[2], 2, 2)
         if go.fire_time > 0 and go.fire_time % 5 == 0 then
             make_effect_fire(pp[1] + rnd() * 12, pp[2] + rnd() * 8 - 2)
         end
-    end
-    go.drop = function(time)
-        if go.dropped then return end
-        go.drop_time = 0
-        go.drop_finish_time = time
-        go.dropped = true
     end
     grid[go.pos[2]][go.pos[1]].space = go
     go.flip = function(side, time)
         if side == go.side then return end
         if side == go.main_side then
             go.side = go.main_side
-            go.flip_time = 0
             return
         end
         go.main_side = go.side
         go.side = side
-        go.flip_time = time
     end
     return go
 end

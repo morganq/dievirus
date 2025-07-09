@@ -1,24 +1,16 @@
 creature_index = 1
-function make_creature(x, y, side, health, spri, sprw, sprh)
-    local go = make_gridobj(x, y, 10, spri, sprw, sprh)
-    addfields(go, {
-        movetime = 0,
-        lastpos = {0,0},
-        yo = -7,
-        side = side,
-        dir = side,
-        damage_time = 0,
-        health = health,
-        max_health = health,
-        shield = 0,
-        shield_timer = 0,
-        stun_time = 0,
-        stun_co = 1,
-        alive=true,
-        overextended_timer=0,
-        index=creature_index,
-        poison_timer = 0,
-    })
+function make_creature(x, y, side, health, spri)
+    local go = make_gridobj(x, y, 10, spri)
+    addfields(go,
+        "movetime=0,yo=-7,damage_time=0,shield=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0",
+        {
+            lastpos = {0,0},
+            side = side,
+            dir = side,
+            health = health,
+            max_health = health,
+            index=creature_index,
+        })
     go.clay_time = 15
     creature_index += 1
     go.draw = function()
@@ -72,12 +64,8 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
         end
     end
 
-    local baseupdate = go.update
     go.update = function()
         local space = grid[go.pos[2]][go.pos[1]].space
-        if space.dropped then
-            push_to_open_square(go)
-        end
         if space.side != go.side then
             go.overextended_timer += 1
             if go.overextended_timer >= 30 then
@@ -99,7 +87,6 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
             go.shield = 0
         end
         go.stun_time -= 1
-        baseupdate()
     end
 
     local basemove = go.move
@@ -107,7 +94,7 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
         if not go.alive then return end
         local pp = tp(go.pos[1],go.pos[2])     
         if go.clay_time <= 0 then
-            make_effect_ghost(pp[1], pp[2] + go.yo, go.spri, go.sprw, go.sprh)
+            make_effect_simple(pp[1], pp[2] + go.yo, nil, go.spri, 0, -1, 3, 0b1010101010101010.11, 2, 2, go.side == -1)
             ssfx(go == pl and 14 or -1)
             go.movetime = 3
         end
@@ -146,16 +133,8 @@ function make_creature(x, y, side, health, spri, sprw, sprh)
         go.alive = false
         local sx = go.spri % 16 * 8
         local sy = go.spri \ 16 * 8
-        for x = 0, go.sprw * 8 - 1 do
-            local xv = (x / (go.sprw * 8 - 1)) - 0.5
-            for y = 0, go.sprh * 8 - 1 do 
-                local c = sget(sx + x, sy + y)
-                local pp = tp(go.pos[1], go.pos[2])
-                if c != 14 then
-                    make_creature_particle(pp[1] + x, pp[2] + y + go.yo, c, xv / 2, pp[2] + 6 + rnd(4))
-                end
-            end
-        end
+        local pp = tp(go.pos[1], go.pos[2])
+        sandify(sx, sy, 15, 15, pp[1], pp[2] + go.yo)
         grid[go.pos[2]][go.pos[1]].creature = nil
         del(grid[go.pos[2]][go.pos[1]], go)
     end

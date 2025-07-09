@@ -1,0 +1,1 @@
+fswatch -o ./*.lua | xargs -n1 -I{} ./minify.sh

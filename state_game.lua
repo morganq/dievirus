@@ -1,24 +1,7 @@
---[[
-function draw_debug()
-    for i = 1,4 do
-        for j = 1,8 do
-            local gs = grid[i][j]
-            if gs.creature then
-                
-                local pp1 = tp(j, i)
-                circ(pp1[1], pp1[2], 2, 10)
-                local pp2 = tp(gs.creature.pos[1], gs.creature.pos[2])
-                line(pp1[1], pp1[2], pp2[1] + 8, pp2[2] + 8, 7)
-            end
-        end
-    end
-end
-]]
 
 function draw_gameplay()
     draw_time = (draw_time + 1) % 1024
     cls(15)
-    -- Background
     sfn([[
 rectfill,0,0,128,32,7
 spr,222,64,9
@@ -58,20 +41,18 @@ fillp,0
 ]])
     local game_seconds = (game_frames_frac / 30) / 0x0.0001 
     if game_seconds < night_time then
-        center_print(night_time - game_seconds, 64, 1, 0)
+        print(night_time - game_seconds, 64, 1, 0)
     else
         spr(231, 60, 1)
         night_palette_imm = true
         is_night = true
     end
-    -- Sort by binning grid objs and non-grid objs by y grid space
-    -- then draw them top to bottom. ez.
     local bins = {{},{},{},{}}
-    for i = 1, #nongrid do
+    --[=[for i = 1, #nongrid do
         local ng = nongrid[i]
         local gpp = gp(ng.pos[1],ng.pos[2])
         add(bins[gpp[2]],ng)
-    end
+    end]=]
     for i = 1,4 do
         for j = 1, 8 do
             local gridspace = grid[i][j]
@@ -79,9 +60,11 @@ fillp,0
                 gridspace[k].draw()
             end
             local pp =tp(j, i)
-            --print(#gridspace, pp[1], pp[2], 7)
         end
         for o in all(bins[i]) do o.draw() end
+    end
+    for ng in all(nongrid) do
+        ng.draw()
     end
     palreset()
 
@@ -131,13 +114,8 @@ sspr,32,100,24,4,25,91
         local lx = print(line1,0,-100)
         print(line1, 64 - lx / 2 + 5, 114, 1)
         spr(130, 64 - lx / 2 - 5, 114)
-        if abil.animal1 != nil then
-            --local line2 = descriptions[abil.base .. "/" .. abil.animal1]
-            --print(line2, 64 - #line2 * 2, 122, 10)
-        end
     end
     
-    -- Upper UI
     local hpx = 6
     spr(132,3,1,1,2)
     local hw = (pl.max_health + pl.shield) * 7
@@ -165,7 +143,6 @@ sspr,32,100,24,4,25,91
         
     end   
 
-    -- Victory and Defeat
     if victory then
         local y = min(victory_time, 40)
         rectfill(34, y - 5, 94, y + 8, 0)
@@ -178,15 +155,7 @@ sspr,32,100,24,4,25,91
         rect(34, y - 5, 94, y + 9, 2)
         print("defeat", 52, y, 8)
     end
-    
-    -- debug
-    for r in all(attack_runners) do
-        --r:debug_draw()
-    end
 
-    --draw_debug()
-
-    -- Screen wobble on pause
     if (time_scale < 1 or pause_extend > 0) and not victory then
         
         poke(0X5F54, 0x60)
@@ -243,8 +212,6 @@ function gameplay_tick()
 
     tf += 1
 
-
-    --make_effect_simple(rnd(128) + 30, rnd(64) - 64, 0, 46, -0.5, 2, 33)
     if rnd() < 0.5 then
         make_creature_particle(128, rnd(60) + 20, 15, -3, rnd(52) + 28)
     end
@@ -276,15 +243,13 @@ function update_gameplay()
                     player_abilities[i] = player_abilities[i].copy()
                 end
                 state = "upgrade"
+                tf = 0
             end
         end
         time_scale = 1
     end
     if defeat then
         defeat_time += 1
-        if defeat_time > 120 then
-            --
-        end
         time_scale = 1
     end
 
@@ -386,7 +351,6 @@ end
 
 function do_level_intro()
     for i = 1, 60 do
-
         if i == 30 then
             pl = make_player()
             for i = 1,6 do
@@ -457,28 +421,31 @@ function do_level_intro()
             elseif level == 15 then
                 place_monster("boss3")
                 place_monster("engineer1")
-                place_monster("fighter1")
+                --place_monster("fighter1")
             end            
         end
 
         _draw()
+        pal(FADE_PALS[max((30 - i) \ 5,1)])
+        poke(0X5f54, 0x60)
+        sspr(0, 0, 128, 128, 0, 0)
+        poke(0X5f54, 0x00)
+        palreset()
+        pal(split"129,2,141,4,134,6,7,136,9,10,142,139,13,14,15,0",1)
         flip()
     end
 end
 
 level = 0
 function start_level()
-    
-    is_night = false
     tf = 0
-    draw_time = 0
     victory = false
-    victory_time = 0
     defeat = false
+    draw_time = 0
+    victory_time = 0
     defeat_time = 0
 
     time_scale = 1
-    move_target = nil
 
     level += 1
     attack_runners = {}
@@ -489,8 +456,8 @@ function start_level()
 
     night_time = max(65 - level * 5, 25)
 
-    --victory = true
-    --victory_time = 90
+    victory = true
+    victory_time = 90
     for i = 1,4 do
         grid[i] = {}
         for j = 1, 8 do
@@ -502,13 +469,7 @@ function start_level()
             make_gridspace(i,j)
         end
     end    
-    die3d = {
-        x = 10, 
-        y = 84,
-        xv = 0,
-        yv = 0,
-        visible = false,
-    }
+    die3d = {}
 
     do_level_intro()
     throw()
@@ -531,22 +492,4 @@ function throw()
     die3d.y = 64
     die3d.xv = 2.5
     die3d.yv = 0
-    dvra = (0.5 - rnd())
-    dvrb = (0.5 - rnd())
-    dvrc = (0.5 - rnd())  
 end
-
-
--- weaken/slow down fighter 1
--- more consistent fighter ai
--- duelist more punish time. less often take tiles
--- early game no curse? or longer time to curse
--- plan some intentional difficulty jumps
--- boss kinda similar to duelist, maybe easier? but with shield? seems not perfect
--- higher level enemies needs palette swaps
--- level 2 mage isn't feeling distinct
--- melee x3 feels cool and scary
-
--- build out of clay /  / fly down from space
-
--- incarnations : poison, growth, claim

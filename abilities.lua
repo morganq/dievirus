@@ -123,7 +123,7 @@ end
 function make_turret(pips, x, y, a, side)
     local spri = 12
     if side == -1 then spri = 2 end
-    local t = make_creature(x, y, side, pips, spri, 2, 2)
+    local t = make_creature(x, y, side, pips, spri)
     local baseupdate = t.update
     t.rate = 80
     t.time = 0
@@ -254,16 +254,6 @@ function make_attack_runner(def, pips, a, x, y, side, fake)
         update = update,
         alive = true,
         fake_hit = {},
-        --[[debug_draw = function(self)
-            for step in all(steps) do
-                if step.virtual_objs then
-                    for vo in all(step.virtual_objs) do
-                        local pp = tp(vo.pos[1], vo.pos[2])
-                        circfill(pp[1], pp[2], 3, 0)
-                    end
-                end
-            end
-        end,]]
     }    
     if fake then
         local ticks = 0

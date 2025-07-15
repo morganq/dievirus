@@ -41,24 +41,9 @@ function make_ability(base, pips, mods)
         rectfill(x, y-1, x + 9, y + 10, color)
         rectfill(x-1, y, x + 10, y + 9, color)
         spr(a.image, x + 1, y + 1, 1, 1)
-        modspots = { {0,0}, {0, 6} }
-        for i = 1, #a.mods do
-            spr(all_mods[a.mods[i]][2], modspots[i][1] + x, modspots[i][2] + y)
-        end
-
-        local pips = a.get_pips()
-
-        local fives = pips \ 5
-        local ones = pips - (fives * 5)
-        local iy = 0
-        for i = 1,fives do
-            rectfill(x + 7, y + 9 - iy - 2, x + 9, y + 9 - iy, 12)
-            iy += 4
-        end
-        for i = 1, ones do
-            rectfill(x + 7, y + 9 - iy, x + 9, y + 9 - iy, 12)
-            iy += 2
-        end
+        draw_mods(a.mods, x, y)
+        draw_pips(a.get_pips(), x + 7, y + 9, 12)
+        
         if n == 4 then
             spr(141, x - 2, y + 4)
         end
@@ -67,7 +52,7 @@ function make_ability(base, pips, mods)
         if a.base == "none" then return end
         a.tiles_claimed = 0
         _ENV["abil_" .. a.type](user, a.get_pips(), a, gx, gy, side)
-        if has_mod(a, "growth") then
+        if has_mod(a, "growth") and a.pips < 5 then
             a.pips += 1
             a.original_pips += 1
         end
@@ -101,6 +86,7 @@ function abil_shield(user, pips, a, x, y, side)
     local pp = tp(x,y)
     if user == pl then ssfx(15) end
     make_effect_simple(pp[1] + 4, pp[2] - 14, 0, 136)
+    add(attack_runners, make_attack_runner(a.def, pips, a, x, y, side))
 end
 
 function abil_attack(user, pips, a, x, y, side)
@@ -110,11 +96,11 @@ end
 function abil_curse()
     local cursed = 0
     for i = 1, 50 do
-        local s = grid[rnd(4)\1+1][rnd(4)\1+1]
+        local s = grid[rnd(4)\1+1][rnd(8)\1+1]
         if s.space.side == 1 then
             s.space.side = -1
             cursed += 1
-            if cursed >= 2 then return end
+            if cursed >= 1 then return end
         end
     end
     ssfx(19)
@@ -122,7 +108,6 @@ end
 
 function make_turret(pips, x, y, a, side)
     local spri = 12
-    if side == -1 then spri = 2 end
     local t = make_creature(x, y, side, pips, spri)
     local baseupdate = t.update
     t.rate = 80
@@ -131,7 +116,7 @@ function make_turret(pips, x, y, a, side)
         baseupdate()
         t.time += 1
         if t.time % t.rate == t.rate \ 2 then
-            a.use(t, x, y, t.side)
+            a.use(t, t.pos[1], t.pos[2], t.side)
         end
         if t.time >= (30 * 15) then
             t.kill()
@@ -153,19 +138,19 @@ function make_attack_runner(def, pips, a, x, y, side, fake)
     local steps_s = split(def, ";")
     local steps = {}
     for step in all(steps_s) do
-        local step_def = split(step, "/")
+        local sd = split(step, "/")
         add(steps, {
-            delay=step_def[1],
-            grid=step_def[2],
-            xv=step_def[3] * side,
-            yv=step_def[4],
-            collides=step_def[5] == 1,
-            telegraph=step_def[6],
-            max_tiles=step_def[7] or 8,
-            bounces_x=step_def[8] == 1,
-            bounces_y=step_def[9] == 1,
-            absolute_x=step_def[10] == 1,
-            absolute_y=step_def[11] == 1,
+            delay=sd[1],
+            grid=sd[2],
+            xv=sd[3] * side,
+            yv=sd[4],
+            collides=sd[5] == 1,
+            telegraph=sd[6],
+            max_tiles=sd[7] or 8,
+            bounces_x=sd[8] == 1,
+            bounces_y=sd[9] == 1,
+            absolute_x=sd[10] == 1,
+            absolute_y=sd[11] == 1,
             alive=true,
         })
     end
@@ -231,11 +216,12 @@ function make_attack_runner(def, pips, a, x, y, side, fake)
             if not step.virtual_objs then
                 if t >= step.delay then
                     step.virtual_objs = {}
-                    for space in all(abil_grid_spaces(step.grid, step.absolute_x and 1 or x, step.absolute_y and 2 or y, side)) do
+                    local abs_x = side * -3.5 + 4.5
+                    for space in all(abil_grid_spaces(step.grid, step.absolute_x and abs_x or x, step.absolute_y and 2 or y, side)) do
                         if not non_moving then
                             local timers = {
-                                (step.xv == 0) and 0 or (30 / step.xv),
-                                (step.yv == 0) and 0 or (30 / step.yv),
+                                (step.xv == 0) and 0 or (30 / abs(step.xv)),
+                                (step.yv == 0) and 0 or (30 / abs(step.yv)),
                             }
                             add(step.virtual_objs, {pos = space, timers = timers, max_tiles=step.max_tiles, xv = step.xv, yv = step.yv, off_grid = false}) -- no need to copy space because generated each time
                             any_alive = true

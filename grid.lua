@@ -7,19 +7,13 @@ function make_nongrid(x,y)
 end
 
 
-function valid_move_target(x,y,side)
+function valid_move_target(x,y,side,flies)
     if x < 1 or x > 8 or y < 1 or y > 4 then return false end
     local spot = grid[y][x]
     if spot.creature then
         return false
     end
-    if spot.space.side != side then
-        if x - side < 1 or x - side > 8 then return false end
-        local spot2 = grid[y][x - side]
-        if spot2.space.side != side then
-            return false
-        end
-    end
+    if flies and spot.space.side != side then return false end
     return true
 end
 
@@ -84,6 +78,11 @@ function push_to_open_square(c)
     local pos = find_open_square_for(c.side, c.pos[1], c.pos[2])
     if pos then
         c.move(pos[1],pos[2])
+    else
+        local px = c.pos[1] - c.side
+        if px >= 1 and px <= 8 then
+            c.move(px, c.pos[2])
+        end
     end
 end
 
@@ -97,19 +96,21 @@ function make_damage_spot(x,y,damage,side,warning,abil)
         abil = abil
     })
     go.update = function()
+        if victory or defeat then return end
         local spot = grid[go.pos[2]][go.pos[1]]
         if go.countdown > 0 then
             go.countdown -= 1
         elseif go.countdown == 0 then
-            if spot.creature and spot.creature.side != go.side then
+            if spot.creature and spot.creature.side != go.side and spot.creature.iframes <= 0 then
                 if has_mod(go.abil, "stun") then
                     spot.creature.stun_time = 90
                 end                
                 if has_mod(go.abil, "poison") then
-                    spot.creature.poison_timer = 120 * go.damage
+                    spot.creature.poison_timer = 60 * go.damage
                 else
-                    spot.creature.take_damage(go.damage)
+                    spot.creature.take_damage(go.damage, has_mod(go.abil, "pierce"))
                 end
+                if spot.creature == pl then pl.iframes = 15 end
             end
             local claims = count(abil.mods, "claim") * 2
             if spot.space.side != go.side and abil.tiles_claimed < claims then
@@ -121,7 +122,7 @@ function make_damage_spot(x,y,damage,side,warning,abil)
             ssfx((go.side == 1) and 8 or 9)
         else
             go.decay += 1
-            if go.decay > 4 then
+            if go.decay > 8 then
                 del(spot, go)
             end
         end
@@ -132,6 +133,7 @@ function make_damage_spot(x,y,damage,side,warning,abil)
         pp[2] += spot.space.offset_y
         local color = 9
         if go.side != 1 then color = 8 end
+        if has_mod(go.abil, "poison") then color = 12 end        
         if go.countdown > 0 then
             local t = 1 - (go.countdown / go.countdown_max)
             local hw = 6 * t + 2
@@ -147,7 +149,22 @@ function make_damage_spot(x,y,damage,side,warning,abil)
             line(x2, y2, x2 - hw, y2, color)
             line(x2, y2, x2, y2 - hh, color)         
         else
-            rectfill(pp[1] + 1, pp[2] + 1, pp[1] + 14, pp[2] + 11, color)
+            if go.decay < 5 then
+                rectfill(pp[1] + 1, pp[2] + 1, pp[1] + 14, pp[2] + 11, color)
+            end
+        end
+        --[[if damage > 1 then
+            draw_pips(damage, pp[1] + 10, pp[2] + 9, go.side == 1 and 12 or 0)
+        end
+        draw_mods(go.abil.mods, pp[1], pp[2])
+        ]]
+        if damage > 2 then
+            fillp(0b1101101101111110.1)
+            if damage > 6 then
+                fillp(0b0101101001011010.1)
+            end
+            rectfill(pp[1] + 2, pp[2] + 2, pp[1] + 13, pp[2] + 10, 0)
+            fillp()
         end
     end
 end
@@ -160,29 +177,22 @@ function make_gridspace(x,y)
     local go = make_gridobj(x,y,0,spri)
     go.side = side
     go.main_side = side
-    go.fire_time = 0
     go.bounce_timer = 15 + x + y
     go.offset_y = 0
     go.update = function()
-        if go.fire_time > 0 then
-            go.fire_time -= 1
-        end
     end
     go.draw = function()
         go.offset_y = -(cos(go.bounce_timer / 10) - 0.5) * (go.bounce_timer / 5)
         go.bounce_timer = max(go.bounce_timer - 1, 0)
         local pp = tp(go.pos[1], go.pos[2])
         pp[2] += go.offset_y
-        local spri = 64
+        local spri = gridpatterns[(x - 1) + (y - 1) * 8 + 1]
         if go.side == -1 then
             pal(split"0,2,3,4,5,3,13,8,9,10,11,12,1,14,15,0")
         else
             palreset()
         end
         spr(spri, pp[1], pp[2], 2, 2)
-        if go.fire_time > 0 and go.fire_time % 5 == 0 then
-            make_effect_fire(pp[1] + rnd() * 12, pp[2] + rnd() * 8 - 2)
-        end
     end
     grid[go.pos[2]][go.pos[1]].space = go
     go.flip = function(side, time)

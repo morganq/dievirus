@@ -5,6 +5,7 @@ function make_effect_simple(x, y, color, spri, xv, yv, lifetime, fill, sprw, spr
     local ng = make_nongrid(x,y)
     local time = 0
     ng.draw = function()
+        palreset()
         fillp(fill)
         spr(spri, ng.pos[1], ng.pos[2], sprw or 1, sprh or 1, flip)
         fillp()

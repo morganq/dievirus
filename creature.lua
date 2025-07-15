@@ -2,7 +2,7 @@ creature_index = 1
 function make_creature(x, y, side, health, spri)
     local go = make_gridobj(x, y, 10, spri)
     addfields(go,
-        "movetime=0,yo=-7,damage_time=0,shield=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0",
+        "movetime=0,yo=-7,damage_time=0,shield=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0,iframes=0",
         {
             lastpos = {0,0},
             side = side,
@@ -11,7 +11,7 @@ function make_creature(x, y, side, health, spri)
             max_health = health,
             index=creature_index,
         })
-    go.clay_time = 15
+    go.clay_time = spri >= 40 and 45 or 15
     creature_index += 1
     go.draw = function()
         local pp = tp(go.pos[1], go.pos[2])
@@ -19,7 +19,8 @@ function make_creature(x, y, side, health, spri)
         local hit = 0
         local space = grid[go.pos[2]][go.pos[1]].space
         function ds(ox, oy)
-            spr(spri, pp[1] + hit + ox, pp[2] + go.yo + oy + space.offset_y, 2,2, go.side == -1)
+            local ov = go.side * -sin(go.overextended_timer / 60) * 3
+            spr(spri, pp[1] + hit + ox + ov, pp[2] + go.yo + oy + space.offset_y, 2,2, go.side == -1)
         end
 
         if go.clay_time > 0 then
@@ -43,41 +44,46 @@ function make_creature(x, y, side, health, spri)
             return
         end
 
+        --[[pal(split"7,7,7,7,7,7,7,7,7,7,7,7,7,7,7")
+        ds(-1,0)
+        ds(1,0)
+        ds(0,-1)
+        ds(0,1)
+        palreset()]]
+
         if go.movetime > 0 then
             fillp(0b0101010101010101.11)
         end
         
         if go.damage_time > 0 then
-            pal({7,7,7,7,7,7,7,7,7,7,7,7,7,7,7})
+            pal(split"7,7,7,7,7,7,7,7,7,7,7,7,7,7,7")
             hit = -go.damage_time * go.dir
         end
         
         if go.poison_timer > 0 then
-            pal(split"1,2,3,4,5,6,7,8,9,10,12,12,13,14,15,0")
+            pal(split"1,2,3,12,12,6,7,12,9,10,12,12,13,14,15,0")
         end
-        ds(0,0)
+        if go.iframes % 2 == 0 then
+            ds(0,0)
+        end
         fillp()
         palreset()
         if go.stun_time > 0 then
             spr(143 + (tf \ 10) % 2, pp[1] + 3, pp[2] - 6)
-            --print(go.stun_time, 100, go.index * 5 + 64, 7 + go.index)
         end
     end
 
     go.update = function()
         local space = grid[go.pos[2]][go.pos[1]].space
+        if go.iframes > 0 then go.iframes -= 1 end
         if space.side != go.side then
             go.overextended_timer += 1
             if go.overextended_timer >= 30 then
                 go.overextended_timer = 0
                 push_to_open_square(go)
-                --go.stun_time = 30
             end
         else
             go.overextended_timer = 0
-        end
-        if space.fire_time > 0 and space.fire_time % 20 == 0 then
-            go.take_damage(1)
         end
         go.poison_timer = max(go.poison_timer - 1, 0)
         go.damage_time -= 1
@@ -110,19 +116,22 @@ function make_creature(x, y, side, health, spri)
         end        
     end
 
-    go.take_damage = function(damage)
-        if damage >= go.shield then
-            local damage_after = damage - go.shield
-            go.shield = 0
-            go.shield_timer = 0
-            go.health -= damage_after
+    go.take_damage = function(damage, pierce)
+        if pierce then 
+            go.health -= damage
         else
-            go.shield -= damage
+            if damage >= go.shield then
+                local damage_after = damage - go.shield
+                go.shield = 0
+                go.shield_timer = 0
+                go.health -= damage_after
+            else
+                go.shield -= damage
+            end
         end
         go.damage_time = 5
         local pp = tp(go.pos[1],go.pos[2])
         sfx(go == pl and 11 or 10, 1)
-        --make_effect_simple(pp[1] + 10, pp[2] - 4, damage)
         if go.health <= 0 then
             go.kill()
             sfx(go == pl and 13 or 12, 1)

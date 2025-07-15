@@ -26,7 +26,14 @@ function _draw()
         pal(split"129,2,141,4,134,5,6,136,9,10,142,3,13,14,15,0",1)
         night_palette_imm = false
     end
+    if pal_override_imm then
+        pal(pal_override_imm)
+        pal_override_imm = nil
+    end
 end
 function _update()
     states[state].update()
 end
+
+-- victory/defeat graphic
+-- timer breaks if paused too long

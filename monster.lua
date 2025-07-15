@@ -45,21 +45,18 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
                 c.move_pattern_i = c.move_pattern_i % #c.move_pattern + 1
             end
             if will_move then -- Move pattern allows move
-                local abiltx = {sword=0, sling=8, bomb=6}
                 local tx = nil
                 local ty = nil
-                if rnd() < 0.4 then tx = abiltx[c.next_ability.base] end
-                if c.favor_row and rnd() < 0.25 then ty = c.favor_row end
+                if c.favor_col and rnd() < 0.45 then tx = c.favor_col end
                 if c.flies then
                     local rx = tx or flr(rnd(4)) + 5
                     local ry = ty or flr(rnd(4)) + 1            
-                    if valid_move_target(rx, ry, c.side) then
+                    if valid_move_target(rx, ry, c.side, true) then
                         c.move(rx, ry)
                     end
                 else
-                    local spots = {}
-                    for i = -1,1 do for j = -1,1 do add(spots, {i,j}) end end
-                    for i = 1,9 do
+                    local spots = {{-1,0},{1,0},{0,-1},{0,1}}
+                    for i = 1,4 do
                         local spot = rnd(spots)
                         del(spots, spot)
                         local dx,dy = nil,nil
@@ -95,9 +92,9 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         if c.abil_pattern and c.abil_timer == 8 and c.abil_pattern[c.abil_pattern_i] then
             ssfx(18)
         end
-        if c.move_pattern and c.move_pattern == 8 and c.move_pattern[c.move_pattern_i] then
+        --[[if c.move_pattern and c.move_pattern == 8 and c.move_pattern[c.move_pattern_i] then
             ssfx(17)
-        end        
+        end ]]       
     end
     local basedraw = c.draw
     c.draw = function()
@@ -114,16 +111,21 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         local hpx = pp[1] + 3
         local hpy = pp[2] + 10
         
-        line(hpx, hpy, hpx + 9, hpy, 6)
-        line(hpx, hpy, hpx + 9 * (c.health / c.max_health), hpy, 15)
+        line(hpx, hpy, hpx + 9, hpy, 1)
+        line(hpx, hpy, hpx + 9 * (c.health / c.max_health), hpy, 9)
+        if c.shield > 0 then
+            line(hpx, hpy, hpx + 9 * min((c.shield / 6),1), hpy, 7)
+        end
 
         palreset()
-        if c.abil_pattern and c.abil_timer < 9 and c.abil_pattern[c.abil_pattern_i] then
-            spr(134, hpx + 2, hpy - 21) 
+        if c.abil_pattern and c.abil_timer == 9 and c.abil_pattern[c.abil_pattern_i] then
+            --spr(134, hpx + 2, hpy - 21) 
+            make_effect_simple(hpx + 2, hpy - 18, nil, 134, 0, -0.25, 12)
         end
-        if c.move_pattern and c.move_timer < 9 and c.move_pattern[c.move_pattern_i] then
-            spr(135, hpx + 2, hpy - 21) 
-        end        
+        --if c.move_pattern and c.move_timer == 9 and c.move_pattern[c.move_pattern_i] then
+            --spr(135, hpx + 2, hpy - 21) 
+            --make_effect_simple(hpx + 2, hpy - 18, nil, c.flies and 135 or 156, 0, -0.25, 12)
+        --end        
     end
     if needs_push then
         push_to_open_square(c)

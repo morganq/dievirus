@@ -31,7 +31,7 @@ function sfn(s)
     end
 end
 
-function string_multilookup(s, no_key)
+function smlu(s, no_key)
     local mt = {}
     for line in all(split(s,"\n")) do
         if #line > 3 then
@@ -80,38 +80,28 @@ function sandify(sx, sy, sw, sh, dx, dy, t)
             local c = sget(sx + x, sy + y)
             if c != (t or 14) then
                 make_creature_particle(dx + x, dy + y, c, xv / 2, dy + 6 + rnd(4))
-                --make_creature_particle(dx + x, dy + y, c, xv / 2, dy + y + rnd(4))
             end
         end
     end 
 end
 
-FADE_PALS = string_multilookup([[
-1 ,2 ,3 ,4 ,5 ,6 ,7 ,8 ,9 ,10,11,12,13,14,15,0 
-0 ,1 ,1 ,2 ,3 ,5 ,6 ,2 ,2 ,9 ,9 ,3 ,5 ,0 ,15 ,0
-0 ,0 ,1 ,1 ,3 ,5 ,6 ,2 ,2 ,9 ,9 ,3 ,5 ,0 ,5 ,0
-0 ,0 ,0 ,0 ,0 ,3 ,5 ,2 ,0 ,0 ,0 ,3 ,0 ,0 ,0 ,0
-0 ,0 ,0 ,0 ,0 ,0 ,3 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
-0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
-0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0
+FADE_PALS_1 = smlu([[
+129,2  ,141,4  ,134,6  ,7  ,136,9  ,10 ,142,139,13 ,14 ,15 ,0
+0. ,129,129,2  ,141,134,6  ,2. ,2  ,9  ,9. ,141,134,0  ,15 ,0
+0. ,0  ,129,129,141,134,6. ,2. ,2  ,9  ,9. ,141,134,0  ,134,0
+0. ,0  ,0. ,0  ,0. ,141,134,2. ,0  ,0  ,0. ,141,0  ,0  ,0  ,0
+0. ,0  ,0. ,0  ,0. ,0  ,141,0. ,0  ,0  ,0. ,0. ,0  ,0  ,0  ,0
+0. ,0  ,0. ,0  ,0. ,0  ,0  ,0. ,0  ,0  ,0. ,0. ,0  ,0  ,0  ,0
+0. ,0  ,0. ,0  ,0. ,0  ,0  ,0. ,0  ,0  ,0. ,0. ,0  ,0  ,0  ,0
 ]],true)
 
-function screen_transition(sand)
-    -- change to make sand a rect.
+
+function scrnt(draw_fn, ...)
     nongrid = {}
-    for i = sand and 0 or 200, 300, 4 do
-        poke(0X5f54, 0x60)
-        if i < 127 and sand then
-            sandify(0, i, 127, rnd(3)+1, 0, i, 5)
-        end
-        
-        pal(FADE_PALS[mid(i \ 5 - 40,1,6)])
-        if sand then
-            rectfill(0,0,127,i - 16, 5)
-        else
-            sspr(0,0,128,128)
-        end
-        poke(0X5f54, 0x00)
+    sandify(...)
+    poke(0X5f54, 0x00)
+    for i = 0, 170, 4 do
+        draw_fn(true)
         local ng = {}
         for i = max(#nongrid - 1000,1), #nongrid do
             local n = nongrid[i]
@@ -120,6 +110,28 @@ function screen_transition(sand)
             add(ng, n)
         end        
         nongrid = ng
+
+        pal(FADE_PALS_1[mid(i \ 5 - 25,1,6)], 1)
         flip()
     end
+end
+
+function draw_pips(pips, x, y, color)
+    local fives = pips \ 5
+    local ones = pips - (fives * 5)
+    local iy = 0
+    for i = 1,fives do
+        rectfill(x, y - iy - 2, x + 2, y - iy, color)
+        iy += 4
+    end
+    for i = 1, ones do
+        rectfill(x, y - iy, x + 2, y - iy, color)
+        iy += 2
+    end    
+end
+
+function draw_mods(mods, x, y)
+    for i = 1, #mods do
+        spr(all_mods[mods[i]][2], x, y + i * 6 - 6)
+    end    
 end

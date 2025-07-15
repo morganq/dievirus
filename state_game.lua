@@ -1,21 +1,9 @@
-
 function draw_gameplay()
     draw_time = (draw_time + 1) % 1024
     cls(15)
     sfn([[
 rectfill,0,0,128,32,7
 spr,222,64,9
-spr,199,-8,16,2,2
-spr,199,4,16,2,2
-spr,199,16,16,2,2
-spr,199,28,16,2,2
-spr,199,40,16,2,2
-spr,201,52,16,3,2
-spr,199,76,16,2,2
-spr,199,88,16,2,2
-spr,199,100,16,2,2
-spr,199,112,16,2,2
-spr,199,124,16,2,2
 spr,208,24,13,3,1
 spr,204,8,13,2,1
 spr,205,1,13,1,1
@@ -24,7 +12,6 @@ spr,220,84,13
 spr,220,94,13
 spr,221,107,13
 spr,221,116,13
-spr,228,2,20,2,2
 spr,211,37,24,2,1
 spr,213,76,24,2,1
 spr,214,108,24,1,1
@@ -39,20 +26,24 @@ fillp,0b1101110111011101.1
 line,34,9,82,9,6
 fillp,0
 ]])
+
+    for wall in all(walls) do
+        spr(wall[1], wall[2], wall[3], 2, 2)
+    end
+    fillp(0b0111110110100000.1)
+    rectfill(0,28,128,31,7)
+    fillp()
     local game_seconds = (game_frames_frac / 30) / 0x0.0001 
     if game_seconds < night_time then
-        print(night_time - game_seconds, 64, 1, 0)
+        spr(155, 111, 0)
+        print(night_time - game_seconds, 120, 2, 0)
     else
-        spr(231, 60, 1)
+        spr(231, 113, 1)
         night_palette_imm = true
         is_night = true
     end
     local bins = {{},{},{},{}}
-    --[=[for i = 1, #nongrid do
-        local ng = nongrid[i]
-        local gpp = gp(ng.pos[1],ng.pos[2])
-        add(bins[gpp[2]],ng)
-    end]=]
+
     for i = 1,4 do
         for j = 1, 8 do
             local gridspace = grid[i][j]
@@ -230,12 +221,10 @@ function gameplay_tick()
 end
 
 function update_gameplay()
-    if btnp(4) then victory = true end
-
     if victory then
         victory_time += 1
         if victory_time > 90 then
-            if level == 15 then
+            if level == 20 then
                 dset(0, dget(0) + 1)
                 state = "win"
             else
@@ -250,7 +239,19 @@ function update_gameplay()
     end
     if defeat then
         defeat_time += 1
+        if defeat_time % 5 == 0 then
+            defeat_wall = rnd(#walls)\1 + 1
+            walls[defeat_wall][3] += 2
+        end
+        for wall in all(walls) do
+            if wall[3] != 16 and rnd() < 0.5 then
+                wall[3] += 0.25
+            end
+        end
         time_scale = 1
+        if defeat_time > 120 then
+            run()
+        end
     end
 
     temp_runner = nil
@@ -294,10 +295,10 @@ function update_gameplay()
             throw()
             time_scale = 1
         end
-        if btnp(2,1) then
-            victory = true
-            victory_time = 90
-        end
+        --if btnp(2,1) then
+        --    victory = true
+        --    victory_time = 90
+        --end
     end
 
     if time_scale > 0 then
@@ -356,82 +357,28 @@ function do_level_intro()
             for i = 1,6 do
                 pl.die[i] = player_abilities[i].copy()
             end
-            pl.die[-1] = make_ability(all_abilities["curse"], 1, {}).copy()            
+            pl.die[-1] = make_ability(all_abilities["curse"], 0, {}).copy()            
         end
 
 
         if i == 1 then
-            function place_monster(name, x, y, favor_row)
-                x = x or flr(rnd(4)) + 5
-                y = y or flr(rnd(4)) + 1
+            local ld = all_levels[level]
+            for enemy in all(ld) do
+                local name, favor_col, time, api, mpi = unpack(split(enemy,"/"))
+                x = flr(rnd(4)) + 5
+                y = flr(rnd(4)) + 1
                 local mon = parse_monster(monster_defs[name], x, y)
                 mon.move(x,y)
-                mon.favor_row = favor_row
-                return mon
+                mon.favor_col = favor_col
+                mon.time = time or 0
+                mon.abil_pattern_i = api or 0
+                mon.move_pattern_i = mpi or 0
             end  
-            if level == 1 then
-                place_monster("mage1", 6, 2, 2)
-                --place_monster("mage1", 6, 4, 3)
-            elseif level == 2 then
-                place_monster("mage1")
-                place_monster("fighter1")
-            elseif level == 3 then
-                place_monster("duelist1")
-                place_monster("duelist1")
-            elseif level == 4 then
-                place_monster("engineer1")
-            elseif level == 5 then
-                place_monster("boss1")
-            elseif level == 6 then
-                place_monster("mage2")
-                place_monster("mage2").abil_pattern_i = 2
-            elseif level == 7 then
-                place_monster("fighter2")
-                place_monster("fighter1")
-                place_monster("fighter1")
-            elseif level == 8 then
-                place_monster("engineer1")
-                place_monster("engineer1")
-                place_monster("fighter1")
-            elseif level == 9 then
-                place_monster("bomber1")
-                place_monster("bomber1").time = 33
-                place_monster("bomber1").time = 66
-            elseif level == 10 then
-                place_monster("boss2")
-            elseif level == 11 then
-                place_monster("bomber2")
-                place_monster("engineer2")
-            elseif level == 12 then
-                place_monster("duelist2")
-            elseif level == 13 then
-                place_monster("mage1")
-                local m2 = place_monster("mage2")
-                m2.abil_pattern_i = 2
-                m2.move_pattern_i = 2
-                local m3 = place_monster("mage3")
-                m3.abil_pattern_i = 3
-                m3.move_pattern_i = 3        
-            elseif level == 14 then
-                place_monster("fighter2")
-                local m2 = place_monster("fighter2")
-                m2.abil_pattern_i = 2
-                m2.move_pattern_i = 2    
-                place_monster("boss2")
-            elseif level == 15 then
-                place_monster("boss3")
-                place_monster("engineer1")
-                --place_monster("fighter1")
-            end            
         end
 
         _draw()
-        pal(FADE_PALS[max((30 - i) \ 5,1)])
-        poke(0X5f54, 0x60)
-        sspr(0, 0, 128, 128, 0, 0)
-        poke(0X5f54, 0x00)
         palreset()
-        pal(split"129,2,141,4,134,6,7,136,9,10,142,139,13,14,15,0",1)
+        pal(FADE_PALS_1[max((30 - i) \ 5,1)],1)
         flip()
     end
 end
@@ -444,20 +391,23 @@ function start_level()
     draw_time = 0
     victory_time = 0
     defeat_time = 0
+    is_night = false
 
     time_scale = 1
 
     level += 1
     attack_runners = {}
     nongrid = {}
-    grid = { }
+    grid = {}
     game_frames_frac = 0
     pause_extend = 0
 
-    night_time = max(65 - level * 5, 25)
+    night_time = max(65 - level * 5, 45)
+    if level == 15 then night_time = 0 end
+    if level >= 18 then night_time = 9999 end
 
-    victory = true
-    victory_time = 90
+    --victory = true
+    --victory_time = 90
     for i = 1,4 do
         grid[i] = {}
         for j = 1, 8 do
@@ -470,6 +420,22 @@ function start_level()
         end
     end    
     die3d = {}
+
+walls = smlu([[
+199,-8,16
+233,4,16
+199,16,16
+199,28,16
+199,40,16
+201,52,16
+235,60,16
+199,76,16
+199,88,16
+199,100,16
+199,112,16
+199,124,16
+]],true)
+    defeat_wall = 0
 
     do_level_intro()
     throw()

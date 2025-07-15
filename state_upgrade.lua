@@ -4,7 +4,7 @@ applied = {}
 
 --faces_options1 = split("x_____,_x____,__x___,___x__,____x_,_____x")
 faces_options2 = split("x_____,_x____,__x___,___x__,____x_,_____x")
-upgrade_mods_names = split"growth,claim,pause,stun,poison,rage,invasion"
+upgrade_mods_names = split"growth,pierce,claim,pause,invasion,rage,poison,stun"
 upgrade_mods = {}
 for mn in all(upgrade_mods_names) do
     for i = 1, all_mods[mn][3] do
@@ -48,7 +48,7 @@ function make_upgrade(faces, kind)
 end
 
 function draw_random_abil()
-    local level_rarity = min(level \ 4 + 1, 3)
+    local level_rarity = split"0,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,4"[level]
     local abils_by_rarity = {}
     for i = -1, 5 do
         abils_by_rarity[i] = {}
@@ -56,14 +56,10 @@ function draw_random_abil()
     for k,v in pairs(all_abilities) do
         add(abils_by_rarity[v[5]], k)
     end
-    if rnd() > 0.35 or level_rarity == 5 then
+    if rnd() > 0.35 then
         return rnd(abils_by_rarity[level_rarity])
     else
-        if rnd() > 0.5 then
-            return rnd(abils_by_rarity[level_rarity + 1])
-        else
-            return rnd(abils_by_rarity[level_rarity - 1])
-        end
+        return rnd(abils_by_rarity[level_rarity + 1])
     end
 end
 
@@ -84,7 +80,6 @@ function update_upgrade()
             local rndfc = '______'
             if v == '+1' then
                 local j = rnd(#faces_options1)\1+1
-                --printh(j)
                 current_upgrades[i] = make_upgrade(faces_options1[j], v)
                 deli(faces_options1,j)
             else
@@ -103,24 +98,28 @@ function update_upgrade()
         ssfx(14)
     end    
     if btnp(5) and tf > 32 then
-        screen_transition(false)
+        ssfx(12)
+        poke(0X5f54, 0x60)
+        local y = selected_upgrade_index * 27 - 16
         player_abilities = applied
+        
         if current_upgrades[selected_upgrade_index].kind == "hp" then
             max_hp += 1
         end
         current_upgrades = nil
         selected_upgrade_index = 1
         state = "gameplay"
+        scrnt(draw_upgrade, 4, y, 22, 23, 4, y, 7)
         start_level()
     end
 end
 
-function draw_upgrade()
+function draw_upgrade(skip_selected)
     camera(0,cos(min(tf / 64, 0.5)) * -64 - 64)
 sfn([[
 rectfill,30,0,128,128,7
 line,31,0,128,0,6
-line,127,0,127,127,6
+
 line,31,127,127,127,6
 spr,146,27,7
 
@@ -132,24 +131,26 @@ line,0,127,30,127,1
 rectfill,31,60,128,109,5
 line,31,60,128,60,3
 line,31,109,128,109,3
-spr,78,33,52
-spr,78,43,52
-spr,78,53,52
-spr,78,63,52
-spr,78,73,52
-spr,78,83,52
-spr,78,93,52
-spr,78,103,52
-spr,78,113,52
-spr,78,33,110,1,1,1,1
-spr,78,43,110,1,1,1,1
-spr,78,53,110,1,1,1,1
-spr,78,63,110,1,1,1,1
-spr,78,73,110,1,1,1,1
-spr,78,83,110,1,1,1,1
-spr,78,93,110,1,1,1,1
-spr,78,103,110,1,1,1,1
-spr,78,113,110,1,1,1,1
+spr,147,33,52
+spr,147,43,52
+spr,147,53,52
+spr,147,63,52
+spr,147,73,52
+spr,147,83,52
+spr,147,93,52
+spr,147,103,52
+spr,147,113,52
+spr,147,33,110,1,1,1,1
+spr,147,43,110,1,1,1,1
+spr,147,53,110,1,1,1,1
+spr,147,63,110,1,1,1,1
+spr,147,73,110,1,1,1,1
+spr,147,83,110,1,1,1,1
+spr,147,93,110,1,1,1,1
+spr,147,103,110,1,1,1,1
+spr,147,113,110,1,1,1,1
+
+line,127,0,127,127,6
 
 spr,79,124,-4
 spr,79,124,123
@@ -171,7 +172,7 @@ print,⬆️,12,4,7
 print,⬇️,12,119,7
 print,choose upgrade,38,22,3
 ]])
-    local ls = "level "..(level + 1).."/15"
+    local ls = "level "..(level + 1).."/20"
     print(ls, 82, 5, 5)
     if current_upgrades != nil then
         local upgrade = current_upgrades[selected_upgrade_index]
@@ -179,28 +180,31 @@ print,choose upgrade,38,22,3
         for i = 1, 6 do
             applied[i] = player_abilities[i].copy()
             if upgrade.faces[i] then
+                local ps = ""
                 if upgrade.kind == "hp" then
-                    --
+                    ps = "+1 health"
                 elseif sub(upgrade.kind,1,1) == "+" then
                     local delta = ({["3"]=3, ["2"]=2, ["-"]=-1, ["1"]=1, [false]=0})[upgrade.faces[i]]
                     applied[i].pips = max(applied[i].pips + delta, 0)
                     applied[i].original_pips = applied[i].pips
-                    nl_print("+1 health", 42, 34, 1)        
+                    ps = "level up abilities"
                 elseif all_abilities[upgrade.kind] != nil then
-                    --applied[i].base = upgrade.kind
                     local abil = all_abilities[upgrade.kind]
                     applied[i] = make_ability(abil, applied[i].pips, applied[i].mods)
-                    nl_print(applied[i].name, 42, 34, 1)                    
+                    ps = applied[i].name
                 else
-                    applied[i].mods[#player_abilities[i].mods + 1] = upgrade.kind
-                    --add(applied[i].mods, upgrade.kind)
-                    local desc = all_mods[upgrade.kind][4]
-                    nl_print(desc, 42, 34, 1)
+                    applied[i].mods[min(#player_abilities[i].mods + 1,2)] = upgrade.kind
+                    ps = all_mods[upgrade.kind][4]
+                    
                 end
+                nl_print(ps, 42, 34, 1)
             end
         end
         for i = 1, #current_upgrades do
             temp_camera(-4, -(i * 27 - 16), function()
+                if i == selected_upgrade_index and skip_selected then
+                    return
+                end
                 rectfill(0, 0, 22, 23, 7)
                 current_upgrades[i].draw(5, 5)
                 local color = 3
@@ -211,6 +215,6 @@ print,choose upgrade,38,22,3
                 rect(0, 0, 22, 23, color)
             end)
         end
-        draw_die2d(player_abilities,50,65,applied,upgrade)
+        draw_die2d(player_abilities,50,65,state == "gameplay" and player_abilities or applied,upgrade)
     end
 end

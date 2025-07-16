@@ -2,7 +2,7 @@ creature_index = 1
 function make_creature(x, y, side, health, spri)
     local go = make_gridobj(x, y, 10, spri)
     addfields(go,
-        "movetime=0,yo=-7,damage_time=0,shield=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0,iframes=0",
+        "movetime=0,yo=-7,damage_time=0,shield=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0,iframes=0,telegraph_x=0,telegraph_y=0",
         {
             lastpos = {0,0},
             side = side,
@@ -20,7 +20,7 @@ function make_creature(x, y, side, health, spri)
         local space = grid[go.pos[2]][go.pos[1]].space
         function ds(ox, oy)
             local ov = go.side * -sin(go.overextended_timer / 60) * 3
-            spr(spri, pp[1] + hit + ox + ov, pp[2] + go.yo + oy + space.offset_y, 2,2, go.side == -1)
+            spr(spri, pp[1] + hit + ox + ov + go.telegraph_x, pp[2] + go.yo + oy + space.offset_y + go.telegraph_y, 2,2, go.side == -1)
         end
 
         if go.clay_time > 0 then
@@ -117,6 +117,7 @@ function make_creature(x, y, side, health, spri)
     end
 
     go.take_damage = function(damage, pierce)
+        if victory or defeat then return end
         if pierce then 
             go.health -= damage
         else

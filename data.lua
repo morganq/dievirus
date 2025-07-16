@@ -49,7 +49,8 @@ d.turret,117,turret,rico,-1
 all_mods = smlu([[
 growth,120,3,+1 each use in%battle (max = 5)
 pierce,121,2,ignores shields
-claim,122,8,claim up to 2%of the tiles hit
+claim,122,6,claim the first tile%you hit
+superclaim,125,2,claim up to 2%of the tiles hit
 pause,123,4,time stands still%for a moment longer
 invasion,124,2,+1 if standing%in enemy tile
 rage,125,2,+2 if less than%half health
@@ -59,7 +60,7 @@ stun,127,2,stuns the enemy%for a moment
 
 local monster_defs = smlu([[
 harpy1,38,0,wave;1,4,60,flies=1,move_pattern=xx_,abil_pattern=__x
-dog1,36,0,sword;1;claim/sword;1,5,28,move_pattern=xx_,abil_pattern=__x
+dog1,36,0,sword;1;superclaim/sword;1,5,28,move_pattern=xx_,abil_pattern=__x
 fox1,14,0,wave;1/splash;2/splash;1/rock;2;claim,6,36,move_pattern=xxx_,abil_pattern=___x
 owl1,34,0,turret;2/sling;1,8,65,flies=1,abil_pattern=_x
 boss1,40,0,bomb;3/wave;2/shield;1/sword;3,20,15,flies=1,abil_pattern=____x_x__,move_pattern=xxxx_____

@@ -30,6 +30,39 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         c.abil_pattern_i = 1
     end
 
+    c.pick_next_move_target = function()
+        c.move_target = nil
+        local tx = nil
+        local ty = nil
+        if c.flies then
+            for i = 1, 10 do
+                if c.favor_col and rnd() < 0.45 then tx = c.favor_col end
+                local rx = tx or flr(rnd(4)) + 5
+                local ry = ty or flr(rnd(4)) + 1            
+                if valid_move_target(rx, ry, c.side, true) then
+                    c.move_target = {rx,ry}
+                    break
+                end
+            end
+        else
+            if c.favor_col and rnd() < 0.45 then tx = c.favor_col end
+            local spots = {{-1,0},{1,0},{0,-1},{0,1}}
+            for i = 1,4 do
+                local spot = rnd(spots)
+                del(spots, spot)
+                local dx,dy = nil,nil
+                if tx then dx = mid(tx - c.pos[1], -1, 1) end
+                if ty then dy = mid(ty - c.pos[2], -1, 1) end
+                local rx = (dx or spot[1]) + c.pos[1]
+                local ry = (dy or spot[2]) + c.pos[2]
+                if valid_move_target(rx, ry, c.side, false) then
+                    c.move_target = {rx,ry}
+                    break
+                end
+            end
+        end
+    end
+
     local baseupdate = c.update
     c.update = function()
         baseupdate()
@@ -37,42 +70,30 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         c.time += 1
         if c.overextended_timer <= 0 then
             c.move_timer -= 1
+            if not c.move_target then
+                c.pick_next_move_target()
+            end
         end
+
         if c.move_timer <= 0 then
             local will_move = true
             if c.move_pattern then
                 if not c.move_pattern[c.move_pattern_i] then will_move = false end
                 c.move_pattern_i = c.move_pattern_i % #c.move_pattern + 1
             end
-            if will_move then -- Move pattern allows move
-                local tx = nil
-                local ty = nil
-                if c.favor_col and rnd() < 0.45 then tx = c.favor_col end
-                if c.flies then
-                    local rx = tx or flr(rnd(4)) + 5
-                    local ry = ty or flr(rnd(4)) + 1            
-                    if valid_move_target(rx, ry, c.side, true) then
-                        c.move(rx, ry)
+            if will_move then
+                if c.move_target then
+                    if valid_move_target(c.move_target[1], c.move_target[2], c.side, c.flies) then
+                        c.move(c.move_target[1], c.move_target[2])
+                    else
+                        printh("invalid move target")
                     end
-                else
-                    local spots = {{-1,0},{1,0},{0,-1},{0,1}}
-                    for i = 1,4 do
-                        local spot = rnd(spots)
-                        del(spots, spot)
-                        local dx,dy = nil,nil
-                        if tx then dx = mid(tx - c.pos[1], -1, 1) end
-                        if ty then dy = mid(ty - c.pos[2], -1, 1) end
-                        local rx = (dx or spot[1]) + c.pos[1]
-                        local ry = (dy or spot[2]) + c.pos[2]
-                        if valid_move_target(rx, ry, c.side) then
-                            c.move(rx, ry)
-                            break
-                        end
-                    end
+                    c.move_target = nil
                 end
             end
             c.move_timer = c.speed
         end
+
         c.abil_timer -= 1
         if c.abil_timer <= 0 then
             local will_abil = true
@@ -98,6 +119,28 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
     end
     local basedraw = c.draw
     c.draw = function()
+
+        if c.move_target then
+            local xo, yo = mid(c.move_target[1] - c.pos[1], -1, 1), mid(c.move_target[2] - c.pos[2], -1, 1)
+            if not c.move_pattern or (c.move_pattern and c.move_pattern[c.move_pattern_i]) then
+                local t = 1 - (c.move_timer / c.speed)
+                local val = 0
+                if t > 0.85 then
+                    val = 3                    
+                elseif t > 0.65 then
+                    val = 2
+                elseif t > 0.25 then
+                    val = 1                    
+                end
+                c.telegraph_x = val * xo
+                c.telegraph_y = val * yo
+            end
+        end
+        if c.move_timer == c.speed then 
+            c.telegraph_x = 0
+            c.telegraph_y = 0
+        end        
+
         palreset()
         if c.palette != nil then
             pal(c.palette)
@@ -130,6 +173,7 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
     if needs_push then
         push_to_open_square(c)
     end
+    c.pick_next_move_target()
     return c
 end
 

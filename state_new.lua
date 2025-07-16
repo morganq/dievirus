@@ -10,7 +10,7 @@ function make_die(as)
 end
 classes = smlu([[
 1,king,0,0,sling;1/sling;1/spear;1/spear;1/shield;1/sword;2
-2,queen,2,0,sword;2/shield;1/spear;1/slap;1/scythe;1;claim/scythe;2
+2,queen,2,0,sword;2/shield;1/spear;1/slap;1/scythe;1;superclaim/scythe;2
 3,priestess,4,0,wave;1/wave;1/wall;0;stun/sword;1/bomb;2/shield;1
 4,engineer,6,1,turret;1/splash;1/cane;1/turret;1/rock;1/shield;1
 5,farmer,8,1,slap;1/shield;1/rock;0;growth/scythe;1/spear;1/sy.turret;1;claim

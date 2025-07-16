@@ -4,7 +4,7 @@ applied = {}
 
 --faces_options1 = split("x_____,_x____,__x___,___x__,____x_,_____x")
 faces_options2 = split("x_____,_x____,__x___,___x__,____x_,_____x")
-upgrade_mods_names = split"growth,pierce,claim,pause,invasion,rage,poison,stun"
+upgrade_mods_names = split"growth,pierce,claim,pause,invasion,superclaim,poison,stun"
 upgrade_mods = {}
 for mn in all(upgrade_mods_names) do
     for i = 1, all_mods[mn][3] do

@@ -112,7 +112,7 @@ function make_damage_spot(x,y,damage,side,warning,abil)
                 end
                 if spot.creature == pl then pl.iframes = 15 end
             end
-            local claims = count(abil.mods, "claim") * 2
+            local claims = count(abil.mods, "claim") + count(abil.mods, "superclaim") * 2
             if spot.space.side != go.side and abil.tiles_claimed < claims then
                 spot.space.flip(go.side, 30 * 8)
                 abil.tiles_claimed += 1
@@ -193,6 +193,7 @@ function make_gridspace(x,y)
             palreset()
         end
         spr(spri, pp[1], pp[2], 2, 2)
+        palreset()
     end
     grid[go.pos[2]][go.pos[1]].space = go
     go.flip = function(side, time)

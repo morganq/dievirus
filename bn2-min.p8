@@ -3,7 +3,7 @@ version 42
 __lua__
 function tp(n,e)return{n*16-16,e*13+19}end function gp(n,e)return{mid(n\16+1,1,8),mid((e-27)\13+1,1,4)}end function addfields(n,e,o)for e in all(split(e))do local e,o=unpack(split(e,"="))if o=="false"then n[e]=false elseif o=="true"then n[e]=true else n[e]=o end end for e,o in pairs(o)do n[e]=o end end function sfn(n)for n in all(split(n,"\n"))do if(#n>3)local n=split(n)local e=n[1]deli(n,1)_ENV[e](unpack(n))
 end end function smlu(e,o)local n={}for e in all(split(e,"\n"))do if#e>3then local e=split(e,",")if(o)add(n,e)else n[e[1]]=e
-end end return n end function nl_print(e,o,n,t)for e in all(split(e,"%"))do print(e,o,n,t)n+=8end end function temp_camera(o,t,l)local n,e=peek2(24360),peek2(24362)camera(n+o,e+t)l()camera(n,e)end function palreset()pal()palt(2)end function get_bit(n,e)return n&32768>>>e~=0end function ssfx(n)sfx(n,0)end function sandify(t,l,e,d,i,o,r)for n=0,e do local a=n/e-.5for e=0,d do local t=sget(t+n,l+e)if(t~=(r or 14))make_creature_particle(i+n,o+e,t,a/2,o+6+rnd(4))
+end end return n end function nl_print(e,o,n,t)for e in all(split(e,"%"))do print(e,o,n,t)n+=8end end function temp_camera(o,t,l)local n,e=peek2(24360),peek2(24362)camera(n+o,e+t)l()camera(n,e)end function palreset()pal()palt(2)end function get_bit(n,e)return n&32768>>>e~=0end function ssfx(n)sfx(n,0)end function sandify(t,l,e,i,d,o,r)for n=0,e do local a=n/e-.5for e=0,i do local t=sget(t+n,l+e)if(t~=(r or 14))make_creature_particle(d+n,o+e,t,a/2,o+6+rnd(4))
 end end end FADE_PALS_1=smlu([[129,2  ,141,4  ,134,6  ,7  ,136,9  ,10 ,142,139,13 ,14 ,15 ,0
 0. ,129,129,2  ,141,134,6  ,2. ,2  ,9  ,9. ,141,134,0  ,15 ,0
 0. ,0  ,129,129,141,134,6. ,2. ,2  ,9  ,9. ,141,134,0  ,134,0
@@ -11,7 +11,7 @@ end end end FADE_PALS_1=smlu([[129,2  ,141,4  ,134,6  ,7  ,136,9  ,10 ,142,139,1
 0. ,0  ,0. ,0  ,0. ,0  ,141,0. ,0  ,0  ,0. ,0. ,0  ,0  ,0  ,0
 0. ,0  ,0. ,0  ,0. ,0  ,0  ,0. ,0  ,0  ,0. ,0. ,0  ,0  ,0  ,0
 0. ,0  ,0. ,0  ,0. ,0  ,0  ,0. ,0  ,0  ,0. ,0. ,0  ,0  ,0  ,0
-]],true)function scrnt(n,...)nongrid={}sandify(...)poke(24404,0)for o=0,170,4do n(true)local e={}for n=max(#nongrid-1000,1),#nongrid do local n=nongrid[n]n.update()n.draw()add(e,n)end nongrid=e pal(FADE_PALS_1[mid(o\5-25,1,6)],1)flip()end end function draw_pips(n,e,o,t)local l=n\5local d,n=n-l*5,0for l=1,l do rectfill(e,o-n-2,e+2,o-n,t)n+=4end for l=1,d do rectfill(e,o-n,e+2,o-n,t)n+=2end end function draw_mods(n,o,t)for e=1,#n do spr(all_mods[n[e]][2],o,t+e*6-6)end end shield_time=300max_hp=4monster_palettes={split"1,2,3,1,5,6,7,3,5,6 ,14,12,13,14,15",split"1,2,3,0,5,6,7,9,1,5,10,12,13,14,15",split"1,2,3,4,5,6,7,8,12,10,11,12,13,14,15",split"1,2,3,4,5,6,7,8,8,10,11,12,13,14,15"}gridpatterns=split"64,66,68,64,64,66,68,64,70,72,66,74,70,72,66,74,74,66,72,70,74,66,72,70,64,72,66,64,64,72,66,64"all_abilities=smlu[[slap,104,attack,    0/0b0000010000000000.0000000000000000/0/0/0/0,0
+]],true)function scrnt(n,...)nongrid={}sandify(...)poke(24404,0)for o=0,170,4do n(true)local e={}for n=max(#nongrid-1000,1),#nongrid do local n=nongrid[n]n.update()n.draw()add(e,n)end nongrid=e pal(FADE_PALS_1[mid(o\5-25,1,6)],1)flip()end end function draw_pips(n,e,o,t)local l=n\5local i,n=n-l*5,0for l=1,l do rectfill(e,o-n-2,e+2,o-n,t)n+=4end for l=1,i do rectfill(e,o-n,e+2,o-n,t)n+=2end end function draw_mods(n,o,t)for e=1,#n do spr(all_mods[n[e]][2],o,t+e*6-6)end end shield_time=300max_hp=4monster_palettes={split"1,2,3,1,5,6,7,3,5,6 ,14,12,13,14,15",split"1,2,3,0,5,6,7,9,1,5,10,12,13,14,15",split"1,2,3,4,5,6,7,8,12,10,11,12,13,14,15",split"1,2,3,4,5,6,7,8,8,10,11,12,13,14,15"}gridpatterns=split"64,66,68,64,64,66,68,64,70,72,66,74,70,72,66,74,74,66,72,70,74,66,72,70,64,72,66,64,64,72,66,64"all_abilities=smlu[[slap,104,attack,    0/0b0000010000000000.0000000000000000/0/0/0/0,0
 rock,112,attack,    0/0b0000000000000100.0000000000000000/0/0/0/25,0
 cane,106,attack,    0/0b1010000000000000.0000000000000000/0/0/0/0,0
 shield,98,shield,   0/0b0100000000000000.0000000000000000/0/0/0/0,1
@@ -93,10 +93,10 @@ scorpion3,scorpion3
 boss4p
 boss4g
 boss4
-]],true)function draw_die2d(d,i,r,o,e)local t=true if(o and e.kind~="hp")t=tf\14%2==0
-local l=split"0,15,15,15,30,15,45,15,15,0,15,30"for n=1,6do temp_camera(-l[n*2-1]-i,-l[n*2]-r,function()if(e and not t and e.faces[n])sfn[[rectfill,-2,-1,11,10,12
+]],true)function draw_die2d(i,d,r,o,e)local t=true if(o and e.kind~="hp")t=tf\14%2==0
+local l=split"0,15,15,15,30,15,45,15,15,0,15,30"for n=1,6do temp_camera(-l[n*2-1]-d,-l[n*2]-r,function()if(e and not t and e.faces[n])sfn[[rectfill,-2,-1,11,10,12
 rectfill,-1,-2,10,11,12
-]]o[n].draw_face(0,0,n)else d[n].draw_face(0,0,n)
+]]o[n].draw_face(0,0,n)else i[n].draw_face(0,0,n)
 end)end end function make_nongrid(n,e)local n={pos={n,e}}add(nongrid,n)return n end function valid_move_target(n,e,o,t)if(n<1or n>8or e<1or e>4)return false
 local n=grid[e][n]if(n.creature)return false
 if(t and n.space.side~=o)return false
@@ -104,7 +104,7 @@ return true end function add_go_to_grid(n)local e=grid[n.pos[2]][n.pos[1]]if#e==
 end end function make_gridobj(n,e,o,t)local n={pos={n,e},layer=o or 10,spri=t}add_go_to_grid(n)n.move=function(e,o)del(grid[n.pos[2]][n.pos[1]],n)n.pos={e,o}add_go_to_grid(n)end n.draw=function()local e=tp(n.pos[1],n.pos[2])spr(n.spri,e[1],e[2],2,2)end return n end function find_open_square_for(o,e,t,l)local n,n=grid[t][e],1if(o~=1)n=-1
 local n=l or{{0,0},{-n,0},{-n,-1},{-n,1},{0,-1},{0,1},{n,0},{n,-1},{n,1}}for n in all(n)do local n,e=e+n[1],t+n[2]if n>=1and n<=8and e>=1and e<=4then local t=grid[e][n]if(t.space.side==o and t.creature==nil)return{n,e}
 end end return nil end function push_to_open_square(n)local e=find_open_square_for(n.side,n.pos[1],n.pos[2])if e then n.move(e[1],e[2])else local e=n.pos[1]-n.side if(e>=1and e<=8)n.move(e,n.pos[2])
-end end function make_damage_spot(n,l,t,d,e,o)local n=make_gridobj(n,l,1)addfields(n,"decay=0",{side=d,damage=t,countdown_max=e or 0,countdown=e or 0,abil=o})n.update=function()if(victory or defeat)return
+end end function make_damage_spot(n,l,t,i,e,o)local n=make_gridobj(n,l,1)addfields(n,"decay=0",{side=i,damage=t,countdown_max=e or 0,countdown=e or 0,abil=o})n.update=function()if(victory or defeat)return
 local e=grid[n.pos[2]][n.pos[1]]if n.countdown>0then n.countdown-=1elseif n.countdown==0then if e.creature and e.creature.side~=n.side and e.creature.iframes<=0then if(has_mod(n.abil,"stun"))e.creature.stun_time=90
 if(has_mod(n.abil,"poison"))e.creature.poison_timer=60*n.damage else e.creature.take_damage(n.damage,has_mod(n.abil,"pierce"))
 if(e.creature==pl)pl.iframes=15
@@ -112,7 +112,7 @@ end local t=count(o.mods,"claim")*2if(e.space.side~=n.side and o.tiles_claimed<t
 e.space.bounce_timer=13n.countdown-=1ssfx(n.side==1and 8or 9)else n.decay+=1if(n.decay>8)del(e,n)
 end end n.draw=function()local e,o=tp(n.pos[1],n.pos[2]),grid[n.pos[2]][n.pos[1]]e[2]+=o.space.offset_y local o=9if(n.side~=1)o=8
 if(has_mod(n.abil,"poison"))o=12
-if n.countdown>0then local n=1-n.countdown/n.countdown_max local d,i,n,e,t,l=6*n+2,4*n+2,e[1]+1,e[2]+1,e[1]+14,e[2]+11line(n,e,n+d,e,o)line(n,e,n,e+i,o)line(n,l,n+d,l,o)line(n,l,n,l-i,o)line(t,e,t-d,e,o)line(t,e,t,e+i,o)line(t,l,t-d,l,o)line(t,l,t,l-i,o)else if(n.decay<5)rectfill(e[1]+1,e[2]+1,e[1]+14,e[2]+11,o)
+if n.countdown>0then local n=1-n.countdown/n.countdown_max local i,d,n,e,t,l=6*n+2,4*n+2,e[1]+1,e[2]+1,e[1]+14,e[2]+11line(n,e,n+i,e,o)line(n,e,n,e+d,o)line(n,l,n+i,l,o)line(n,l,n,l-d,o)line(t,e,t-i,e,o)line(t,e,t,e+d,o)line(t,l,t-i,l,o)line(t,l,t,l-d,o)else if(n.decay<5)rectfill(e[1]+1,e[2]+1,e[1]+14,e[2]+11,o)
 end if t>2then fillp(56190.5)if(t>6)fillp(23130.5)
 rectfill(e[1]+2,e[2]+2,e[1]+13,e[2]+10,0)fillp()end end end function make_gridspace(e,o)local t=1if(e>4)t=-1
 local n=make_gridobj(e,o,0,spri)n.side=t n.main_side=t n.bounce_timer=15+e+o n.offset_y=0n.update=function()end n.draw=function()n.offset_y=-(cos(n.bounce_timer/10)-.5)*(n.bounce_timer/5)n.bounce_timer=max(n.bounce_timer-1,0)local t=tp(n.pos[1],n.pos[2])t[2]+=n.offset_y local e=gridpatterns[e-1+(o-1)*8+1]if(n.side==-1)pal(split"0,2,3,4,5,3,13,8,9,10,11,12,1,14,15,0")else palreset()
@@ -124,13 +124,13 @@ return n.pips end n.draw_face=function(e,o,l)local t=n.name=="curse"and 8or 7rec
 end n.use=function(e,o,t,l)if(n.base=="none")return
 n.tiles_claimed=0_ENV["abil_"..n.type](e,n.get_pips(),n,o,t,l)if(has_mod(n,"growth")and n.pips<5)n.pips+=1n.original_pips+=1
 if(has_mod(n,"fast"))pl.die_speed=3
-end return n end function abil_grid_spaces(t,l,d,i)local o={}for n=0,7do for e=0,3do if get_bit(t,n*4+e%4)then local n,e=l+n*i,d+e-1if(n>=1and n<=8and e>=1and e<=4)add(o,{n,e})
-end end end return o end function abil_shield(n,e,o,t,l,i)local d=e n.shield=max(n.shield,d)n.shield_timer=shield_time local d=tp(t,l)if(n==pl)ssfx(15)
-make_effect_simple(d[1]+4,d[2]-14,0,136)add(attack_runners,make_attack_runner(o.def,e,o,t,l,i))end function abil_attack(d,e,n,o,t,l)add(attack_runners,make_attack_runner(n.def,e,n,o,t,l))end function abil_curse()local n=0for e=1,50do local e=grid[rnd(4)\1+1][rnd(8)\1+1]if e.space.side==1then e.space.side=-1n+=1if(n>=1)return
+end return n end function abil_grid_spaces(t,l,i,d)local o={}for n=0,7do for e=0,3do if get_bit(t,n*4+e%4)then local n,e=l+n*d,i+e-1if(n>=1and n<=8and e>=1and e<=4)add(o,{n,e})
+end end end return o end function abil_shield(n,e,o,t,l,d)local i=e n.shield=max(n.shield,i)n.shield_timer=shield_time local i=tp(t,l)if(n==pl)ssfx(15)
+make_effect_simple(i[1]+4,i[2]-14,0,136)add(attack_runners,make_attack_runner(o.def,e,o,t,l,d))end function abil_attack(i,e,n,o,t,l)add(attack_runners,make_attack_runner(n.def,e,n,o,t,l))end function abil_curse()local n=0for e=1,50do local e=grid[rnd(4)\1+1][rnd(8)\1+1]if e.space.side==1then e.space.side=-1n+=1if(n>=1)return
 end end ssfx(19)end function make_turret(n,e,o,t,l)local n=make_creature(e,o,l,n,12)local e=n.update n.rate=80n.time=0n.update=function()e()n.time+=1if(n.time%n.rate==n.rate\2)t.use(n,n.pos[1],n.pos[2],n.side)
 if(n.time>=450)n.kill()
-end return n end function abil_turret(n,o,t,l,d,e)local n,t=e,make_ability(all_abilities[t.def],o,t.mods)local n=find_open_square_for(e,l,d,{{n,0},{-n,0},{0,-1},{0,1},{n,-1},{n,1},{-n,-1},{-n,1}})if(n)local n=make_turret(o,n[1],n[2],t,e)
-end function make_attack_runner(n,d,i,r,a,o,l)local n,e=split(n,";"),{}for n in all(n)do local n=split(n,"/")add(e,{delay=n[1],grid=n[2],xv=n[3]*o,yv=n[4],collides=n[5]==1,telegraph=n[6],max_tiles=n[7]or 8,bounces_x=n[8]==1,bounces_y=n[9]==1,absolute_x=n[10]==1,absolute_y=n[11]==1,alive=true})end local n=0function update(f)local t=false function damage_and_stop(n,e,t)if(l)add(s.fake_hit,{e,t})else make_damage_spot(e,t,d,o,n.telegraph,i)
+end return n end function abil_turret(n,o,t,l,i,e)local n,t=e,make_ability(all_abilities[t.def],o,t.mods)local n=find_open_square_for(e,l,i,{{n,0},{-n,0},{0,-1},{0,1},{n,-1},{n,1},{-n,-1},{-n,1}})if(n)local n=make_turret(o,n[1],n[2],t,e)
+end function make_attack_runner(n,i,d,r,a,o,l)local n,e=split(n,";"),{}for n in all(n)do local n=split(n,"/")add(e,{delay=n[1],grid=n[2],xv=n[3]*o,yv=n[4],collides=n[5]==1,telegraph=n[6],max_tiles=n[7]or 8,bounces_x=n[8]==1,bounces_y=n[9]==1,absolute_x=n[10]==1,absolute_y=n[11]==1,alive=true})end local n=0function update(f)local t=false function damage_and_stop(n,e,t)if(l)add(s.fake_hit,{e,t})else make_damage_spot(e,t,i,o,n.telegraph,d)
 if n.collides then local e=grid[t][e].creature if(e and e.side~=o)n.alive=false
 end end for e in all(e)do local l=e.xv==0and e.yv==0if e.virtual_objs and e.alive then for n in all(e.virtual_objs)do if e.xv~=0or e.yv~=0then n.timers={n.timers[1]-1,n.timers[2]-1}local o=false if n.xv~=0and n.timers[1]<=0then if n.pos[1]<=1and n.xv<0or n.pos[1]>=8and n.xv>0then if(e.bounces_x)n.xv=-n.xv else n.off_grid=true
 end n.pos[1]+=sgn(n.xv)o=true n.timers[1]=30/abs(n.xv)-1end if n.yv~=0and n.timers[2]<=0then if n.pos[2]<=1and n.yv<0or n.pos[2]>=4and n.yv>0then if(e.bounces_y)n.yv=-n.yv else n.off_grid=true
@@ -139,12 +139,12 @@ if(not n.off_grid and n.max_tiles>0)t=true
 end end end if not e.virtual_objs then if n>=e.delay then e.virtual_objs={}local n=o*-3.5+4.5for n in all(abil_grid_spaces(e.grid,e.absolute_x and n or r,e.absolute_y and 2or a,o))do if(not l)local o={e.xv==0and 0or 30/abs(e.xv),e.yv==0and 0or 30/abs(e.yv)}add(e.virtual_objs,{pos=n,timers=o,max_tiles=e.max_tiles,xv=e.xv,yv=e.yv,off_grid=false})t=true
 damage_and_stop(e,n[1],n[2])end else t=true end end end if(not t)f.alive=false
 n+=1end s={update=update,alive=true,fake_hit={}}if l then local n=0while(s.alive)n+=1s:update()
-else s:update()end return s end function make_effect_simple(n,l,c,d,e,o,t,i,r,a,f)e=e or 0o=o or-.2t=t or 30local n,l=make_nongrid(n,l),0n.draw=function()palreset()fillp(i)spr(d,n.pos[1],n.pos[2],r or 1,a or 1,f)fillp()end n.update=function()n.pos[1]+=e n.pos[2]+=o l+=1if(l>t)del(nongrid,n)
-end return n end function make_creature_particle(n,e,o,d,t)local n,e,l=make_nongrid(n,e),-50+rnd(2),(rnd()-.5)*1.8addfields(n,"",{color=o,yv=l,xv=d+(.5-rnd())*.25})n.draw=function()pset(n.pos[1],n.pos[2],o)end n.update=function()e+=1if(rnd()<.04or e>=0)o=rnd{15,15,5}
+else s:update()end return s end function make_effect_simple(n,l,c,i,e,o,t,d,r,a,f)e=e or 0o=o or-.2t=t or 30local n,l=make_nongrid(n,l),0n.draw=function()palreset()fillp(d)spr(i,n.pos[1],n.pos[2],r or 1,a or 1,f)fillp()end n.update=function()n.pos[1]+=e n.pos[2]+=o l+=1if(l>t)del(nongrid,n)
+end return n end function make_creature_particle(n,e,o,i,t)local n,e,l=make_nongrid(n,e),-50+rnd(2),(rnd()-.5)*1.8addfields(n,"",{color=o,yv=l,xv=i+(.5-rnd())*.25})n.draw=function()pset(n.pos[1],n.pos[2],o)end n.update=function()e+=1if(rnd()<.04or e>=0)o=rnd{15,15,5}
 if e<l*10-30then n.yv+=.1else n.yv+=.02n.yv*=.5if(n.xv>-3)n.xv+=-rnd()*.25
 end if n.pos[2]>t then n.yv=n.yv*-.15if(n.yv>-.1)n.yv=0n.y=t
 end n.pos={n.pos[1]+n.xv,n.pos[2]+n.yv}if(e>32and rnd()<.1)del(nongrid,n)
-end return n end creature_index=1function make_creature(n,l,e,o,t)local n=make_gridobj(n,l,10,t)addfields(n,"movetime=0,yo=-7,damage_time=0,shield=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0,iframes=0",{lastpos={0,0},side=e,dir=e,health=o,max_health=o,index=creature_index})n.clay_time=t>=40and 45or 15creature_index+=1n.draw=function()local e,o,t,l=tp(n.pos[1],n.pos[2]),n.spri,0,grid[n.pos[2]][n.pos[1]].space function ds(d,i)local r=n.side*-sin(n.overextended_timer/60)*3spr(o,e[1]+t+d+r,e[2]+n.yo+i+l.offset_y,2,2,n.side==-1)end if(n.clay_time>0)if o<12then pal(split"2,2,2,2,2,2,1,1,1,1,1,1,1,1,15,1")clip(0,e[2]+n.yo+max((n.clay_time-10)*4,-4),128,22)ds(n.clay_time\5,0)ds(-n.clay_time\6,0)ds(0,n.clay_time\7)ds(0,-n.clay_time\8)ds(0,0)clip()palreset()elseif o<40then ds(0,0)else ds(n.clay_time*n.clay_time*.125,n.clay_time*n.clay_time*-.25)end n.clay_time-=1return
+end return n end creature_index=1function make_creature(n,l,e,o,t)local n=make_gridobj(n,l,10,t)addfields(n,"movetime=0,yo=-7,damage_time=0,shield=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0,iframes=0,telegraph_x=0,telegraph_y=0",{lastpos={0,0},side=e,dir=e,health=o,max_health=o,index=creature_index})n.clay_time=t>=40and 45or 15creature_index+=1n.draw=function()local e,o,t,l=tp(n.pos[1],n.pos[2]),n.spri,0,grid[n.pos[2]][n.pos[1]].space function ds(i,d)local r=n.side*-sin(n.overextended_timer/60)*3spr(o,e[1]+t+i+r+n.telegraph_x,e[2]+n.yo+d+l.offset_y+n.telegraph_y,2,2,n.side==-1)end if(n.clay_time>0)if o<12then pal(split"2,2,2,2,2,2,1,1,1,1,1,1,1,1,15,1")clip(0,e[2]+n.yo+max((n.clay_time-10)*4,-4),128,22)ds(n.clay_time\5,0)ds(-n.clay_time\6,0)ds(0,n.clay_time\7)ds(0,-n.clay_time\8)ds(0,0)clip()palreset()elseif o<40then ds(0,0)else ds(n.clay_time*n.clay_time*.125,n.clay_time*n.clay_time*-.25)end n.clay_time-=1return
 if(n.movetime>0)fillp(21845.75)
 if(n.damage_time>0)pal(split"7,7,7,7,7,7,7,7,7,7,7,7,7,7,7")t=-n.damage_time*n.dir
 if(n.poison_timer>0)pal(split"1,2,3,12,12,6,7,12,9,10,12,12,13,14,15,0")
@@ -156,29 +156,32 @@ else n.overextended_timer=0end n.poison_timer=max(n.poison_timer-1,0)n.damage_ti
 n.stun_time-=1end local l=n.move n.move=function(e,o)if(not n.alive)return
 local t=tp(n.pos[1],n.pos[2])if(n.clay_time<=0)make_effect_simple(t[1],t[2]+n.yo,nil,n.spri,0,-1,3,43690.75,2,2,n.side==-1)ssfx(n==pl and 14or-1)n.movetime=3
 grid[n.pos[2]][n.pos[1]].creature=nil n.lastpos={n.pos[1],n.pos[2]}l(e,o)grid[o][e].creature=n if(n.poison_timer>0)n.take_damage(1)local n=tp(e,o)
-end n.take_damage=function(e,o)if o then n.health-=e else if(e>=n.shield)local e=e-n.shield n.shield=0n.shield_timer=0n.health-=e else n.shield-=e
+end n.take_damage=function(e,o)if(victory or defeat)return
+if o then n.health-=e else if(e>=n.shield)local e=e-n.shield n.shield=0n.shield_timer=0n.health-=e else n.shield-=e
 end n.damage_time=5local e=tp(n.pos[1],n.pos[2])sfx(n==pl and 11or 10,1)if(n.health<=0)n.kill()sfx(n==pl and 13or 12,1)
-end n.kill=function()n.alive=false local o,t,e=n.spri%16*8,n.spri\16*8,tp(n.pos[1],n.pos[2])sandify(o,t,15,15,e[1],e[2]+n.yo)grid[n.pos[2]][n.pos[1]].creature=nil del(grid[n.pos[2]][n.pos[1]],n)end grid[n.pos[2]][n.pos[1]].creature=n return n end pl=nil function make_player()local n=make_creature(1,2,1,max_hp,player_sprite)addfields(n,"die_speed=1",{max_health=n.health,die={}})return n end function make_monster(d,i,n,t,r,a,o,e)local l=false if(grid[t][n].creature)l=true
-local n=make_creature(n,t,-1,a,d)n.palette=monster_palettes[i]n.abilities=r n.speed=o n.abil_timer=o\2n.move_timer=o n.next_ability=rnd(n.abilities)addfields(n,"time=0",e or{})if(e.move_pattern)n.move_pattern={}for o=1,#e.move_pattern do add(n.move_pattern,e.move_pattern[o]=="x")end n.move_pattern_i=1
+end n.kill=function()n.alive=false local o,t,e=n.spri%16*8,n.spri\16*8,tp(n.pos[1],n.pos[2])sandify(o,t,15,15,e[1],e[2]+n.yo)grid[n.pos[2]][n.pos[1]].creature=nil del(grid[n.pos[2]][n.pos[1]],n)end grid[n.pos[2]][n.pos[1]].creature=n return n end pl=nil function make_player()local n=make_creature(1,2,1,max_hp,player_sprite)addfields(n,"die_speed=1",{max_health=n.health,die={}})return n end function make_monster(i,d,n,t,r,a,o,e)local l=false if(grid[t][n].creature)l=true
+local n=make_creature(n,t,-1,a,i)n.palette=monster_palettes[d]n.abilities=r n.speed=o n.abil_timer=o\2n.move_timer=o n.next_ability=rnd(n.abilities)addfields(n,"time=0",e or{})if(e.move_pattern)n.move_pattern={}for o=1,#e.move_pattern do add(n.move_pattern,e.move_pattern[o]=="x")end n.move_pattern_i=1
 if(e.abil_pattern)n.abil_pattern={}for o=1,#e.abil_pattern do add(n.abil_pattern,e.abil_pattern[o]=="x")end n.abil_pattern_i=1
-local e=n.update n.update=function()e()if(n.stun_time>0)return
-n.time+=1if(n.overextended_timer<=0)n.move_timer-=1
-if n.move_timer<=0then local e=true if n.move_pattern then if(not n.move_pattern[n.move_pattern_i])e=false
-n.move_pattern_i=n.move_pattern_i%#n.move_pattern+1end if e then local e=nil if(n.favor_col and rnd()<.45)e=n.favor_col
-if n.flies then local e,o=e or flr(rnd(4))+5,flr(rnd(4))+1if(valid_move_target(e,o,n.side,true))n.move(e,o)
-else local t={{-1,0},{1,0},{0,-1},{0,1}}for o=1,4do local o=rnd(t)del(t,o)local t,l=nil,nil if(e)t=mid(e-n.pos[1],-1,1)
-local e,o=(t or o[1])+n.pos[1],(l or o[2])+n.pos[2]if(valid_move_target(e,o,n.side))n.move(e,o)break
-end end end n.move_timer=n.speed end n.abil_timer-=1if n.abil_timer<=0then local e=true if n.abil_pattern then if(not n.abil_pattern[n.abil_pattern_i])e=false
+n.pick_next_move_target=function()n.move_target=nil local e=nil if n.flies then for o=1,10do if(n.favor_col and rnd()<.45)e=n.favor_col
+local e,o=e or flr(rnd(4))+5,flr(rnd(4))+1if(valid_move_target(e,o,n.side,true))n.move_target={e,o}break
+end else if(n.favor_col and rnd()<.45)e=n.favor_col
+local t={{-1,0},{1,0},{0,-1},{0,1}}for o=1,4do local o=rnd(t)del(t,o)local t,l=nil,nil if(e)t=mid(e-n.pos[1],-1,1)
+local e,o=(t or o[1])+n.pos[1],(l or o[2])+n.pos[2]if(valid_move_target(e,o,n.side,false))n.move_target={e,o}break
+end end end local e=n.update n.update=function()e()if(n.stun_time>0)return
+n.time+=1if n.overextended_timer<=0then n.move_timer-=1if(not n.move_target)n.pick_next_move_target()
+end if n.move_timer<=0then local e=true if n.move_pattern then if(not n.move_pattern[n.move_pattern_i])e=false
+n.move_pattern_i=n.move_pattern_i%#n.move_pattern+1end if e then if n.move_target then if(valid_move_target(n.move_target[1],n.move_target[2],n.side,n.flies))n.move(n.move_target[1],n.move_target[2])else printh"invalid move target"
+n.move_target=nil end end n.move_timer=n.speed end n.abil_timer-=1if n.abil_timer<=0then local e=true if n.abil_pattern then if(not n.abil_pattern[n.abil_pattern_i])e=false
 n.abil_pattern_i=n.abil_pattern_i%#n.abil_pattern+1end if(e)n.next_ability.use(n,n.pos[1],n.pos[2],n.side)n.animate_time=5n.next_ability=rnd(n.abilities)
 n.abil_timer=n.speed end if(n.abil_pattern and n.abil_timer==8and n.abil_pattern[n.abil_pattern_i])ssfx(18)
-if(n.move_pattern and n.move_pattern==8and n.move_pattern[n.move_pattern_i])ssfx(17)
-end local e=n.draw n.draw=function()palreset()if(n.palette~=nil)pal(n.palette)e()palreset()else e()
+end local e=n.draw n.draw=function()if n.move_target then local t,l=mid(n.move_target[1]-n.pos[1],-1,1),mid(n.move_target[2]-n.pos[2],-1,1)if(not n.move_pattern or n.move_pattern and n.move_pattern[n.move_pattern_i])local o,e=1-n.move_timer/n.speed,0if o>.85then e=3elseif o>.65then e=2elseif o>.25then e=1end n.telegraph_x=e*t n.telegraph_y=e*l
+end if(n.move_timer==n.speed)n.telegraph_x=0n.telegraph_y=0
+palreset()if(n.palette~=nil)pal(n.palette)e()palreset()else e()
 if(n.clay_time>0)return
 local o=tp(n.pos[1],n.pos[2])local e,o=o[1]+3,o[2]+10line(e,o,e+9,o,1)line(e,o,e+9*(n.health/n.max_health),o,9)if(n.shield>0)line(e,o,e+9*min(n.shield/6,1),o,7)
 palreset()if(n.abil_pattern and n.abil_timer==9and n.abil_pattern[n.abil_pattern_i])make_effect_simple(e+2,o-18,nil,134,0,-.25,12)
-if(n.move_pattern and n.move_timer==9and n.move_pattern[n.move_pattern_i])make_effect_simple(e+2,o-18,nil,n.flies and 135or 156,0,-.25,12)
 end if(l)push_to_open_square(n)
-return n end function parse_monster(n,t,l)local o,e=split(n[4],"/"),{}for n in all(o)do add(e,parse_ability(n))end local o={}for e=7,#n do local n=split(n[e],"=")o[n[1]]=n[2]end return make_monster(n[2],n[3],t,l,e,n[5],n[6],o)end titlef=0function update_title()titlef+=1player_abilities={}state="newgame"end function draw_title()cls()print("die virus",46,32,7)spr(13,55+rnd()*sin(titlef/100)*2,56+rnd()*sin(titlef/100)*2,2,2)print("❎ to start",42,88)end tf=0function make_die(e)local n,o={},split(e,"/")for e=1,6do n[e]=parse_ability(o[e])end return n end classes=smlu[[1,king,0,0,sling;1/sling;1/spear;1/spear;1/shield;1/sword;2
+n.pick_next_move_target()return n end function parse_monster(n,t,l)local o,e=split(n[4],"/"),{}for n in all(o)do add(e,parse_ability(n))end local o={}for e=7,#n do local n=split(n[e],"=")o[n[1]]=n[2]end return make_monster(n[2],n[3],t,l,e,n[5],n[6],o)end titlef=0function update_title()titlef+=1player_abilities={}state="newgame"end function draw_title()cls()print("die virus",46,32,7)spr(13,55+rnd()*sin(titlef/100)*2,56+rnd()*sin(titlef/100)*2,2,2)print("❎ to start",42,88)end tf=0function make_die(e)local n,o={},split(e,"/")for e=1,6do n[e]=parse_ability(o[e])end return n end classes=smlu[[1,king,0,0,sling;1/sling;1/spear;1/spear;1/shield;1/sword;2
 2,queen,2,0,sword;2/shield;1/spear;1/slap;1/scythe;1;claim/scythe;2
 3,priestess,4,0,wave;1/wave;1/wall;0;stun/sword;1/bomb;2/shield;1
 4,engineer,6,1,turret;1/splash;1/cane;1/turret;1/rock;1/shield;1
@@ -313,7 +316,7 @@ else end if die3d.visible then die3d.yv+=.3*pl.die_speed if die3d.y>100then if(d
 die3d.yv=die3d.yv*-.35die3d.y=100die3d.xv*=.5die_spin*=2end if die_time>45then pl.die_speed=1die3d.xv=0die3d.yv=0if pl.stun_time<=0then die3d.visible=false pl.current_ability=flr(rnd(6))+1if(is_night and pl.current_ability==4)pl.current_ability=-1
 time_scale=0if(has_mod(pl.die[pl.current_ability],"pause"))pause_extend+=30
 end end die3d.xv*=.975die3d.x+=die3d.xv die3d.y+=die3d.yv end end function do_level_intro()for n=1,60do if(n==30)pl=make_player()for n=1,6do pl.die[n]=player_abilities[n].copy()end pl.die[-1]=make_ability(all_abilities["curse"],0,{}).copy()
-if(n==1)local n=o[level]for n in all(n)do local n,o,t,l,d=unpack(split(n,"/"))x=flr(rnd(4))+5y=flr(rnd(4))+1local n=parse_monster(e[n],x,y)n.move(x,y)n.favor_col=o n.time=t or 0n.abil_pattern_i=l or 0n.move_pattern_i=d or 0end
+if(n==1)local n=o[level]for n in all(n)do local n,o,t,l,i=unpack(split(n,"/"))x=flr(rnd(4))+5y=flr(rnd(4))+1local n=parse_monster(e[n],x,y)n.move(x,y)n.favor_col=o n.time=t or 0n.abil_pattern_i=l or 0n.move_pattern_i=i or 0end
 _draw()palreset()pal(FADE_PALS_1[max((30-n)\5,1)],1)flip()end end level=0function start_level()tf=0victory=false defeat=false draw_time=0victory_time=0defeat_time=0is_night=false time_scale=1level+=1attack_runners={}nongrid={}grid={}game_frames_frac=0pause_extend=0night_time=max(65-level*5,45)if(level==15)night_time=0
 if(level>=18)night_time=9999
 for n=1,4do grid[n]={}for e=1,8do grid[n][e]={}end end for n=1,4do for e=1,8do make_gridspace(e,n)end end die3d={}walls=smlu([[199,-8,16
@@ -508,14 +511,14 @@ eee6c55666655666655cc6eeeeeeeeeeeeeeeeeeceeeeeeeeeeeeeeefffffffffff5eeeeff5cf5c3
 ece55666cc65566cc66556ceeeeeeeeeeeeeceeecceeeeeeeeeeeeeefffffffffff5eeeeff5cf5c3666eeeeeeeeeeeee666ee666eeeeeeeeeeeeeeeeeeeeeeee
 e5566666c66556666666655eeeeeeeceeeeecceccceeeeeeceeeeeeefffffffffff5eeeefcccf5c3666eeeeeeeeeeeee666666666666666666eeeeee66eeeeee
 566666666665566666666665ceeccecccecccccccccceccececeeeeefffffffffff5eeeefcccf5c366ceeeeeeeeeeeee666666666666666666666eee66666eee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeccceeeeeeeeeeeeecceeeeeeee7000ee55555555eeeeeeeeeeeeeeeeeeeffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeeeeee66666666666666eeeeeeeeeecccceeceeeeecceecceeeceee700077e57577775eeeeeeeeeeeeeeeeeeeffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeccecceecceeeeeceeee7000777757575575eeeeeeeeeeeeeeeeeee33333333eeeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeee66e66666666666666e66eeeeeeeeeeeeceeceeeeeeeeeeeeeee7000777757575575eeeeeeeeeeeeeeeeeeefffffff35fff5eeeeeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeee7000777757577575eeeeeeeecceeeeeeeeefffffff355ff3eeeeeeeeeeeeeeeeeeeeeeee
-66666666666666666666666666666eeeeeeeeceeceeeeeeeeeeeeeee7000777757555575ffffffffccffeeeeeee3333fff333333eeeeeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeeee700077e57777775fcfffcffffffeeeeeeeee553fffffff5eeeeeeeeeeeeeeeeeeeeeeee
-6e6e6e6e6e6e6e6e6e6e6e6e6e6e6eeeeeeeeceeceeeeeeeeeeeeeeeee7000ee555555553c333cc33333eeeeeeeeee553ffffff5eeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeccceeeeeeeeeeeeecceeeeeeee7888ee55555555eeeeeeeeeeeeeeeeeeeffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeee66666666666666eeeeeeeeeecccceeceeeeecceecceeeceee788877e57577775eeeeeeeeeeeeeeeeeeeffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeccecceecceeeeeceeee7888777757575575eeeeeeeeeeeeeeeeeee33333333eeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeee66e66666666666666e66eeeeeeeeeeeeceeceeeeeeeeeeeeeee7888777757575575eeeeeeeeeeeeeeeeeeefffffff35fff5eeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeee7888777757577575eeeeeeeecceeeeeeeeefffffff355ff3eeeeeeeeeeeeeeeeeeeeeeee
+66666666666666666666666666666eeeeeeeeceeceeeeeeeeeeeeeee7888777757555575ffffffffccffeeeeeee3333fff333333eeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeeee788877e57777775fcfffcffffffeeeeeeeee553fffffff5eeeeeeeeeeeeeeeeeeeeeeee
+6e6e6e6e6e6e6e6e6e6e6e6e6e6e6eeeeeeeeceeceeeeeeeeeeeeeeeee7888ee555555553c333cc33333eeeeeeeeee553ffffff5eeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeeeeeeeeeeeeeeeeeee5c5555c55553eeeeeeeeeee53f5555f5eeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeeeeeeeeeeeeeeeeeee3c3333c33333eeeeeeeeeee53f5ff5f5eeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeecceeceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefcffffcffff5eeeeeeeeeee53f5ff5f5eeeeeeeeeeeeeeeeeeeeeeee

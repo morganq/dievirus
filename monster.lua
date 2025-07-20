@@ -162,15 +162,11 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
 
         palreset()
         if c.abil_pattern and c.abil_timer == 9 and c.abil_pattern[c.abil_pattern_i] then
-            --spr(134, hpx + 2, hpy - 21) 
             make_effect_simple(hpx + 2, hpy - 18, nil, 134, 0, -0.25, 12)
         end
-        --if c.move_pattern and c.move_timer == 9 and c.move_pattern[c.move_pattern_i] then
-            --spr(135, hpx + 2, hpy - 21) 
-            --make_effect_simple(hpx + 2, hpy - 18, nil, c.flies and 135 or 156, 0, -0.25, 12)
-        --end        
     end
     if needs_push then
+        printh("needs push")
         push_to_open_square(c)
     end
     c.pick_next_move_target()

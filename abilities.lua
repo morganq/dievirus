@@ -27,11 +27,17 @@ function make_ability(base, pips, mods)
     end
 
     a.get_pips = function()
-        if pl and has_mod(a, "invasion") and grid[pl.pos[2]][pl.pos[1]].space.side == -1 then
-            return a.pips + 1
-        end        
-        if pl and has_mod(a, "rage") and pl.health <= pl.max_health / 2 then
-            return a.pips + 1
+        if pl then
+            local gps = grid[pl.pos[2]][pl.pos[1]].space
+            if has_mod(a, "invasion") and gps.side == -1 then
+                return a.pips + 1
+            end
+            if has_mod(a, "snipe") and pl.pos[1] == 1 then
+                return a.pips + 1
+            end            
+            if has_mod(a, "rage") and pl.health <= pl.max_health / 2 then
+                return a.pips + 1
+            end
         end
         return a.pips
     end
@@ -52,7 +58,8 @@ function make_ability(base, pips, mods)
         if a.base == "none" then return end
         a.tiles_claimed = 0
         _ENV["abil_" .. a.type](user, a.get_pips(), a, gx, gy, side)
-        if has_mod(a, "growth") and a.pips < 5 then
+        local max_growth_pips = 4 + side -- lol nice
+        if has_mod(a, "growth") and a.pips < max_growth_pips then
             a.pips += 1
             a.original_pips += 1
         end
@@ -80,9 +87,8 @@ function abil_grid_spaces(grid_def, x, y, dir)
 end
 
 function abil_shield(user, pips, a, x, y, side)
-    local shield = pips
-    user.shield = max(user.shield, shield)
-    user.shield_timer = shield_time
+    user.shield = 1
+    user.shield_timer = max(shield_time * pips, user.shield_timer)
     local pp = tp(x,y)
     if user == pl then ssfx(15) end
     make_effect_simple(pp[1] + 4, pp[2] - 14, 0, 136)

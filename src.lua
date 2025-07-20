@@ -35,5 +35,7 @@ function _update()
     states[state].update()
 end
 
+-- title screen
 -- victory/defeat graphic
--- timer breaks if paused too long
+-- enemies can still spawn on top of eachother
+-- shield snd

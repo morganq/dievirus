@@ -103,7 +103,7 @@ function make_damage_spot(x,y,damage,side,warning,abil)
         elseif go.countdown == 0 then
             if spot.creature and spot.creature.side != go.side and spot.creature.iframes <= 0 then
                 if has_mod(go.abil, "stun") then
-                    spot.creature.stun_time = 90
+                    spot.creature.stun_time = 75
                 end                
                 if has_mod(go.abil, "poison") then
                     spot.creature.poison_timer = 60 * go.damage
@@ -153,14 +153,9 @@ function make_damage_spot(x,y,damage,side,warning,abil)
                 rectfill(pp[1] + 1, pp[2] + 1, pp[1] + 14, pp[2] + 11, color)
             end
         end
-        --[[if damage > 1 then
-            draw_pips(damage, pp[1] + 10, pp[2] + 9, go.side == 1 and 12 or 0)
-        end
-        draw_mods(go.abil.mods, pp[1], pp[2])
-        ]]
-        if damage > 2 then
+        if side == -1 and damage >= 2 then
             fillp(0b1101101101111110.1)
-            if damage > 6 then
+            if damage >= 3 then
                 fillp(0b0101101001011010.1)
             end
             rectfill(pp[1] + 2, pp[2] + 2, pp[1] + 13, pp[2] + 10, 0)

@@ -4,7 +4,7 @@ applied = {}
 
 --faces_options1 = split("x_____,_x____,__x___,___x__,____x_,_____x")
 faces_options2 = split("x_____,_x____,__x___,___x__,____x_,_____x")
-upgrade_mods_names = split"growth,pierce,claim,pause,invasion,superclaim,poison,stun"
+upgrade_mods_names = split"growth,pierce,claim,pause,invasion,superclaim,poison,stun,snipe"
 upgrade_mods = {}
 for mn in all(upgrade_mods_names) do
     for i = 1, all_mods[mn][3] do
@@ -48,7 +48,7 @@ function make_upgrade(faces, kind)
 end
 
 function draw_random_abil()
-    local level_rarity = split"0,1,1,1,2,2,2,2,2,3,3,3,3,3,4,4,4,4,4,4"[level]
+    local level_rarity = split"1,1,1,2,2,2,2,2,3,3,3,3,3,3,4,4,4,4,4,4"[level]
     local abils_by_rarity = {}
     for i = -1, 5 do
         abils_by_rarity[i] = {}
@@ -72,7 +72,7 @@ function update_upgrade()
         if level % 3 == 0 then
             options = {"+1", "+1", "+1", "+1"}
         end
-        local faces_options1 = split("11____,____11,__11__,1__1__,_2____,2_____,___2__,3-____")
+        local faces_options1 = split("11____,____11,__11__,1__1__,_2____,2_____,___2__,3-____,_1___1,_1__1_")
         for i = 1, 4 do
             local ind = flr(rnd(#options) + 1)
             local v = options[ind]

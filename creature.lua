@@ -110,7 +110,7 @@ function make_creature(x, y, side, health, spri)
         basemove(x,y)
         grid[y][x].creature = go
         if go.poison_timer > 0 then
-            go.take_damage(1)
+            go.take_damage(1, true)
             local npp = tp(x,y)
             --make_effect_simple(npp[1] + 8, npp[2] - 9, 0, 126)
         end        
@@ -118,18 +118,14 @@ function make_creature(x, y, side, health, spri)
 
     go.take_damage = function(damage, pierce)
         if victory or defeat then return end
-        if pierce then 
-            go.health -= damage
-        else
-            if damage >= go.shield then
-                local damage_after = damage - go.shield
+        if not pierce then 
+            if go.shield > 0 then
                 go.shield = 0
                 go.shield_timer = 0
-                go.health -= damage_after
-            else
-                go.shield -= damage
+                return
             end
         end
+        go.health -= damage
         go.damage_time = 5
         local pp = tp(go.pos[1],go.pos[2])
         sfx(go == pl and 11 or 10, 1)

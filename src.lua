@@ -1,6 +1,4 @@
-state = "title"
 states = {
-    title = {update=update_title, draw=draw_title},
     newgame = {update=update_newgame, draw=draw_newgame},
     gameplay = {update=update_gameplay, draw=draw_gameplay},
     upgrade = {update=update_upgrade, draw=draw_upgrade},
@@ -9,13 +7,46 @@ states = {
 
 player_sprite = 0
 
+function begin_game(spr, def)
+    player_abilities = make_die(def)
+    -- DEBUG:
+    debug_start_level = 1
+    for j = 1, debug_start_level - 1 do
+        level = j
+        for i = 1, 6 do
+            player_abilities[i] = player_abilities[i].copy()
+        end
+        current_upgrades = nil
+        tf = 0
+        update_upgrade()
+        draw_upgrade()
+        player_abilities = applied
+        if current_upgrades[selected_upgrade_index].kind == "hp" then
+            max_hp += 1
+        end
+    end
+    reset()
+    level = 0
+    state = "gameplay"
+    player_sprite = spr
+    tf = 0
+    start_level()    
+end
+
 function _init()
-    state = "title"
     night_palette_imm = false
     cartdata("dievirus")
     menuitem(1, "clear wins", function()
         dset(0,0)
     end)
+
+    for i = 1, 20 do
+        cls(7)
+        flip()
+    end    
+
+    inmediasres = true
+    begin_game(0, "sling;5/sling;5/sling;5/sling;5/sling;5/sling;5")
 end
 
 function _draw()
@@ -35,7 +66,7 @@ function _update()
     states[state].update()
 end
 
--- title screen
 -- victory/defeat graphic
 -- enemies can still spawn on top of eachother
 -- shield snd
+-- wait a long time bug in upgrade screen

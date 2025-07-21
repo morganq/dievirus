@@ -96,7 +96,6 @@ function make_damage_spot(x,y,damage,side,warning,abil)
         abil = abil
     })
     go.update = function()
-        if victory or defeat then return end
         local spot = grid[go.pos[2]][go.pos[1]]
         if go.countdown > 0 then
             go.countdown -= 1

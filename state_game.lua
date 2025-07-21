@@ -1,7 +1,8 @@
 function draw_gameplay()
     draw_time = (draw_time + 1) % 1024
-    cls(15)
-    sfn([[
+    cls(inmediasres and 7 or 15)
+    if not inmediasres then
+        sfn([[
 rectfill,0,0,128,32,7
 spr,222,64,9
 spr,208,24,13,3,1
@@ -27,21 +28,14 @@ line,34,9,82,9,6
 fillp,0
 ]])
 
-    for wall in all(walls) do
-        spr(wall[1], wall[2], wall[3], 2, 2)
+        for wall in all(walls) do
+            spr(wall[1], wall[2], wall[3], 2, 2)
+        end
+        fillp(0b0111110110100000.1)
+        rectfill(0,28,128,31,7)
+        fillp()
     end
-    fillp(0b0111110110100000.1)
-    rectfill(0,28,128,31,7)
-    fillp()
-    local game_seconds = (game_frames_frac / 30) / 0x0.0001 
-    if game_seconds < night_time then
-        spr(155, 111, 0)
-        print(night_time - game_seconds, 120, 2, 0)
-    else
-        spr(231, 113, 1)
-        night_palette_imm = true
-        is_night = true
-    end
+
     local bins = {{},{},{},{}}
 
     for i = 1,4 do
@@ -66,7 +60,8 @@ fillp,0
         end
     end
 
-    sfn([[
+    if not inmediasres then
+        sfn([[
 rectfill,0,86,128,96,15
 line,5,86,29,86,15
 line,49,86,79,86,15
@@ -81,70 +76,88 @@ sspr,32,96,24,4,42,120
 sspr,32,100,24,4,74,111
 sspr,32,100,24,4,25,91
 ]])
+    else
+        rectfill(imrtimer * 4 - 200,0,128,96,7)
+    end
     if not pl then return end
 
-    if die3d.visible then
-        rectfill(die3d.x, 105, die3d.x + 14, 107, 5)
-        rectfill(die3d.x-1, 106, die3d.x + 15, 106, 5)
-        local f, x, y = die_frames[(die_time \ die_spin) % 8 + 1], die3d.x - 8, die3d.y - 8
-        pal(split"0,0,0,0,0,0,0")
-        spr(f, x + 1, y, 2, 2)
-        spr(f, x - 1, y, 2, 2)
-        spr(f, x, y + 1, 2, 2)
-        spr(f, x, y - 1, 2, 2)
-        palreset()
-        spr(f, x, y, 2, 2)
-        
-        die_time += 1
-    elseif pl.current_ability != nil then
-        local abil = pl.die[pl.current_ability]
-        spr(76, die3d.x - 7, die3d.y - 7, 3, 2)
-        abil.draw_face(die3d.x - 5, die3d.y - 3)
 
-        local line1 = abil.name
-        local lx = print(line1,0,-100)
-        print(line1, 64 - lx / 2 + 5, 114, 1)
-        spr(130, 64 - lx / 2 - 5, 114)
+    if not imr_pressed then
+        if die3d.visible then
+            rectfill(die3d.x, 105, die3d.x + 14, 107, 5)
+            rectfill(die3d.x-1, 106, die3d.x + 15, 106, 5)
+            local f, x, y = die_frames[(die_time \ die_spin) % 8 + 1], die3d.x - 8, die3d.y - 8
+            pal(split"0,0,0,0,0,0,0")
+            spr(f, x + 1, y, 2, 2)
+            spr(f, x - 1, y, 2, 2)
+            spr(f, x, y + 1, 2, 2)
+            spr(f, x, y - 1, 2, 2)
+            palreset()
+            spr(f, x, y, 2, 2)
+            
+            die_time += 1
+        elseif pl.current_ability != nil then
+            local abil = pl.die[pl.current_ability]
+            spr(76, die3d.x - 7, die3d.y - 7, 3, 2)
+            abil.draw_face(die3d.x - 5, die3d.y - 3)
+
+            local line1 = abil.name
+            local lx = print(line1,0,-100)
+            print(line1, 64 - lx / 2 + 5, 114, 1)
+            spr(130, 64 - lx / 2 - 5, 114)
+        end
     end
     
-    local hpx = 6
-    spr(132,3,1,1,2)
-    local hw = (pl.max_health + pl.shield) * 7
-    line(6,1,hw+3,1,1)
-    line(6,10,hw+3,10,1)
-    spr(132,hw,1,1,2,true)
-    for i = 1, pl.max_health do
-        
-        if i <= pl.health then
-            spr(128, hpx, 3)
+    if not inmediasres then
+        local game_seconds = (game_frames_frac / 30) / 0x0.0001 
+        if game_seconds < night_time then
+            spr(155, 111, 0)
+            print(night_time - game_seconds, 120, 2, 0)
         else
-            spr(129, hpx, 3)
+            spr(231, 113, 1)
+            night_palette_imm = true
+            is_night = true
         end
-        hpx += 7
-    end
-    if pl.shield_timer > 0 then
-        local fx = 1 - (pl.shield_timer / shield_time)
-        for i = 1, pl.shield do
-            spr(145, hpx, 3)
-            local yo = fx * 6
-            sspr(64, 64 + yo, 8, 6 - yo, hpx, 3 + yo)
+
+        local hpx = 6
+        spr(132,3,1,1,2)
+        local hw = (pl.max_health + pl.shield) * 7
+        line(6,1,hw+3,1,1)
+        line(6,10,hw+3,10,1)
+        spr(132,hw,1,1,2,true)
+        for i = 1, pl.max_health do
+            
+            if i <= pl.health then
+                spr(128, hpx, 3)
+            else
+                spr(129, hpx, 3)
+            end
             hpx += 7
         end
-        
-        
-    end   
+        if pl.shield_timer > 0 then
+            local fx = 1 - (pl.shield_timer / shield_time)
+            for i = 1, pl.shield do
+                spr(145, hpx, 3)
+                local yo = fx * 6
+                sspr(64, 64 + yo, 8, 6 - yo, hpx, 3 + yo)
+                hpx += 7
+            end
+            
+            
+        end
 
-    if victory then
-        local y = min(victory_time, 40)
-        rectfill(34, y - 5, 94, y + 8, 0)
-        rect(34, y - 5, 94, y + 9, 9)
-        print("victory", 50, y, 10)
-    end
-    if defeat then
-        local y = min(defeat_time, 40)
-        rectfill(34, y - 5, 94, y + 8, 0)
-        rect(34, y - 5, 94, y + 9, 2)
-        print("defeat", 52, y, 8)
+        if victory then
+            local y = min(victory_time, 40)
+            rectfill(34, y - 5, 94, y + 8, 0)
+            rect(34, y - 5, 94, y + 9, 9)
+            print("victory", 50, y, 10)
+        end
+        if defeat then
+            local y = min(defeat_time, 40)
+            rectfill(34, y - 5, 94, y + 8, 0)
+            rect(34, y - 5, 94, y + 9, 2)
+            print("defeat", 52, y, 8)
+        end
     end
 
     if (time_scale < 1 or pause_extend > 0) and not victory then
@@ -156,9 +169,13 @@ sspr,32,100,24,4,25,91
             sspr(0,i,128,1,x * 1.25, i)
         end
         poke(0X5F54, 0x00)        
-        if draw_time % 20 > 10 then
+        if not inmediasres and draw_time % 20 > 10 then
             spr(133, 59, 54)
         end
+    end
+
+    if show_title then
+        print("\^w\^tvideo game", 24, 10, 0)
     end
 end
 
@@ -224,7 +241,9 @@ function update_gameplay()
     if victory then
         victory_time += 1
         if victory_time > 90 then
-            if level == 20 then
+            if inmediasres then
+                show_title = true
+            elseif level == 20 then
                 dset(0, dget(0) + 1)
                 state = "win"
             else
@@ -234,6 +253,10 @@ function update_gameplay()
                 state = "upgrade"
                 tf = 0
             end
+        end
+        if victory_time > 180 and inmediasres then
+            state = "newgame"
+            tf = 0
         end
         time_scale = 1
     end
@@ -269,7 +292,7 @@ function update_gameplay()
         if btnp(3) and pl.pos[2] < 4 then
             move_target = {pl.pos[1], pl.pos[2] + 1}
         end
-        if move_target then
+        if move_target and not inmediasres then
             if pl.overextended_timer == 0 then
                 if valid_move_target(move_target[1], move_target[2], pl.side) then
                     pl.move(move_target[1], move_target[2])
@@ -288,6 +311,7 @@ function update_gameplay()
             end
         end
         if btnp(5) and pl.current_ability != nil then
+            if inmediasres then imr_pressed = true end
             abil.use(pl, pl.pos[1], pl.pos[2], 1)
             pl.die[pl.current_ability] = abil.copy()
             pl.current_ability = nil
@@ -311,10 +335,10 @@ function update_gameplay()
         -- enable/disable a music track
     end
 
-    if die3d.visible then
+    if die3d.visible and not victory and not defeat then
         die3d.yv += 0.3 * pl.die_speed
         if die3d.y > 100 then
-            if die3d.yv > 0.5 then
+            if die3d.yv > 1 then
                 for i = 1, die3d.yv * 10 do 
                     local p = make_creature_particle(die3d.x + rnd(10) - 5, 106, 5, rnd(1)-0.5, 106 + rnd(3))
                     p.yv = rnd(2) * -0.5
@@ -348,32 +372,21 @@ function update_gameplay()
         die3d.x += die3d.xv
         die3d.y += die3d.yv
     end    
+    imrtimer = min(imrtimer + 1, 1000)
+end
+
+function spawn()
+    pl = make_player()
+    for i = 1,6 do
+        pl.die[i] = player_abilities[i].copy()
+    end
+    pl.die[-1] = make_ability(all_abilities["curse"], 0, {}).copy()          
 end
 
 function do_level_intro()
     for i = 1, 60 do
         if i == 30 then
-            pl = make_player()
-            for i = 1,6 do
-                pl.die[i] = player_abilities[i].copy()
-            end
-            pl.die[-1] = make_ability(all_abilities["curse"], 0, {}).copy()            
-        end
-
-
-        if i == 1 then
-            local ld = all_levels[level]
-            for enemy in all(ld) do
-                local name, favor_col, time, api, mpi = unpack(split(enemy,"/"))
-                x = flr(rnd(4)) + 5
-                y = flr(rnd(4)) + 1
-                local mon = parse_monster(monster_defs[name], x, y)
-                mon.move(x,y)
-                mon.favor_col = favor_col
-                mon.time = time or 0
-                mon.abil_pattern_i = api or 0
-                mon.move_pattern_i = mpi or 0
-            end  
+            spawn()
         end
 
         _draw()
@@ -437,7 +450,31 @@ walls = smlu([[
 ]],true)
     defeat_wall = 0
 
-    do_level_intro()
+    local ld = all_levels[level]
+    for enemy in all(ld) do
+        local name, favor_col, time, api, mpi = unpack(split(enemy,"/"))
+        x = flr(rnd(4)) + 5
+        y = flr(rnd(4)) + 1
+        if inmediasres then
+            x = 6
+            y = 2
+            name = "dog1"
+        end
+        local mon = parse_monster(monster_defs[name], x, y)
+        mon.move(x,y)
+        mon.favor_col = favor_col
+        mon.time = time or 0
+        mon.abil_pattern_i = api or 0
+        mon.move_pattern_i = mpi or 0
+    end    
+
+    if inmediasres then
+        spawn()
+        imrtimer = 0
+    else
+        do_level_intro()
+        imrtimer = 1000
+    end
     throw()
 end
 

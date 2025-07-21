@@ -23,35 +23,13 @@ function update_newgame()
     if btnp(5) and dget(0) >= cl[4] then
         ssfx(12)
         scrnt(draw_newgame, cl[3] \ 8, 0, 16, 16, 92, 60)
-        
-        player_abilities = make_die(cl[5])
-        -- DEBUG:
-        debug_start_level = 1
-        for j = 1, debug_start_level - 1 do
-            level = j
-            for i = 1, 6 do
-                player_abilities[i] = player_abilities[i].copy()
-            end
-            current_upgrades = nil
-            tf = 0
-            update_upgrade()
-            draw_upgrade()
-            player_abilities = applied
-            if current_upgrades[selected_upgrade_index].kind == "hp" then
-                max_hp += 1
-            end
-        end
-        reset()
-        state = "gameplay"
-        player_sprite = cl[3]
-        tf = 0
-        start_level()
+        inmediasres, show_title, imr_pressed, imrtimer = false, false, false, 0
+        begin_game(cl[3], cl[5])
     end
 end
 
 function draw_newgame(skip_player)
-    cls(5)
-
+    camera(0,cos(min(tf / 64, 0.5)) * -64 - 64)
 sfn([[
 rectfill,0,0,128,128,7
 spr,146,27,7
@@ -120,8 +98,11 @@ print,choose your character,4,4,3
         print("unlocked after " .. cl[4] .. " wins", 22, 116, color)
         pal(split"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1")
     else
-        local s = "❎ to begin"
-        print(s, 44, 116, 1)
+        local s = "  to begin"
+sfn([[
+print,to begin,52,116,1
+spr,130,41,116
+]])
     end
     
     if not skip_player then

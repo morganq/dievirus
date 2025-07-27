@@ -104,7 +104,7 @@ sspr,32,100,24,4,25,91
             local line1 = abil.name
             local lx = print(line1,0,-100)
             print(line1, 64 - lx / 2 + 5, 114, 1)
-            spr(130, 64 - lx / 2 - 5, 114)
+            spr(130 + (draw_time \ 10) % 2, 64 - lx / 2 - 5, 114)
         end
     end
     
@@ -167,9 +167,9 @@ sspr,32,100,24,4,25,91
             local mul = mid(i / 16 - 0.5,0,1)
             local x = sin(i / 26 + draw_time / 128) * mul
             sspr(0,i,128,1,x * 1.25, i)
-        end
+        end   
         poke(0X5F54, 0x00)        
-        if not inmediasres and draw_time % 20 > 10 then
+        if draw_time % 20 > 10 then
             spr(133, 59, 54)
         end
     end
@@ -240,10 +240,10 @@ end
 function update_gameplay()
     if victory then
         victory_time += 1
-        if victory_time > 90 then
-            if inmediasres then
-                show_title = true
-            elseif level == 20 then
+        if inmediasres and victory_time > 45 then
+            show_title = true
+        elseif victory_time > 90 then
+            if level == 20 then
                 dset(0, dget(0) + 1)
                 state = "win"
             else
@@ -254,7 +254,7 @@ function update_gameplay()
                 tf = 0
             end
         end
-        if victory_time > 180 and inmediasres then
+        if victory_time > 120 and inmediasres then
             state = "newgame"
             tf = 0
         end

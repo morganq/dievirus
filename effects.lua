@@ -33,7 +33,10 @@ function make_creature_particle(x, y, color, xv, floor)
     end
     ng.update = function()
         freezetime += 1
-        if rnd() < 0.04 or freezetime >= 0 then color = rnd({15,15,5}) end
+        if rnd() < 0.04 or freezetime >= 0 then
+            color = rnd({15,15,5})
+            --if inmediasres then color = 7 end
+        end
         
         if freezetime < syv * 10 - 30 then
             ng.yv += 0.1

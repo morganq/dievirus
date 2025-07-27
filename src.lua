@@ -46,7 +46,7 @@ function _init()
     end    
 
     inmediasres = true
-    begin_game(0, "sling;5/sling;5/sling;5/sling;5/sling;5/sling;5")
+    begin_game(0, "start;5/start;5/start;5/start;5/start;5/start;5")
 end
 
 function _draw()

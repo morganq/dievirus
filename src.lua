@@ -70,3 +70,34 @@ end
 -- enemies can still spawn on top of eachother
 -- shield snd
 -- wait a long time bug in upgrade screen
+
+
+--[[
+Name words and concepts:
+
+die / dice
+roll
+grid
+tiles
+tactics
+rogue
+combat
+tournament / gauntlet / crucible
+skirmish
+defender
+champion
+
+sand / dust
+walls
+
+old / ancient
+ur / uruk
+king / royal
+sumer / babylon
+civilization
+
+curse
+epic
+poem
+
+]]

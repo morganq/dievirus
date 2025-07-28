@@ -175,7 +175,23 @@ sspr,32,100,24,4,25,91
     end
 
     if show_title then
-        print("\^w\^tvideo game", 24, 10, 0)
+sfn([[
+clip,0,0,127,9
+print,the relic of power & ruin,14,6,8
+clip,0,9,127,16
+print,the relic of power & ruin,13,6,8
+clip
+]])
+        
+        if victory_time > 90 then
+sfn([[
+rect,54,14,65,25,8
+spr,240,40,16,3,1
+spr,243,64,16
+spr,247,72,16,2,1
+]])                 
+            
+        end
     end
 end
 
@@ -240,7 +256,7 @@ end
 function update_gameplay()
     if victory then
         victory_time += 1
-        if inmediasres and victory_time > 45 then
+        if inmediasres and victory_time > 65 then
             show_title = true
         elseif victory_time > 90 then
             if level == 20 then
@@ -254,7 +270,7 @@ function update_gameplay()
                 tf = 0
             end
         end
-        if victory_time > 120 and inmediasres then
+        if victory_time > 180 and inmediasres then
             state = "newgame"
             tf = 0
         end

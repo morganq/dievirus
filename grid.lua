@@ -181,9 +181,9 @@ function make_gridspace(x,y)
         local pp = tp(go.pos[1], go.pos[2])
         pp[2] += go.offset_y
         local spri = gridpatterns[(x - 1) + (y - 1) * 8 + 1]
-        if inmediasres then
-            spri = 237
-        end
+        --if inmediasres then
+            --spri = 237
+        --end
         if go.side == -1 then
             pal(split"0,2,3,4,5,3,13,8,9,10,11,12,1,14,15,0")
         else

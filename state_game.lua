@@ -153,6 +153,7 @@ rectfill,0,-5,128,29,0
 print,victory!,4,0,10
 print,the die trembles with energy,4,9,10
 print,from your defeated foes...,4,18,10
+print,continue,4,18,10
 ]])
             end)
         end

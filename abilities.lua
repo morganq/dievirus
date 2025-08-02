@@ -65,9 +65,6 @@ function make_ability(base, pips, mods, icon_color)
             a.pips += 1
             a.original_pips += 1
         end
-        if has_mod(a, "fast") then
-            pl.die_speed = 3
-        end
     end
     return a
 end

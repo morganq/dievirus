@@ -66,6 +66,7 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
     local baseupdate = c.update
     c.update = function()
         baseupdate()
+        if ended then return end
         if c.stun_time > 0 then return end
         c.time += 1
         if c.overextended_timer <= 0 then

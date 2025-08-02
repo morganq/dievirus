@@ -105,7 +105,7 @@ function make_creature(x, y, side, health, spri)
     end
 
     go.take_damage = function(damage, pierce)
-        if victory or defeat then return end
+        if ended then return end
         if not pierce then 
             if go.shield_timer > 0 then
                 go.shield_timer = 0

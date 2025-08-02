@@ -89,7 +89,6 @@ function abil_shield(user, pips, a, x, y, side)
     user.shield_timer = max(shield_time * pips, user.shield_timer)
     local pp = tp(x,y)
     if user == pl then ssfx(15) end
-    --make_effect_simple(pp[1] + 4, pp[2] - 14, 0, 136)
     bounce_hp[#bounce_hp] = 10
     add(attack_runners, make_attack_runner(a.def, pips, a, x, y, side))
 end
@@ -99,6 +98,7 @@ function abil_attack(user, pips, a, x, y, side)
 end
 
 function abil_curse()
+    sfx(19,1)
     local cursed = 0
     for i = 1, 50 do
         local s = grid[rnd(4)\1+1][rnd(8)\1+1]
@@ -108,7 +108,6 @@ function abil_curse()
             if cursed >= 1 then return end
         end
     end
-    ssfx(19)
 end
 
 function make_turret(pips, x, y, a, side)

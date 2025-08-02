@@ -9,9 +9,9 @@ player_sprite = 0
 
 function begin_game(spr, def)
     player_abilities = make_die(def)
+    level = 0
     -- DEBUG:
-    --[[
-    debug_start_level = 1
+    --[[debug_start_level = 15
     for j = 1, debug_start_level - 1 do
         level = j
         for i = 1, 6 do
@@ -25,10 +25,9 @@ function begin_game(spr, def)
         if current_upgrades[selected_upgrade_index].kind == "hp" then
             max_hp += 1
         end
-    end
-    ]]
+    end]]
+    
     reset()
-    level = 0
     set_state("gameplay")
     player_sprite = spr
     start_level()    
@@ -41,14 +40,14 @@ function _init()
         dset(0,0)
     end)
 
-    for i = 1, 20 do
-        cls(7)
-        flip()
-    end    
+    --for i = 1, 20 do
+    --    cls(7)
+    --    flip()
+    --end    
 
-    --inmediasres = true
-    --begin_game(0, "start;5/start;5/start;5/start;5/start;5/start;5")
-    begin_game(0, "sling;1/sling;1/spear;1/spear;1/shield;1/sword;2")
+    inmediasres = true
+    begin_game(0, "start;5/start;5/start;5/start;5/start;5/start;5")
+    --begin_game(0, "sling;1/sling;1/spear;1/spear;1/shield;1/sword;2")
 end
 
 function _draw()

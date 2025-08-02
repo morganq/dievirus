@@ -123,7 +123,7 @@ sprf,0,0, 2, 2
             print(night_time - game_seconds, 119, 3, 0)
         else
             spr(231, 115, 1)
-            night_palette_imm = true
+            night_palette_imm = not ended
             is_night = true
         end
 
@@ -147,7 +147,7 @@ sprf,0,0, 2, 2
         end
 
         if victory then
-            local mvt = -coslerp(victory_time,40,-46,28)
+            local mvt = -coslerp(victory_time,60,-46,28)
             temp_camera_sfn(0, mvt,
 [[
 rectfill,0,-5,128,46,7
@@ -238,19 +238,15 @@ function gameplay_tick()
             end
         end
     end
-    if not ended then
-        for o in all(need_update) do o.update() end
-    end
+    for o in all(need_update) do o.update() end
 
     for ng in all(nongrid) do
         ng.update()
     end
 
-    if not ended then
-        for runner in all(attack_runners) do
-            runner:update()
-            if not runner.alive then del(attack_runners, runner) end
-        end
+    for runner in all(attack_runners) do
+        runner:update()
+        if not runner.alive then del(attack_runners, runner) end
     end
 
     if living_monsters == 0 and not victory then
@@ -319,7 +315,7 @@ function update_gameplay()
         end
         time_scale = 1
         if defeat_time > 240 then
-            run()
+            set_state("newgame")
         end
     end
 
@@ -383,6 +379,7 @@ function update_gameplay()
     if die3d.visible and not ended then
         die3d.yv += 0.3 * pl.die_speed
         if die3d.y > 100 then
+            if die3d.yv > 4 then sfx(16,1) end
             if die3d.yv > 1 then
                 for i = 1, die3d.yv * 10 do 
                     local p = make_creature_particle(die3d.x + rnd(10) - 5, 106, 5, rnd(1)-0.5, 106 + rnd(3))
@@ -527,15 +524,13 @@ walls = smlu([[
 end
 
 function throw()
-    sfx(16,1)
-    local all_frames = {160,162,164,166,168,170,172,174}
+    local all_frames = split"160,162,164,166,168,170,172,174"
     die_frames = {}
     for i = 1, 8 do
         local j = rnd(#all_frames)\1 + 1
         add(die_frames, all_frames[j])
         deli(all_frames,j)
     end
-    --die_frames = {34,36,42,44,40,32,38,46}
     die_time = 0
     die_spin = 2
     die3d.visible = true

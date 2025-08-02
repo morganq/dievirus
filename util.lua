@@ -60,6 +60,10 @@ function temp_camera(dx, dy, fn)
     camera(cx, cy)
 end
 
+function temp_camera_sfn(x,y,s)
+    temp_camera(x,y,function() sfn(s) end)
+end
+
 function palreset()
     pal()
     palt(0b0000000000000010)
@@ -134,4 +138,8 @@ function draw_mods(mods, x, y)
     for i = 1, #mods do
         spr(all_mods[mods[i]][2], x, y + i * 6 - 6)
     end    
+end
+
+function coslerp(t,s,a,b)
+    return (cos(min(t / s,0.5)) * -0.5 + 0.5) * (b - a) + a
 end

@@ -29,9 +29,8 @@ function begin_game(spr, def)
     ]]
     reset()
     level = 0
-    state = "gameplay"
+    set_state("gameplay")
     player_sprite = spr
-    tf = 0
     start_level()    
 end
 
@@ -47,8 +46,9 @@ function _init()
         flip()
     end    
 
-    inmediasres = true
-    begin_game(0, "start;5/start;5/start;5/start;5/start;5/start;5")
+    --inmediasres = true
+    --begin_game(0, "start;5/start;5/start;5/start;5/start;5/start;5")
+    begin_game(0, "sling;1/sling;1/spear;1/spear;1/shield;1/sword;2")
 end
 
 function _draw()
@@ -66,6 +66,12 @@ function _draw()
 end
 function _update()
     states[state].update()
+    tf += 1
+end
+
+function set_state(name)
+    state = name
+    tf = 0
 end
 
 -- victory/defeat graphic

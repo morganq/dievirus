@@ -82,21 +82,29 @@ sspr,32,100,24,4,25,91
     if not pl then return end
 
 
-    if not imr_pressed then
+    if not imr_pressed and not ended then
         if die3d.visible then
-            rectfill(die3d.x, 105, die3d.x + 14, 107, 5)
-            rectfill(die3d.x-1, 106, die3d.x + 15, 106, 5)
             local f, x, y = die_frames[(die_time \ die_spin) % 8 + 1], die3d.x - 8, die3d.y - 8
+            temp_camera_sfn(die3d.x,0,[[
+rectfill,0, 105, 14, 107, 5
+rectfill,-1, 106, 15, 106, 5     
+]])
+            
+            function sprf(...)
+                spr(f,...)
+            end
             pal(split"0,0,0,0,0,0,0")
-            spr(f, x + 1, y, 2, 2)
-            spr(f, x - 1, y, 2, 2)
-            spr(f, x, y + 1, 2, 2)
-            spr(f, x, y - 1, 2, 2)
-            palreset()
-            spr(f, x, y, 2, 2)
+            temp_camera_sfn(-x,-y,[[
+sprf,1,0, 2, 2
+sprf,-1,0, 2, 2
+sprf,0,1, 2, 2
+sprf,0,-1, 2, 2
+palreset
+sprf,0,0, 2, 2
+]])
             
             die_time += 1
-        elseif pl.current_ability != nil then
+        elseif pl.current_ability != nil and not ended then
             local abil = pl.die[pl.current_ability]
             spr(76, die3d.x - 7, die3d.y - 7, 3, 2)
             abil.draw_face(die3d.x - 5, die3d.y - 3)
@@ -111,61 +119,71 @@ sspr,32,100,24,4,25,91
     if not inmediasres then
         local game_seconds = (game_frames_frac / 30) / 0x0.0001 
         if game_seconds < night_time then
-            spr(155, 111, 0)
-            print(night_time - game_seconds, 120, 2, 0)
+            spr(155, 110, 1)
+            print(night_time - game_seconds, 119, 3, 0)
         else
-            spr(231, 113, 1)
+            spr(231, 115, 1)
             night_palette_imm = true
             is_night = true
         end
 
-        local hpx = 6
-        spr(132,3,1,1,2)
-        local hw = (pl.max_health + pl.shield) * 7
-        line(6,1,hw+3,1,1)
-        line(6,10,hw+3,10,1)
-        spr(132,hw,1,1,2,true)
-        for i = 1, pl.max_health do
-            
-            if i <= pl.health then
-                spr(128, hpx, 3)
-            else
-                spr(129, hpx, 3)
+        local hpx = 2
+        for i = 1, pl.max_health + 1 do
+            local bounce = 0
+            if bounce_hp[i] > 0 then
+                bounce_hp[i] -= 1
+                bounce = sin(bounce_hp[i] / 25) * 4
             end
-            hpx += 7
-        end
-        if pl.shield_timer > 0 then
-            local fx = 1 - (pl.shield_timer / shield_time)
-            for i = 1, pl.shield do
-                spr(145, hpx, 3)
-                local yo = fx * 6
-                sspr(64, 64 + yo, 8, 6 - yo, hpx, 3 + yo)
-                hpx += 7
+            if i == pl.max_health + 1 and pl.shield_timer > 0 then
+                if pl.shield_timer > 30 or pl.shield_timer \ 2 % 3 == 0 then
+                    spr(145, hpx, 2 + bounce)
+                end
+            elseif i <= pl.health then
+                spr(128, hpx, 2 + bounce)
+            elseif i <= pl.max_health then
+                spr(129, hpx, 2 + bounce)
             end
-            
-            
+            hpx += 9
         end
 
         if victory then
-            temp_camera(0, -min(victory_time, 40), function()
-sfn([[
-rectfill,0,-5,128,29,0
-print,victory!,4,0,10
-print,the die trembles with energy,4,9,10
-print,from your defeated foes...,4,18,10
-print,continue,4,18,10
+            local mvt = -coslerp(victory_time,40,-46,28)
+            temp_camera_sfn(0, mvt,
+[[
+rectfill,0,-5,128,46,7
+rect,-1,-5,128,46,1
+fillp,0b0101101001011010.1
+rectfill,-1,47,127,48,1
+fillp
+print,victory!,48,0,1
+print,the die         with energy,8,13,2
+print,from your defeated foes...,8,21,2
+spr,97,26,-2
+spr,97,94,-2,1,1,1
+print,upgrade,14,36,12
 ]])
-            end)
+
+            print("rattles", 40 + sin(tf \ 3 * 0.39) * 1.25, -mvt + sin(tf \ 3 * 1.9) * 0.75 + 13,1)
+            spr(130 + (tf \ 10) % 2, 4, -mvt + 35)
         end
         if defeat then
-            temp_camera(0, -min(defeat_time, 40), function()
-sfn([[
-rectfill,0,-5,128,29,0
-print,you are slain.,4,0,10
-print,the die now searches,4,9,10
-print,for a new champion,4,18,10
+--spr,203,26,-2
+--spr,203,94,-2,1,1,1            
+            temp_camera_sfn(0, -coslerp(defeat_time,80,-46,38),
+[[
+rectfill,0,-5,128,46,6
+rect,-1,-5,128,46,1
+fillp,0b0101101001011010.1
+rectfill,-1,47,127,48,1
+fillp
+print,you are slain,38,0,0
+spr,203,4,-2
+spr,203,117,-2,1,1,1
+spr,203,4,35
+spr,203,117,35,1,1,1
+print,the die seeks out,30,18,8
+print,a new champion...,30,26,8
 ]])
-            end)
         end
     end
 
@@ -205,7 +223,7 @@ spr,247,72,16,2,1
 end
 
 function gameplay_tick()
-    game_frames_frac += 0x0.0001
+    game_frames_frac += ended and 0 or 0x0.0001
     
     local living_monsters = 0
     local need_update = {}
@@ -220,13 +238,15 @@ function gameplay_tick()
             end
         end
     end
-    for o in all(need_update) do o.update() end
+    if not ended then
+        for o in all(need_update) do o.update() end
+    end
 
     for ng in all(nongrid) do
         ng.update()
     end
 
-    if not victory and not defeat then
+    if not ended then
         for runner in all(attack_runners) do
             runner:update()
             if not runner.alive then del(attack_runners, runner) end
@@ -242,8 +262,6 @@ function gameplay_tick()
         defeat = true
         defeat_time = 0
     end    
-
-    tf += 1
 
     if rnd() < 0.5 then
         make_creature_particle(128, rnd(60) + 20, 15, -3, rnd(52) + 28)
@@ -263,27 +281,29 @@ function gameplay_tick()
 end
 
 function update_gameplay()
+    ended = victory or defeat
     if victory then
         victory_time += 1
-        if inmediasres and victory_time > 65 then
-            show_title = true
-        elseif victory_time > 90 then
+        if inmediasres then
+            if victory_time > 65 then
+                show_title = true
+            end
+            if victory_time > 180 then
+                set_state("newgame")
+            end
+        elseif victory_time > 60 and btnp(5) then
             dset(1, dget(1) + 1)
             if level == 20 then
                 dset(0, dget(0) + 1)
-                state = "win"
+                set_state("win")
             else
                 for i = 1, 6 do
                     player_abilities[i] = player_abilities[i].copy()
                 end
-                state = "upgrade"
-                tf = 0
+                set_state("upgrade")
             end
         end
-        if victory_time > 180 and inmediasres then
-            state = "newgame"
-            tf = 0
-        end
+
         time_scale = 1
     end
     if defeat then
@@ -298,13 +318,13 @@ function update_gameplay()
             end
         end
         time_scale = 1
-        if defeat_time > 120 then
+        if defeat_time > 240 then
             run()
         end
     end
 
     temp_runner = nil
-    if pl.stun_time <= 0 and not victory and not defeat then
+    if pl.stun_time <= 0 and not ended then
         move_target = nil    
         if btnp(0) and pl.pos[1] > 1 then
             move_target = {pl.pos[1] - 1, pl.pos[2]}
@@ -345,10 +365,9 @@ function update_gameplay()
             throw()
             time_scale = 1
         end
-        if btnp(4) then
-            victory = true
-            --victory_time = 90
-        end
+        --if btnp(4) then
+        --    defeat = true
+        --end
     end
 
     if time_scale > 0 then
@@ -361,7 +380,7 @@ function update_gameplay()
         -- enable/disable a music track
     end
 
-    if die3d.visible and not victory and not defeat then
+    if die3d.visible and not ended then
         die3d.yv += 0.3 * pl.die_speed
         if die3d.y > 100 then
             if die3d.yv > 1 then
@@ -391,7 +410,7 @@ function update_gameplay()
                 time_scale = 0
                 if has_mod(pl.die[pl.current_ability], "pause") then
                     pause_extend += 30
-                end                    
+                end
             end
         end        
         die3d.xv *= 0.975
@@ -424,7 +443,6 @@ end
 
 level = 0
 function start_level()
-    tf = 0
     victory = false
     defeat = false
     draw_time = 0
@@ -440,6 +458,10 @@ function start_level()
     grid = {}
     game_frames_frac = 0
     pause_extend = 0
+    bounce_hp = {}
+    for i = 1, max_hp + 1 do
+        bounce_hp[i] = 0
+    end
 
     night_time = max(65 - level * 5, 45)
     if level == 15 then night_time = 0 end

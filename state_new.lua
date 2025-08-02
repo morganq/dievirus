@@ -1,5 +1,3 @@
-tf = 0
-
 function make_die(as)
     local die = {}
     local sas = split(as,"/")
@@ -29,7 +27,8 @@ function update_newgame()
 end
 
 function draw_newgame(skip_player)
-    camera(0,cos(min(tf / 64, 0.5)) * -64 - 64)
+    --camera(0,cos(min(tf / 64, 0.5)) * -64 - 64)
+    camera(0, coslerp(tf, 64, -128, 0))
 sfn([[
 rectfill,0,0,128,128,7
 spr,146,27,7
@@ -95,11 +94,11 @@ print,choose your character,4,4,3
     local color = 1
     if dget(1) < cl[5] then
         color = 8
-        print("unlocked after " .. cl[5] .. " rounds (" .. dget(1) ..")", 22, 116, color)
+        print("unlocked after " .. cl[5] .. " rounds (" .. dget(1) ..")", 6, 116, color)
         pal(split"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1")
     elseif dget(0) < cl[4] then
         color = 8
-        print("unlocked after " .. cl[4] .. " wins (" .. dget(0) ..")", 22, 116, color)
+        print("unlocked after " .. cl[4] .. " wins (" .. dget(0) ..")", 18, 116, color)
         pal(split"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1")        
     else
         local s = "  to begin"
@@ -120,7 +119,6 @@ spr,130,41,116
     end
     palreset()
     print(cl[2], 100 - #cl[2] * 2, 42, color)
-    tf += 1
 end
 
 --music(0)

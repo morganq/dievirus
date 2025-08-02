@@ -65,7 +65,6 @@ end
 
 function update_upgrade()
     pl = nil
-    tf += 1
     if current_upgrades == nil then
         current_upgrades = {}
         local options = {"hp", rnd(upgrade_mods), rnd(upgrade_mods), rnd(upgrade_mods), draw_random_abil(), draw_random_abil(), draw_random_abil()}
@@ -108,14 +107,14 @@ function update_upgrade()
         end
         current_upgrades = nil
         selected_upgrade_index = 1
-        state = "gameplay"
         scrnt(draw_upgrade, 4, y, 22, 23, 4, y, 7)
+        set_state("gameplay")
         start_level()
     end
 end
 
 function draw_upgrade(skip_selected)
-    camera(0,cos(min(tf / 64, 0.5)) * -64 - 64)
+    camera(0, coslerp(tf, 64, -128, 0))
 sfn([[
 rectfill,30,0,128,128,7
 line,31,0,128,0,6

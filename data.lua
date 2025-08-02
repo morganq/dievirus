@@ -65,11 +65,11 @@ pierce,121,4,ignores shields
 claim,122,6,claim the first tile%you hit
 superclaim,125,2,claim up to 2%of the tiles hit
 pause,123,2,time stands still%for a moment longer
-invasion,124,4,+1 if standing%in enemy tile
+invasion,124,5,+1 if standing%in enemy tile
 rage,125,2,+2 if less than%half health
 poison,126,2,deals poison damage%instead of normal
 stun,127,2,stuns the enemy%for a moment
-snipe,255,4,+1 in back row
+snipe,255,5,+1 if standing%in back row
 ]])
 -- weaken: +1 damage per hit
 -- wound (like poison): damage when they move for n seconds

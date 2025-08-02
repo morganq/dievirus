@@ -156,8 +156,8 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         
         line(hpx, hpy, hpx + 9, hpy, 1)
         line(hpx, hpy, hpx + 9 * (c.health / c.max_health), hpy, 9)
-        if c.shield > 0 then
-            line(hpx, hpy, hpx + 9 * min((c.shield / 6),1), hpy, 7)
+        if c.shield_timer > 0 then
+            line(hpx, hpy, hpx + 9, hpy, 7)
         end
 
         palreset()

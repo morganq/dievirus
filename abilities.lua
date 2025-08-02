@@ -1,14 +1,14 @@
 function parse_ability(s)
     local args = split(s,";")
     local abil_def = all_abilities[args[1]]
-    return make_ability(abil_def, args[2], {args[3]})
+    return make_ability(abil_def, args[2], {args[3]}, abil_def[6])
 end
 
 function has_mod(abil, name)
     return count(abil.mods, name) > 0
 end
 
-function make_ability(base, pips, mods)
+function make_ability(base, pips, mods, icon_color)
     local a = {
         base = base,
         name = base[1],
@@ -46,7 +46,9 @@ function make_ability(base, pips, mods)
         local color = a.name == "curse" and 8 or 7
         rectfill(x, y-1, x + 9, y + 10, color)
         rectfill(x-1, y, x + 10, y + 9, color)
+        pal(1, icon_color or 1)
         spr(a.image, x + 1, y + 1, 1, 1)
+        pal(1,1)
         draw_mods(a.mods, x, y)
         draw_pips(a.get_pips(), x + 7, y + 9, 12)
         

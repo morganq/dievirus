@@ -44,13 +44,6 @@ function make_creature(x, y, side, health, spri)
             return
         end
 
-        --[[pal(split"7,7,7,7,7,7,7,7,7,7,7,7,7,7,7")
-        ds(-1,0)
-        ds(1,0)
-        ds(0,-1)
-        ds(0,1)
-        palreset()]]
-
         if go.movetime > 0 then
             fillp(0b0101010101010101.11)
         end
@@ -85,14 +78,9 @@ function make_creature(x, y, side, health, spri)
         else
             go.overextended_timer = 0
         end
-        go.poison_timer = max(go.poison_timer - 1, 0)
-        go.damage_time -= 1
-        go.movetime -= 1
-        go.shield_timer -= 1
-        if go.shield_timer <= 0 then
-            go.shield = 0
+        for t in all(split"poison_timer,damage_time,movetime,shield_timer,stun_time") do
+            go[t] = max(go[t] - 1, 0)
         end
-        go.stun_time -= 1
     end
 
     local basemove = go.move

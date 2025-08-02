@@ -9,12 +9,12 @@ monster_palettes = {
 gridpatterns = split"64,66,68,64,64,66,68,64,70,72,66,74,70,72,66,74,74,66,72,70,74,66,72,70,64,72,66,64,64,72,66,64"
 
 classes = smlu([[
-1,king,0,0,sling;1/sling;1/spear;1/spear;1/shield;1/sword;2
-2,queen,2,0,sword;2/shield;1/spear;1/slap;1/scythe;1;superclaim/scythe;2
-3,priestess,4,0,wave;1/wave;1/wall;0;stun/sword;1/bomb;2/shield;1
-4,engineer,6,1,turret;1/splash;1/cane;1/turret;1/rock;1/shield;1
-5,farmer,8,2,slap;1/shield;1/rock;0;growth/scythe;1/spear;1/sy.turret;1;claim
-6,apothecary,10,3,bomb;1;poison/slap;2;poison/sword;1/bomb;1/cane;1/sling;1
+1,king,0,0,0,sling;1/sling;1/spear;1/spear;1/shield;1/sword;2
+2,queen,2,0,5,sword;2/shield;1/spear;1/slap;1/scythe;1;superclaim/scythe;2
+3,priestess,4,0,15,wave;1/wave;1/wall;0;stun/sword;1/bomb;2/shield;1
+4,engineer,6,1,0,turret;1/splash;1/cane;1/turret;1/rock;1/shield;1
+5,farmer,8,2,0,slap;1/shield;1/rock;0;growth/scythe;1/spear;1/sy.turret;1;claim
+6,apothecary,10,3,0,bomb;1;poison/slap;2;poison/sword;1/bomb;1/cane;1/sling;1
 ]])
 
 all_abilities = smlu([[
@@ -40,6 +40,7 @@ pinch,116,attack,   0/0b0000000000000001.0000000000000000/0/-30/0/10/4/0/0/0/1;1
 s.bash,109,shield,  0/0b0100111000000000.0000000000000000/0/0/0/0,4
 3.rock,159,attack,  0/0b0000000000000100.0000000000000000/0/0/0/25;15/0b0000000000000100.0000000000000000/0/0/0/25;30/0b0000000000000100.0000000000000000/0/0/0/25,4
 turret,99,turret,wave,4
+sling.f,96,attack,    0/0b0100010001000100.0100010001000100/0/0/1/1/8,5,9
 sp.turret,117,turret,split,5
 bigwave,115,attack,     0/0b0000111100000000.0000000000000000/2/0/0/30/8/0/0/0/1,5
 sy.turret,118,turret,scythe,-1

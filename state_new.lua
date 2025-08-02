@@ -20,11 +20,11 @@ function update_newgame()
         ssfx(14)
     end    
     local cl = classes[selected_class_index]
-    if btnp(5) and dget(0) >= cl[4] then
+    if btnp(5) and dget(0) >= cl[4] and dget(1) >= cl[5] then
         ssfx(12)
         scrnt(draw_newgame, cl[3] \ 8, 0, 16, 16, 92, 60)
         inmediasres, show_title, imr_pressed, imrtimer = false, false, false, 0
-        begin_game(cl[3], cl[5])
+        begin_game(cl[3], cl[6])
     end
 end
 
@@ -93,10 +93,14 @@ print,choose your character,4,4,3
 
     local cl = classes[selected_class_index]
     local color = 1
-    if dget(0) < cl[4] then
+    if dget(1) < cl[5] then
         color = 8
-        print("unlocked after " .. cl[4] .. " wins", 22, 116, color)
+        print("unlocked after " .. cl[5] .. " rounds (" .. dget(1) ..")", 22, 116, color)
         pal(split"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1")
+    elseif dget(0) < cl[4] then
+        color = 8
+        print("unlocked after " .. cl[4] .. " wins (" .. dget(0) ..")", 22, 116, color)
+        pal(split"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1")        
     else
         local s = "  to begin"
 sfn([[
@@ -108,7 +112,7 @@ spr,130,41,116
     if not skip_player then
         spr(cl[3], 92, 60, 2, 2)
     end    
-    local d = make_die(cl[5])
+    local d = make_die(cl[6])
     draw_die2d(d, 12, 42)
     
     if tf % 60 > 45 then

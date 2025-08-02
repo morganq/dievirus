@@ -147,16 +147,24 @@ sspr,32,100,24,4,25,91
         end
 
         if victory then
-            local y = min(victory_time, 40)
-            rectfill(34, y - 5, 94, y + 8, 0)
-            rect(34, y - 5, 94, y + 9, 9)
-            print("victory", 50, y, 10)
+            temp_camera(0, -min(victory_time, 40), function()
+sfn([[
+rectfill,0,-5,128,29,0
+print,victory!,4,0,10
+print,the die trembles with energy,4,9,10
+print,from your defeated foes...,4,18,10
+]])
+            end)
         end
         if defeat then
-            local y = min(defeat_time, 40)
-            rectfill(34, y - 5, 94, y + 8, 0)
-            rect(34, y - 5, 94, y + 9, 2)
-            print("defeat", 52, y, 8)
+            temp_camera(0, -min(defeat_time, 40), function()
+sfn([[
+rectfill,0,-5,128,29,0
+print,you are slain.,4,0,10
+print,the die now searches,4,9,10
+print,for a new champion,4,18,10
+]])
+            end)
         end
     end
 
@@ -259,6 +267,7 @@ function update_gameplay()
         if inmediasres and victory_time > 65 then
             show_title = true
         elseif victory_time > 90 then
+            dset(1, dget(1) + 1)
             if level == 20 then
                 dset(0, dget(0) + 1)
                 state = "win"
@@ -335,10 +344,10 @@ function update_gameplay()
             throw()
             time_scale = 1
         end
-        --if btnp(2,1) then
-        --    victory = true
-        --    victory_time = 90
-        --end
+        if btnp(4) then
+            victory = true
+            --victory_time = 90
+        end
     end
 
     if time_scale > 0 then

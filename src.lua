@@ -10,6 +10,7 @@ player_sprite = 0
 function begin_game(spr, def)
     player_abilities = make_die(def)
     -- DEBUG:
+    --[[
     debug_start_level = 1
     for j = 1, debug_start_level - 1 do
         level = j
@@ -25,6 +26,7 @@ function begin_game(spr, def)
             max_hp += 1
         end
     end
+    ]]
     reset()
     level = 0
     state = "gameplay"

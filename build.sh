@@ -1,1 +1,1 @@
-/Applications/PICO-8.app/Contents/MacOS/pico8 -run ./tinyhawk.p8 -export "tinyhawk.html -f -p ../plates/xbr"
+/Applications/PICO-8.app/Contents/MacOS/pico8 -run ./bn2-min.p8 -export "bn2.html -f"

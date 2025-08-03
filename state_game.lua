@@ -283,6 +283,13 @@ end
 function update_gameplay()
     ended = victory or defeat
     if victory then
+
+        if level == 20 then
+            dset(0, dget(0) + 1)
+            set_state("win")
+            return
+        end        
+
         victory_time = min(victory_time + 1, 10000)
         if inmediasres then
             if victory_time > 65 then
@@ -293,15 +300,10 @@ function update_gameplay()
             end
         elseif victory_time > 60 and btnp(5) then
             dset(1, dget(1) + 1)
-            if level == 20 then
-                dset(0, dget(0) + 1)
-                set_state("win")
-            else
-                for i = 1, 6 do
-                    player_abilities[i] = player_abilities[i].copy()
-                end
-                set_state("upgrade")
+            for i = 1, 6 do
+                player_abilities[i] = player_abilities[i].copy()
             end
+            set_state("upgrade")
         end
         time_scale = 1
     end
@@ -469,7 +471,6 @@ function start_level()
 
     night_time = max(65 - level * 5, 45)
     if level == 15 then night_time = 0 end
-    if level >= 18 then night_time = 9999 end
 
     --victory = true
     --victory_time = 90
@@ -513,7 +514,7 @@ walls = smlu([[
             name = "dog1"
         end
         local mon = parse_monster(monster_defs[name], x, y)
-        mon.move(x,y)
+        --mon.move(x,y)
         mon.favor_col = favor_col
         mon.time = time or 0
         mon.abil_pattern_i = api or 0

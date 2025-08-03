@@ -60,12 +60,12 @@ end
 function ssfx(n)
 sfx(n,0)
 end
-function sandify(o,l,e,i,r,t,d)
+function sandify(o,l,e,r,i,t,d)
 for n=0,e do
 local a=n/e-.5
-for e=0,i do
+for e=0,r do
 local o=sget(o+n,l+e)
-if(o~=(d or 14))make_creature_particle(r+n,t+e,o,a/2,t+6+rnd(4))
+if(o~=(d or 14))make_creature_particle(i+n,t+e,o,a/2,t+6+rnd(4))
 end
 end
 end
@@ -97,12 +97,12 @@ end
 end
 function draw_pips(n,e,t,o)
 local l=n\5
-local i,n=n-l*5,0
+local r,n=n-l*5,0
 for l=1,l do
 rectfill(e,t-n-2,e+2,t-n,o)
 n+=4
 end
-for l=1,i do
+for l=1,r do
 rectfill(e,t-n,e+2,t-n,o)
 n+=2
 end
@@ -155,6 +155,8 @@ s.bash,109,shield,  0/0b0100111000000000.0000000000000000/0/0/0/0,4
 turret,99,turret,wave,4
 sling.f,96,attack,    0/0b0100010001000100.0100010001000100/0/0/1/1/8,5,9
 sp.turret,117,turret,split,5
+wavewide1,100,attack,    0/0b0000011000000000.0000000000000000/4/0/0/15/8/0/0,-1
+wavewide2,100,attack,    0/0b0000110000000000.0000000000000000/4/0/0/15/8/0/0,-1
 bigwave,115,attack,     0/0b0000111100000000.0000000000000000/2/0/0/30/8/0/0/0/1,5
 sy.turret,118,turret,scythe,-1
 sl.turret,118,turret,sling,-1
@@ -170,7 +172,14 @@ fastbomb,107,attack,    0/0b0000000001001110.0100000000000000/0/0/0/20,-1
 donut,107,attack,       0/0b0000000011101010.1110000000000000/0/0/0/35,-1
 crisscross,0,attack,    0/0b0000000000000000.0000000000001000/0/3/0/20/16/0/0/1/1;0/0b0000000000000000.0000000000010000/0/-3/0/20/16/0/0/1/1;0/0b0000000000000000.0000100000000000/0/3/0/20/16/0/0/1/1;0/0b0000000000000000.0001000000000000/0/-3/0/20/16/0/0/1/1,-1
 fullscreen,107,attack,  0/0b1111111111111111.1111111111111111/0/0/0/35/32/0/0/1/1,-1
+fullscreen.a,107,attack,  0/0b1111111111111111.0111111111111111/0/0/0/35/32/0/0/1/1,-1
+fullscreen.b,107,attack,  0/0b1111111111111111.1111111111111110/0/0/0/35/32/0/0/1/1,-1
+fullscreen.c,107,attack,  0/0b1111111111111111.1111101111111111/0/0/0/35/32/0/0/1/1,-1
+fullscreen.d,107,attack,  0/0b1111111111111111.1111111111011111/0/0/0/35/32/0/0/1/1,-1
 d.turret,117,turret,rico,-1
+r1.turret,117,turret,rico.s1,-1
+r2.turret,117,turret,rico.s2,-1
+donut.turret,117,turret,donut,-1
 start,246,attack,    0/0b0100000000000000.0000000000000000/30/0/1/5/8,-1
 ]]
 all_mods=smlu[[growth,120,3,+1 each use in%battle (max = 5)
@@ -190,19 +199,21 @@ fox1,14,0,splash;1;claim/splash;1/splash;1,6,46,move_pattern=xxx_,abil_pattern=_
 owl1,34,0,turret;1/turret;1/sling;1,8,65,flies=1,abil_pattern=_x
 boss1,40,0,bomb;1/wave;1/shield;1/sword;1,15,15,flies=1,abil_pattern=____x_x____,move_pattern=xxxx_______
 scorpion1,32,0,bomb;1,8,99
-harpy2,38,1,wave;2/rico;2,8,50,flies=1,move_pattern=xx_,abil_pattern=__x
+harpy2,38,1,wavewide1;2/wavewide2;2,8,50,flies=1,move_pattern=xx_,abil_pattern=__x
 dog2,36,1,sword;2/spear;2,10,32,abil_pattern=_x
 fox2,14,1,rico.s1;2/rico.s2;1/rico.s1;1/rico.s2;2,14,33,move_pattern=xxx_,abil_pattern=___x
 owl2,34,1,turret;2/sling;2/shield;1,10,55,flies=1,abil_pattern=_x
 scorpion2,32,1,backrow1;2/backrow2;2,15,66,abil_pattern=_x__
 boss2,42,0,pinch;2/mortar;2/double;2/shield;3,20,23,flies=1,abil_pattern=______x_x_x_,move_pattern=xxxx___x___x
-harpy3,38,2,bigwave;2/wave;1;stun/wave;3,13,45,flies=1,move_pattern=xx_,abil_pattern=__x
-fox3,14,2,sling;2;poison/sword;2;poison/fastbomb;2;poison,20,28,move_pattern=xxx_,abil_pattern=___x
-scorpion3,32,2,bomb;3;claim/rico2;3/shield;3,20,35,abil_pattern=_x_
+dog3,36,1,sword;2;claim/spear;2/scythe;2,15,15,abil_pattern=_____xx_,move_pattern=xxx_____
+harpy3,38,2,bigwave;1/wave;1;stun/wave;3,13,45,flies=1,move_pattern=xx_,abil_pattern=__x
+fox3,14,2,rico2;2;poison/wave;2,20,28,move_pattern=xxx_,abil_pattern=___x
+owl3,34,1,r1.turret;3/r2.turret;3/shield;3,25,28,flies=1,abil_pattern=xx____,move_pattern=___x_x
+scorpion3,32,2,bomb;3;claim/shield;3,20,35,abil_pattern=_x_
 boss3,44,0,donut;4/rico2;3/crisscross;3,30,21,move_pattern=x___x___,abil_pattern=__x___x_
-boss4p,46,3,fullscreen;2;poison/turret;3/sling;3;poison/rico3;3/s.bash;2,40,25,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
-boss4g,46,0,fullscreen;1/rico3;1;growth/shield;1;growth/scythe;3;claim;claim,40,24,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
-boss4,46,4,fullscreen;1;invasion/sl.turret;3/rico3;3/s.bash;2;invasion,40,23,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
+boss4p,46,3,fullscreen;2;poison/turret;3/sling;3;poison/rico3;3/s.bash;2,30,28,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
+boss4g,46,0,fullscreen;1/rico3;1;growth/shield;1;growth/scythe;3;claim;claim,30,24,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
+boss4,46,4,fullscreen.a;1/fullscreen.b;1/fullscreen.c;1/fullscreen.d;1/sl.turret;3/s.bash;2,40,28,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
 ]],smlu([[harpy1/6
 harpy1,dog1/3
 fox1/4/0/2/2,fox1/5
@@ -213,26 +224,26 @@ dog2/4,dog1/3,dog1/2
 owl1,scorpion1
 fox2/4/0/2/2,fox2
 boss2
-scorpion2/6,dog2/2,dog2/4
-harpy2,harpy2,dog2
-harpy3,fox2
-owl2,owl2
+harpy2,harpy2
+dog2/3,dog2/4,scorpion2/8
+harpy3,fox2/4
+owl2/8,owl2
 boss3
-fox3,harpy3
-scorpion3,scorpion3
-boss4p
-boss4g
+fox3,fox3,scorpion3
+owl3/6,dog1/4
+dog3/2,dog3/4/0/2/2
+harpy3,harpy2/8/0/1/1,harpy2/6/0/1/1,harpy1/5/0/2/2,harpy1/7/0/2/2
 boss4
 ]],true)
-function draw_die2d(i,r,d,t,e)
+function draw_die2d(r,i,d,t,e)
 local o=true
 if(t and e.kind~="hp")o=tf\14%2==0
 local l=split"0,15,15,15,30,15,45,15,15,0,15,30"
 for n=1,6do
-temp_camera(-l[n*2-1]-r,-l[n*2]-d,function()
+temp_camera(-l[n*2-1]-i,-l[n*2]-d,function()
 if(e and not o and e.faces[n])sfn[[rectfill,-2,-1,11,10,12
 rectfill,-1,-2,10,11,12
-]]t[n].draw_face(0,0,n)else i[n].draw_face(0,0,n)
+]]t[n].draw_face(0,0,n)else r[n].draw_face(0,0,n)
 end)
 end
 end
@@ -301,8 +312,8 @@ local e=n.pos[1]-n.side
 if(e>=1and e<=8)n.move(e,n.pos[2])
 end
 end
-function make_damage_spot(n,i,o,l,e,t)
-local n=make_gridobj(n,i,1)
+function make_damage_spot(n,r,o,l,e,t)
+local n=make_gridobj(n,r,1)
 addfields(n,"decay=0",{
 side=l,
 damage=o,
@@ -316,7 +327,7 @@ if n.countdown>0then
 n.countdown-=1
 elseif n.countdown==0then
 if e.creature and e.creature.side~=n.side and e.creature.iframes<=0then
-if(has_mod(n.abil,"stun"))e.creature.stun_time=75
+if(has_mod(n.abil,"stun"))e.creature.stun_time=65
 if(has_mod(n.abil,"poison"))e.creature.poison_timer=60*n.damage else e.creature.take_damage(n.damage,has_mod(n.abil,"pierce"))
 if(e.creature==pl)pl.iframes=15
 end
@@ -338,15 +349,15 @@ if(n.side~=1)t=8
 if(has_mod(n.abil,"poison"))t=12
 if n.countdown>0then
 local n=1-n.countdown/n.countdown_max
-local i,r,n,e,o,l=6*n+2,4*n+2,e[1]+1,e[2]+1,e[1]+14,e[2]+11
-line(n,e,n+i,e,t)
-line(n,e,n,e+r,t)
-line(n,l,n+i,l,t)
-line(n,l,n,l-r,t)
-line(o,e,o-i,e,t)
-line(o,e,o,e+r,t)
-line(o,l,o-i,l,t)
-line(o,l,o,l-r,t)
+local r,i,n,e,o,l=6*n+2,4*n+2,e[1]+1,e[2]+1,e[1]+14,e[2]+11
+line(n,e,n+r,e,t)
+line(n,e,n,e+i,t)
+line(n,l,n+r,l,t)
+line(n,l,n,l-i,t)
+line(o,e,o-r,e,t)
+line(o,e,o,e+i,t)
+line(o,l,o-r,l,t)
+line(o,l,o,l-i,t)
 else
 if(n.decay<5)rectfill(e[1]+1,e[2]+1,e[1]+14,e[2]+11,t)
 end
@@ -420,7 +431,7 @@ if(has_mod(n,"rage")and pl.health<=pl.max_health/2)return n.pips+1
 end
 return n.pips
 end
-n.draw_face=function(e,t,i)
+n.draw_face=function(e,t,r)
 local o=n.name=="curse"and 8or 7
 rectfill(e,t-1,e+9,t+10,o)
 rectfill(e-1,t,e+10,t+9,o)
@@ -429,7 +440,7 @@ spr(n.image,e+1,t+1,1,1)
 pal(1,1)
 draw_mods(n.mods,e,t)
 draw_pips(n.get_pips(),e+7,t+9,12)
-if(i==4)spr(141,e-2,t+4)
+if(r==4)spr(141,e-2,t+4)
 end
 n.use=function(t,o,l,e)
 if(n.base=="none")return
@@ -440,26 +451,26 @@ if(has_mod(n,"growth")and n.pips<e)n.pips+=1n.original_pips+=1
 end
 return n
 end
-function abil_grid_spaces(o,l,i,r)
+function abil_grid_spaces(o,l,r,i)
 local t={}
 for n=0,7do
 for e=0,3do
 if get_bit(o,n*4+e%4)then
-local n,e=l+n*r,i+e-1
+local n,e=l+n*i,r+e-1
 if(n>=1and n<=8and e>=1and e<=4)add(t,{n,e})
 end
 end
 end
 return t
 end
-function abil_shield(n,e,t,o,l,i)
+function abil_shield(n,e,t,o,l,r)
 n.shield_timer=max(shield_time*e,n.shield_timer)
-local r=tp(o,l)
+local i=tp(o,l)
 if(n==pl)ssfx(15)
 bounce_hp[#bounce_hp]=10
-add(attack_runners,make_attack_runner(t.def,e,t,o,l,i))
+add(attack_runners,make_attack_runner(t.def,e,t,o,l,r))
 end
-function abil_attack(i,e,n,t,o,l)
+function abil_attack(r,e,n,t,o,l)
 add(attack_runners,make_attack_runner(n.def,e,n,t,o,l))
 end
 function abil_curse()
@@ -477,7 +488,7 @@ end
 function make_turret(n,e,t,o,l)
 local n=make_creature(e,t,l,n,12)
 local e=n.update
-n.rate=80
+n.rate=90
 n.time=0
 n.update=function()
 e()
@@ -487,12 +498,12 @@ if(n.time>=450)n.kill()
 end
 return n
 end
-function abil_turret(n,t,o,l,i,e)
+function abil_turret(n,t,o,l,r,e)
 local n,o=e,make_ability(all_abilities[o.def],t,o.mods)
-local n=find_open_square_for(e,l,i,{{n,0},{-n,0},{0,-1},{0,1},{n,-1},{n,1},{-n,-1},{-n,1}})
+local n=find_open_square_for(e,l,r,{{n,0},{-n,0},{0,-1},{0,1},{n,-1},{n,1},{-n,-1},{-n,1}})
 if(n)local n=make_turret(t,n[1],n[2],o,e)
 end
-function make_attack_runner(n,i,r,d,a,t,l)
+function make_attack_runner(n,r,i,d,a,t,l)
 local n,e=split(n,";"),{}
 for n in all(n)do
 local n=split(n,"/")
@@ -515,7 +526,7 @@ local n=0
 function update(f)
 local o=false
 function damage_and_stop(n,e,o)
-if(l)add(s.fake_hit,{e,o})else make_damage_spot(e,o,i,t,n.telegraph,r)
+if(l)add(s.fake_hit,{e,o})else make_damage_spot(e,o,r,t,n.telegraph,i)
 if n.collides then
 local e=grid[o][e].creature
 if(e and e.side~=t)n.alive=false
@@ -578,16 +589,16 @@ s:update()
 end
 return s
 end
-function make_effect_simple(n,l,c,i,e,t,o,r,d,a,f)
+function make_effect_simple(n,l,c,r,e,t,o,i,d,a,f)
 e=e or 0
 t=t or-.2
 o=o or 30
 local n,l=make_nongrid(n,l),0
 n.draw=function()
 palreset()
-fillp(r)
+fillp(i)
 pal(12,tf\2%2==0and 7or 12)
-spr(i,n.pos[1],n.pos[2],d or 1,a or 1,f)
+spr(r,n.pos[1],n.pos[2],d or 1,a or 1,f)
 palreset()
 fillp()
 end
@@ -599,12 +610,12 @@ if(l>o)del(nongrid,n)
 end
 return n
 end
-function make_creature_particle(n,e,t,i,o)
+function make_creature_particle(n,e,t,r,o)
 local n,e,l=make_nongrid(n,e),-50+rnd(2),(rnd()-.5)*1.8
 addfields(n,"",{
 color=t,
 yv=l,
-xv=i+(.5-rnd())*.25
+xv=r+(.5-rnd())*.25
 })
 n.draw=function()
 pset(n.pos[1],n.pos[2],t)
@@ -645,9 +656,9 @@ n.clay_time=o>=40and 45or 15
 creature_index+=1
 n.draw=function()
 local e,t,o,l=tp(n.pos[1],n.pos[2]),n.spri,0,grid[n.pos[2]][n.pos[1]].space
-function ds(i,r)
+function ds(r,i)
 local d=n.side*-sin(n.overextended_timer/60)*3
-spr(t,e[1]+o+i+d+n.telegraph_x,e[2]+n.yo+r+l.offset_y+n.telegraph_y,2,2,n.side==-1)
+spr(t,e[1]+o+r+d+n.telegraph_x,e[2]+n.yo+i+l.offset_y+n.telegraph_y,2,2,n.side==-1)
 end
 if(n.clay_time>0)if t<12then pal(split"2,2,2,2,2,2,1,1,1,1,1,1,1,1,15,1")clip(0,e[2]+n.yo+max((n.clay_time-10)*4,-4),128,22)ds(n.clay_time\5,0)ds(-n.clay_time\6,0)ds(0,n.clay_time\7)ds(0,-n.clay_time\8)ds(0,0)clip()palreset()elseif t<40then ds(0,0)else ds(n.clay_time*n.clay_time*.125,n.clay_time*n.clay_time*-.25)end n.clay_time-=1return
 if(n.movetime>0)fillp(21845.75)
@@ -713,11 +724,11 @@ die={}
 })
 return n
 end
-function make_monster(i,r,n,o,d,a,t,e)
+function make_monster(r,i,n,o,d,a,t,e)
 local l=false
 if(grid[o][n].creature)l=true
-local n=make_creature(n,o,-1,a,i)
-n.palette=monster_palettes[r]
+local n=make_creature(n,o,-1,a,r)
+n.palette=monster_palettes[i]
 n.abilities=d
 n.speed=t
 n.abil_timer=t\2
@@ -764,7 +775,7 @@ n.move_pattern_i=n.move_pattern_i%#n.move_pattern+1
 end
 if e then
 if n.move_target then
-if(valid_move_target(n.move_target[1],n.move_target[2],n.side,n.flies))n.move(n.move_target[1],n.move_target[2])else printh"invalid move target"
+if(valid_move_target(n.move_target[1],n.move_target[2],n.side,n.flies))n.move(n.move_target[1],n.move_target[2])
 n.move_target=nil
 end
 end
@@ -800,7 +811,7 @@ if(n.shield_timer>0)line(e,t,e+9,t,7)
 palreset()
 if(n.abil_pattern and n.abil_timer==9and n.abil_pattern[n.abil_pattern_i])make_effect_simple(e+2,t-18,nil,134,0,-.25,14)
 end
-if(l)printh"needs push"push_to_open_square(n)
+if(l)push_to_open_square(n)
 n.pick_next_move_target()
 return n
 end
@@ -1084,13 +1095,17 @@ end
 function update_gameplay()
 ended=victory or defeat
 if victory then
+if(level==20)dset(0,dget(0)+1)set_state"win"return
 victory_time=min(victory_time+1,10000)
 if inmediasres then
 if(victory_time>65)show_title=true
 if(victory_time>180)set_state"newgame"
 elseif victory_time>60and btnp(5)then
 dset(1,dget(1)+1)
-if(level==20)dset(0,dget(0)+1)set_state"win"else for n=1,6do player_abilities[n]=player_abilities[n].copy()end set_state"upgrade"
+for n=1,6do
+player_abilities[n]=player_abilities[n].copy()
+end
+set_state"upgrade"
 end
 time_scale=1
 end
@@ -1201,7 +1216,6 @@ bounce_hp[n]=0
 end
 night_time=max(65-level*5,45)
 if(level==15)night_time=0
-if(level>=18)night_time=9999
 for n=1,4do
 grid[n]={}
 for e=1,8do
@@ -1230,16 +1244,15 @@ walls=smlu([[199,-8,16
 defeat_wall=0
 local n=n[level]
 for n in all(n)do
-local n,t,o,l,i=unpack(split(n,"/"))
+local n,t,o,l,r=unpack(split(n,"/"))
 x=flr(rnd(4))+5
 y=flr(rnd(4))+1
 if(inmediasres)x=6y=2n="dog1"
 local n=parse_monster(e[n],x,y)
-n.move(x,y)
 n.favor_col=t
 n.time=o or 0
 n.abil_pattern_i=l or 0
-n.move_pattern_i=i or 0
+n.move_pattern_i=r or 0
 end
 if(inmediasres)spawn()imrtimer=0else do_level_intro()imrtimer=1000
 throw()

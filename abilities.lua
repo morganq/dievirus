@@ -114,7 +114,7 @@ function make_turret(pips, x, y, a, side)
     local spri = 12
     local t = make_creature(x, y, side, pips, spri)
     local baseupdate = t.update
-    t.rate = 80
+    t.rate = 90
     t.time = 0
     t.update = function()
         baseupdate()

@@ -102,7 +102,7 @@ function make_damage_spot(x,y,damage,side,warning,abil)
         elseif go.countdown == 0 then
             if spot.creature and spot.creature.side != go.side and spot.creature.iframes <= 0 then
                 if has_mod(go.abil, "stun") then
-                    spot.creature.stun_time = 75
+                    spot.creature.stun_time = 65
                 end                
                 if has_mod(go.abil, "poison") then
                     spot.creature.poison_timer = 60 * go.damage

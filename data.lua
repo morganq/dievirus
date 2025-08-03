@@ -42,6 +42,8 @@ s.bash,109,shield,  0/0b0100111000000000.0000000000000000/0/0/0/0,4
 turret,99,turret,wave,4
 sling.f,96,attack,    0/0b0100010001000100.0100010001000100/0/0/1/1/8,5,9
 sp.turret,117,turret,split,5
+wavewide1,100,attack,    0/0b0000011000000000.0000000000000000/4/0/0/15/8/0/0,-1
+wavewide2,100,attack,    0/0b0000110000000000.0000000000000000/4/0/0/15/8/0/0,-1
 bigwave,115,attack,     0/0b0000111100000000.0000000000000000/2/0/0/30/8/0/0/0/1,5
 sy.turret,118,turret,scythe,-1
 sl.turret,118,turret,sling,-1
@@ -57,7 +59,14 @@ fastbomb,107,attack,    0/0b0000000001001110.0100000000000000/0/0/0/20,-1
 donut,107,attack,       0/0b0000000011101010.1110000000000000/0/0/0/35,-1
 crisscross,0,attack,    0/0b0000000000000000.0000000000001000/0/3/0/20/16/0/0/1/1;0/0b0000000000000000.0000000000010000/0/-3/0/20/16/0/0/1/1;0/0b0000000000000000.0000100000000000/0/3/0/20/16/0/0/1/1;0/0b0000000000000000.0001000000000000/0/-3/0/20/16/0/0/1/1,-1
 fullscreen,107,attack,  0/0b1111111111111111.1111111111111111/0/0/0/35/32/0/0/1/1,-1
+fullscreen.a,107,attack,  0/0b1111111111111111.0111111111111111/0/0/0/35/32/0/0/1/1,-1
+fullscreen.b,107,attack,  0/0b1111111111111111.1111111111111110/0/0/0/35/32/0/0/1/1,-1
+fullscreen.c,107,attack,  0/0b1111111111111111.1111101111111111/0/0/0/35/32/0/0/1/1,-1
+fullscreen.d,107,attack,  0/0b1111111111111111.1111111111011111/0/0/0/35/32/0/0/1/1,-1
 d.turret,117,turret,rico,-1
+r1.turret,117,turret,rico.s1,-1
+r2.turret,117,turret,rico.s2,-1
+donut.turret,117,turret,donut,-1
 start,246,attack,    0/0b0100000000000000.0000000000000000/30/0/1/5/8,-1
 ]])
 
@@ -86,19 +95,21 @@ fox1,14,0,splash;1;claim/splash;1/splash;1,6,46,move_pattern=xxx_,abil_pattern=_
 owl1,34,0,turret;1/turret;1/sling;1,8,65,flies=1,abil_pattern=_x
 boss1,40,0,bomb;1/wave;1/shield;1/sword;1,15,15,flies=1,abil_pattern=____x_x____,move_pattern=xxxx_______
 scorpion1,32,0,bomb;1,8,99
-harpy2,38,1,wave;2/rico;2,8,50,flies=1,move_pattern=xx_,abil_pattern=__x
+harpy2,38,1,wavewide1;2/wavewide2;2,8,50,flies=1,move_pattern=xx_,abil_pattern=__x
 dog2,36,1,sword;2/spear;2,10,32,abil_pattern=_x
 fox2,14,1,rico.s1;2/rico.s2;1/rico.s1;1/rico.s2;2,14,33,move_pattern=xxx_,abil_pattern=___x
 owl2,34,1,turret;2/sling;2/shield;1,10,55,flies=1,abil_pattern=_x
 scorpion2,32,1,backrow1;2/backrow2;2,15,66,abil_pattern=_x__
 boss2,42,0,pinch;2/mortar;2/double;2/shield;3,20,23,flies=1,abil_pattern=______x_x_x_,move_pattern=xxxx___x___x
-harpy3,38,2,bigwave;2/wave;1;stun/wave;3,13,45,flies=1,move_pattern=xx_,abil_pattern=__x
-fox3,14,2,sling;2;poison/sword;2;poison/fastbomb;2;poison,20,28,move_pattern=xxx_,abil_pattern=___x
-scorpion3,32,2,bomb;3;claim/rico2;3/shield;3,20,35,abil_pattern=_x_
+dog3,36,1,sword;2;claim/spear;2/scythe;2,15,15,abil_pattern=_____xx_,move_pattern=xxx_____
+harpy3,38,2,bigwave;1/wave;1;stun/wave;3,13,45,flies=1,move_pattern=xx_,abil_pattern=__x
+fox3,14,2,rico2;2;poison/wave;2,20,28,move_pattern=xxx_,abil_pattern=___x
+owl3,34,1,r1.turret;3/r2.turret;3/shield;3,25,28,flies=1,abil_pattern=xx____,move_pattern=___x_x
+scorpion3,32,2,bomb;3;claim/shield;3,20,35,abil_pattern=_x_
 boss3,44,0,donut;4/rico2;3/crisscross;3,30,21,move_pattern=x___x___,abil_pattern=__x___x_
-boss4p,46,3,fullscreen;2;poison/turret;3/sling;3;poison/rico3;3/s.bash;2,40,25,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
-boss4g,46,0,fullscreen;1/rico3;1;growth/shield;1;growth/scythe;3;claim;claim,40,24,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
-boss4,46,4,fullscreen;1;invasion/sl.turret;3/rico3;3/s.bash;2;invasion,40,23,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
+boss4p,46,3,fullscreen;2;poison/turret;3/sling;3;poison/rico3;3/s.bash;2,30,28,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
+boss4g,46,0,fullscreen;1/rico3;1;growth/shield;1;growth/scythe;3;claim;claim,30,24,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
+boss4,46,4,fullscreen.a;1/fullscreen.b;1/fullscreen.c;1/fullscreen.d;1/sl.turret;3/s.bash;2,40,28,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
 ]])
 
 -- col / time / api / mpi
@@ -113,14 +124,14 @@ dog2/4,dog1/3,dog1/2
 owl1,scorpion1
 fox2/4/0/2/2,fox2
 boss2
-scorpion2/6,dog2/2,dog2/4
-harpy2,harpy2,dog2
-harpy3,fox2
-owl2,owl2
+harpy2,harpy2
+dog2/3,dog2/4,scorpion2/8
+harpy3,fox2/4
+owl2/8,owl2
 boss3
-fox3,harpy3
-scorpion3,scorpion3
-boss4p
-boss4g
+fox3,fox3,scorpion3
+owl3/6,dog1/4
+dog3/2,dog3/4/0/2/2
+harpy3,harpy2/8/0/1/1,harpy2/6/0/1/1,harpy1/5/0/2/2,harpy1/7/0/2/2
 boss4
 ]],true)

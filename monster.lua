@@ -84,8 +84,6 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
                 if c.move_target then
                     if valid_move_target(c.move_target[1], c.move_target[2], c.side, c.flies) then
                         c.move(c.move_target[1], c.move_target[2])
-                    else
-                        printh("invalid move target")
                     end
                     c.move_target = nil
                 end
@@ -165,7 +163,6 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         end
     end
     if needs_push then
-        printh("needs push")
         push_to_open_square(c)
     end
     c.pick_next_move_target()

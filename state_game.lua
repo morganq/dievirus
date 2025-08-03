@@ -251,11 +251,13 @@ function gameplay_tick()
 
     if living_monsters == 0 and not victory then
         victory = true
+        music(11)
         victory_time = 0
     end
 
     if pl.health <= 0 and not defeat then 
         defeat = true
+        music(10)
         defeat_time = 0
     end    
 
@@ -271,8 +273,10 @@ function gameplay_tick()
     end
     if side_total == 32 then
         victory = true
+        music(11)
     elseif side_total == -32 then
         defeat = true
+        music(10)
     end
 end
 
@@ -297,9 +301,9 @@ function update_gameplay()
                     player_abilities[i] = player_abilities[i].copy()
                 end
                 set_state("upgrade")
+                music(12)
             end
         end
-
         time_scale = 1
     end
     if defeat then
@@ -316,6 +320,7 @@ function update_gameplay()
         time_scale = 1
         if defeat_time > 240 then
             set_state("newgame")
+            music(12)
         end
     end
 
@@ -440,6 +445,7 @@ end
 
 level = 0
 function start_level()
+    music(0)
     victory = false
     defeat = false
     draw_time = 0

@@ -83,6 +83,7 @@ local n <- abil
 local n <- rndfc
 local n <- j
 local n <- y
+local n <- name
 local n <- gx
 local n <- x
 local n <- s
@@ -126,7 +127,6 @@ local n <- kind
 local n <- color
 local n <- ls
 local n <- spr
-local n <- name
 local n <- spot
 local n <- user
 local n <- t

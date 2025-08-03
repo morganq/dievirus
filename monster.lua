@@ -69,15 +69,13 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
         if ended then return end
         if c.stun_time > 0 then return end
         c.time += 1
-        if c.overextended_timer <= 0 then
-            c.move_timer -= 1
-            if not c.move_target then
-                c.pick_next_move_target()
-            end
+        c.move_timer -= 1
+        if c.overextended_timer <= 0 and not c.move_target then
+            c.pick_next_move_target()
         end
 
         if c.move_timer <= 0 then
-            local will_move = true
+            local will_move = c.overextended_timer <= 0
             if c.move_pattern then
                 if not c.move_pattern[c.move_pattern_i] then will_move = false end
                 c.move_pattern_i = c.move_pattern_i % #c.move_pattern + 1
@@ -163,7 +161,7 @@ function make_monster(spri, palette_index, x, y, abilities, health, speed, speci
 
         palreset()
         if c.abil_pattern and c.abil_timer == 9 and c.abil_pattern[c.abil_pattern_i] then
-            make_effect_simple(hpx + 2, hpy - 18, nil, 134, 0, -0.25, 12)
+            make_effect_simple(hpx + 2, hpy - 18, nil, 134, 0, -0.25, 14)
         end
     end
     if needs_push then

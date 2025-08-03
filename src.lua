@@ -11,7 +11,7 @@ function begin_game(spr, def)
     player_abilities = make_die(def)
     level = 0
     -- DEBUG:
-    --[[debug_start_level = 15
+    --[[debug_start_level = 9
     for j = 1, debug_start_level - 1 do
         level = j
         for i = 1, 6 do

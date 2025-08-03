@@ -271,10 +271,10 @@ function gameplay_tick()
             side_total += grid[y][x].space.side
         end
     end
-    if side_total == 32 then
+    if side_total == 32 and not ended then
         victory = true
         music(11)
-    elseif side_total == -32 then
+    elseif side_total == -32 and not ended then
         defeat = true
         music(10)
     end

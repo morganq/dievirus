@@ -141,8 +141,8 @@ spear,101,attack,   0/0b0000010000000000.0000000000000000/7/0/0/0/2,1
 wave,100,attack,    0/0b0000010000000000.0000000000000000/4/0/0/15/8/0/0,2
 bomb,107,attack,    0/0b0000000001001110.0100000000000000/0/0/0/35,2
 katana,158,attack,  0/0b1000010000100000.0000000000000000/0/0/0/0,2
+rico,105,attack,    0/0b0100000000000000.0000000000000000/5/-5/1/15/10/1/1,2
 sling,96,attack,    0/0b0100000000000000.0000000000000000/30/0/1/5/8,3
-rico,105,attack,    0/0b0100000000000000.0000000000000000/5/-5/1/15/10/1/1,3
 scythe,102,attack,  0/0b1010111000000000.0000000000000000/0/0/0/0,3
 split,103,attack,   0/0b1010000000000000.0000000000000000/3/0/0/15,3
 bouncer,113,attack, 0/0b0000010000000000.0000000000000000/6/0/0/15/6/1/0,3
@@ -161,6 +161,8 @@ sl.turret,118,turret,sling,-1
 curse,119,curse,,-1
 backrow1,0,attack,      0/0b0000000000000000.0000000000001111/0/0/0/30/4/0/0/1/1,-1
 backrow2,0,attack,      0/0b0000000000000000.0000000011111111/0/0/0/30/4/0/0/1/1,-1
+rico.s1,105,attack,     0/0b0100000000000000.0000000000000000/3/-3/1/15/4/1/1,-1
+rico.s2,105,attack,     0/0b0100000000000000.0000000000000000/3/3/1/15/4/1/1,-1
 rico2,105,attack,       0/0b0100000000000000.0000000000000000/5/-5/1/15/30/1/1,-1
 rico3,105,attack,       0/0b0100000000000000.0000000000000000/4/-8/0/20/999/0/1,-1
 rico4,105,attack,       0/0b0100000000000000.0000000000000000/16/2/0/20/64/1/1,-1
@@ -184,13 +186,13 @@ snipe,255,5,+1 if standing%in back row
 ]]
 local e,n=smlu[[harpy1,38,0,wave;1,4,60,flies=1,move_pattern=xx_,abil_pattern=__x
 dog1,36,0,sword;1;superclaim/sword;1,5,32,move_pattern=xx__,abil_pattern=__x_
-fox1,14,0,wave;1/splash;1/splash;1/rock;1;claim,6,46,move_pattern=xxx_,abil_pattern=___x
-owl1,34,0,turret;1/sling;1,8,65,flies=1,abil_pattern=_x
+fox1,14,0,splash;1;claim/splash;1/splash;1,6,46,move_pattern=xxx_,abil_pattern=___x
+owl1,34,0,turret;1/turret;1/sling;1,8,65,flies=1,abil_pattern=_x
 boss1,40,0,bomb;1/wave;1/shield;1/sword;1,15,15,flies=1,abil_pattern=____x_x____,move_pattern=xxxx_______
 scorpion1,32,0,bomb;1,8,99
 harpy2,38,1,wave;2/rico;2,8,50,flies=1,move_pattern=xx_,abil_pattern=__x
 dog2,36,1,sword;2/spear;2,10,32,abil_pattern=_x
-fox2,14,1,wave;2;claim/splash;2/sling;2,14,33,move_pattern=xxx_,abil_pattern=___x
+fox2,14,1,rico.s1;2/rico.s2;1/rico.s1;1/rico.s2;2,14,33,move_pattern=xxx_,abil_pattern=___x
 owl2,34,1,turret;2/sling;2/shield;1,10,55,flies=1,abil_pattern=_x
 scorpion2,32,1,backrow1;2/backrow2;2,15,66,abil_pattern=_x__
 boss2,42,0,pinch;2/mortar;2/double;2/shield;3,20,23,flies=1,abil_pattern=______x_x_x_,move_pattern=xxxx___x___x
@@ -201,15 +203,15 @@ boss3,44,0,donut;4/rico2;3/crisscross;3,30,21,move_pattern=x___x___,abil_pattern
 boss4p,46,3,fullscreen;2;poison/turret;3/sling;3;poison/rico3;3/s.bash;2,40,25,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
 boss4g,46,0,fullscreen;1/rico3;1;growth/shield;1;growth/scythe;3;claim;claim,40,24,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
 boss4,46,4,fullscreen;1;invasion/sl.turret;3/rico3;3/s.bash;2;invasion,40,23,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
-]],smlu([[harpy1
+]],smlu([[harpy1/6
 harpy1,dog1/3
-fox1/4,fox1/5
+fox1/4/0/2/2,fox1/5
 owl1
 boss1
 scorpion1,scorpion1,scorpion1
 dog2/4,dog1/3,dog1/2
-owl1,fox1,scorpion1
-fox2,harpy1,harpy1
+owl1,scorpion1
+fox2/4/0/2/2,fox2
 boss2
 scorpion2/6,dog2/2,dog2/4
 harpy2,harpy2,dog2
@@ -584,7 +586,9 @@ local n,l=make_nongrid(n,l),0
 n.draw=function()
 palreset()
 fillp(r)
+pal(12,tf\2%2==0and 7or 12)
 spr(i,n.pos[1],n.pos[2],d or 1,a or 1,f)
+palreset()
 fillp()
 end
 n.update=function()
@@ -750,12 +754,10 @@ e()
 if(ended)return
 if(n.stun_time>0)return
 n.time+=1
-if n.overextended_timer<=0then
 n.move_timer-=1
-if(not n.move_target)n.pick_next_move_target()
-end
+if(n.overextended_timer<=0and not n.move_target)n.pick_next_move_target()
 if n.move_timer<=0then
-local e=true
+local e=n.overextended_timer<=0
 if n.move_pattern then
 if(not n.move_pattern[n.move_pattern_i])e=false
 n.move_pattern_i=n.move_pattern_i%#n.move_pattern+1
@@ -796,7 +798,7 @@ line(e,t,e+9,t,1)
 line(e,t,e+9*(n.health/n.max_health),t,9)
 if(n.shield_timer>0)line(e,t,e+9,t,7)
 palreset()
-if(n.abil_pattern and n.abil_timer==9and n.abil_pattern[n.abil_pattern_i])make_effect_simple(e+2,t-18,nil,134,0,-.25,12)
+if(n.abil_pattern and n.abil_timer==9and n.abil_pattern[n.abil_pattern_i])make_effect_simple(e+2,t-18,nil,134,0,-.25,14)
 end
 if(l)printh"needs push"push_to_open_square(n)
 n.pick_next_move_target()
@@ -1064,17 +1066,17 @@ if(not n.alive)del(attack_runners,n)
 end
 if(e==0and not victory)victory=true music(11)victory_time=0
 if(pl.health<=0and not defeat)defeat=true music(10)defeat_time=0
-if(rnd()<.5)make_creature_particle(128,rnd(60)+20,15,-3,rnd(52)+28)
+if(rnd()<.25)make_creature_particle(128,rnd(60)+20,15,-3,rnd(52)+28)
 local n=0
 for e=1,4do
 for t=1,8do
 n+=grid[e][t].space.side
 end
 end
-if n==32then
+if n==32and not ended then
 victory=true
 music(11)
-elseif n==-32then
+elseif n==-32and not ended then
 defeat=true
 music(10)
 end
@@ -1088,7 +1090,7 @@ if(victory_time>65)show_title=true
 if(victory_time>180)set_state"newgame"
 elseif victory_time>60and btnp(5)then
 dset(1,dget(1)+1)
-if(level==20)dset(0,dget(0)+1)set_state"win"else for n=1,6do player_abilities[n]=player_abilities[n].copy()end set_state"upgrade"music(12)
+if(level==20)dset(0,dget(0)+1)set_state"win"else for n=1,6do player_abilities[n]=player_abilities[n].copy()end set_state"upgrade"
 end
 time_scale=1
 end
@@ -1179,7 +1181,7 @@ end
 end
 level=0
 function start_level()
-music(0)
+if(not inmediasres)music(0)
 victory=false
 defeat=false
 draw_time=0
@@ -1298,6 +1300,7 @@ end
 function update_upgrade()
 pl=nil
 if current_upgrades==nil then
+music(12)
 current_upgrades={}
 local n={"hp",rnd(upgrade_mods),rnd(upgrade_mods),rnd(upgrade_mods),draw_random_abil(),draw_random_abil(),draw_random_abil()}
 if(level%3==0)n={"+1","+1","+1","+1"}
@@ -1432,6 +1435,7 @@ cartdata"dievirus"
 menuitem(1,"clear wins",function()
 dset(0,0)
 end)
+inmediasres=true
 begin_game(0,"start;5/start;5/start;5/start;5/start;5/start;5")
 end
 function _draw()
@@ -1447,6 +1451,7 @@ tf+=1
 end
 function set_state(n)
 state=n
+if(n=="newgame")music(12)
 tf=0
 end
 __gfx__
@@ -1598,7 +1603,7 @@ __sfx__
 011000001e24318243186431864318643186430000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 010a00001f11500700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700
 0110000021010260101a0130070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000000000000
-01110000240001800118001000002861300000000000c6130c6140000000001000010000100001000010000100001000010000100001000010000100001000010000100000000000000000000000000000000000
+011100002861300000000000c6130c614000000000100001000010000100001000010000100001000010000100001000010000100001000010000000000000000000000000000000000000000000000000000000
 010400001c41024411007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700
 010400001c41037321007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700
 011200001611112111111130000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
@@ -1649,7 +1654,7 @@ __music__
 00 41424344
 00 41424344
 04 41423444
-00 41423536
+04 41423536
 01 41423233
 02 41423273
 __label__

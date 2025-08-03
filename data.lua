@@ -28,8 +28,8 @@ spear,101,attack,   0/0b0000010000000000.0000000000000000/7/0/0/0/2,1
 wave,100,attack,    0/0b0000010000000000.0000000000000000/4/0/0/15/8/0/0,2
 bomb,107,attack,    0/0b0000000001001110.0100000000000000/0/0/0/35,2
 katana,158,attack,  0/0b1000010000100000.0000000000000000/0/0/0/0,2
+rico,105,attack,    0/0b0100000000000000.0000000000000000/5/-5/1/15/10/1/1,2
 sling,96,attack,    0/0b0100000000000000.0000000000000000/30/0/1/5/8,3
-rico,105,attack,    0/0b0100000000000000.0000000000000000/5/-5/1/15/10/1/1,3
 scythe,102,attack,  0/0b1010111000000000.0000000000000000/0/0/0/0,3
 split,103,attack,   0/0b1010000000000000.0000000000000000/3/0/0/15,3
 bouncer,113,attack, 0/0b0000010000000000.0000000000000000/6/0/0/15/6/1/0,3
@@ -48,6 +48,8 @@ sl.turret,118,turret,sling,-1
 curse,119,curse,,-1
 backrow1,0,attack,      0/0b0000000000000000.0000000000001111/0/0/0/30/4/0/0/1/1,-1
 backrow2,0,attack,      0/0b0000000000000000.0000000011111111/0/0/0/30/4/0/0/1/1,-1
+rico.s1,105,attack,     0/0b0100000000000000.0000000000000000/3/-3/1/15/4/1/1,-1
+rico.s2,105,attack,     0/0b0100000000000000.0000000000000000/3/3/1/15/4/1/1,-1
 rico2,105,attack,       0/0b0100000000000000.0000000000000000/5/-5/1/15/30/1/1,-1
 rico3,105,attack,       0/0b0100000000000000.0000000000000000/4/-8/0/20/999/0/1,-1
 rico4,105,attack,       0/0b0100000000000000.0000000000000000/16/2/0/20/64/1/1,-1
@@ -76,17 +78,17 @@ snipe,255,5,+1 if standing%in back row
 -- +1 on back row
 -- +1 in daytime, add 2 sec of daytime
 
-
+--fox1,14,0,wave;1/splash;1/splash;1/rock;1;claim,6,46,move_pattern=xxx_,abil_pattern=___x
 local monster_defs = smlu([[
 harpy1,38,0,wave;1,4,60,flies=1,move_pattern=xx_,abil_pattern=__x
 dog1,36,0,sword;1;superclaim/sword;1,5,32,move_pattern=xx__,abil_pattern=__x_
-fox1,14,0,wave;1/splash;1/splash;1/rock;1;claim,6,46,move_pattern=xxx_,abil_pattern=___x
-owl1,34,0,turret;1/sling;1,8,65,flies=1,abil_pattern=_x
+fox1,14,0,splash;1;claim/splash;1/splash;1,6,46,move_pattern=xxx_,abil_pattern=___x
+owl1,34,0,turret;1/turret;1/sling;1,8,65,flies=1,abil_pattern=_x
 boss1,40,0,bomb;1/wave;1/shield;1/sword;1,15,15,flies=1,abil_pattern=____x_x____,move_pattern=xxxx_______
 scorpion1,32,0,bomb;1,8,99
 harpy2,38,1,wave;2/rico;2,8,50,flies=1,move_pattern=xx_,abil_pattern=__x
 dog2,36,1,sword;2/spear;2,10,32,abil_pattern=_x
-fox2,14,1,wave;2;claim/splash;2/sling;2,14,33,move_pattern=xxx_,abil_pattern=___x
+fox2,14,1,rico.s1;2/rico.s2;1/rico.s1;1/rico.s2;2,14,33,move_pattern=xxx_,abil_pattern=___x
 owl2,34,1,turret;2/sling;2/shield;1,10,55,flies=1,abil_pattern=_x
 scorpion2,32,1,backrow1;2/backrow2;2,15,66,abil_pattern=_x__
 boss2,42,0,pinch;2/mortar;2/double;2/shield;3,20,23,flies=1,abil_pattern=______x_x_x_,move_pattern=xxxx___x___x
@@ -101,15 +103,15 @@ boss4,46,4,fullscreen;1;invasion/sl.turret;3/rico3;3/s.bash;2;invasion,40,23,mov
 
 -- col / time / api / mpi
 local all_levels = smlu([[
-harpy1
+harpy1/6
 harpy1,dog1/3
-fox1/4,fox1/5
+fox1/4/0/2/2,fox1/5
 owl1
 boss1
 scorpion1,scorpion1,scorpion1
 dog2/4,dog1/3,dog1/2
-owl1,fox1,scorpion1
-fox2,harpy1,harpy1
+owl1,scorpion1
+fox2/4/0/2/2,fox2
 boss2
 scorpion2/6,dog2/2,dog2/4
 harpy2,harpy2,dog2

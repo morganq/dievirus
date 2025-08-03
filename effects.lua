@@ -7,7 +7,9 @@ function make_effect_simple(x, y, color, spri, xv, yv, lifetime, fill, sprw, spr
     ng.draw = function()
         palreset()
         fillp(fill)
+        pal(12, (tf \ 2 % 2 == 0) and 7 or 12)
         spr(spri, ng.pos[1], ng.pos[2], sprw or 1, sprh or 1, flip)
+        palreset()
         fillp()
     end
     ng.update = function()

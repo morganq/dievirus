@@ -45,9 +45,10 @@ function _init()
     --    flip()
     --end    
 
-    inmediasres = true
+    --inmediasres = true
     begin_game(0, "start;5/start;5/start;5/start;5/start;5/start;5")
     --begin_game(0, "sling;1/sling;1/spear;1/spear;1/shield;1/sword;2")
+    --set_state("win")
 end
 
 function _draw()

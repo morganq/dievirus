@@ -163,7 +163,7 @@ spr,97,94,-2,1,1,1
 print,upgrade,14,36,12
 ]])
 
-            print("rattles", 40 + sin(tf \ 3 * 0.39) * 1.25, -mvt + sin(tf \ 3 * 1.9) * 0.75 + 13,1)
+            print("rattles", 40 + sin(6699.39 % (victory_time \ 3) / 20) * 1.25, -mvt + sin(9437.9 % (victory_time \ 3) / 20) * 0.75 + 13,1)
             spr(130 + (tf \ 10) % 2, 4, -mvt + 35)
         end
         if defeat then
@@ -279,7 +279,7 @@ end
 function update_gameplay()
     ended = victory or defeat
     if victory then
-        victory_time += 1
+        victory_time = min(victory_time + 1, 10000)
         if inmediasres then
             if victory_time > 65 then
                 show_title = true

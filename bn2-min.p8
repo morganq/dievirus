@@ -47,6 +47,9 @@ camera(n+t,e+o)
 l()
 camera(n,e)
 end
+function temp_camera_sfn(n,e,t)
+temp_camera(n,e,function()sfn(t)end)
+end
 function palreset()
 pal()
 palt(2)
@@ -109,6 +112,9 @@ for e=1,#n do
 spr(all_mods[n[e]][2],t,o+e*6-6)
 end
 end
+function coslerp(e,t,n,o)
+return(cos(min(e/t,.5))*-.5+.5)*(o-n)+n
+end
 shield_time=150
 max_hp=3
 monster_palettes={
@@ -170,11 +176,11 @@ pierce,121,4,ignores shields
 claim,122,6,claim the first tile%you hit
 superclaim,125,2,claim up to 2%of the tiles hit
 pause,123,2,time stands still%for a moment longer
-invasion,124,4,+1 if standing%in enemy tile
+invasion,124,5,+1 if standing%in enemy tile
 rage,125,2,+2 if less than%half health
 poison,126,2,deals poison damage%instead of normal
 stun,127,2,stuns the enemy%for a moment
-snipe,255,4,+1 in back row
+snipe,255,5,+1 if standing%in back row
 ]]
 local e,n=smlu[[harpy1,38,0,wave;1,4,60,flies=1,move_pattern=xx_,abil_pattern=__x
 dog1,36,0,sword;1;superclaim/sword;1,5,32,move_pattern=xx__,abil_pattern=__x_
@@ -429,7 +435,6 @@ n.tiles_claimed=0
 _ENV["abil_"..n.type](t,n.get_pips(),n,o,l,e)
 local e=4+e
 if(has_mod(n,"growth")and n.pips<e)n.pips+=1n.original_pips+=1
-if(has_mod(n,"fast"))pl.die_speed=3
 end
 return n
 end
@@ -445,18 +450,18 @@ end
 end
 return t
 end
-function abil_shield(n,e,t,o,l,r)
-n.shield=1
+function abil_shield(n,e,t,o,l,i)
 n.shield_timer=max(shield_time*e,n.shield_timer)
-local i=tp(o,l)
+local r=tp(o,l)
 if(n==pl)ssfx(15)
-make_effect_simple(i[1]+4,i[2]-14,0,136)
-add(attack_runners,make_attack_runner(t.def,e,t,o,l,r))
+bounce_hp[#bounce_hp]=10
+add(attack_runners,make_attack_runner(t.def,e,t,o,l,i))
 end
 function abil_attack(i,e,n,t,o,l)
 add(attack_runners,make_attack_runner(n.def,e,n,t,o,l))
 end
 function abil_curse()
+sfx(19,1)
 local n=0
 for e=1,50do
 local e=grid[rnd(4)\1+1][rnd(8)\1+1]
@@ -466,7 +471,6 @@ n+=1
 if(n>=1)return
 end
 end
-ssfx(19)
 end
 function make_turret(n,e,t,o,l)
 local n=make_creature(e,t,l,n,12)
@@ -624,7 +628,7 @@ creature_index=1
 function make_creature(n,l,e,t,o)
 local n=make_gridobj(n,l,10,o)
 addfields(n,
-"movetime=0,yo=-7,damage_time=0,shield=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0,iframes=0,telegraph_x=0,telegraph_y=0",
+"movetime=0,yo=-7,damage_time=0,shield_timer=0,stun_time=0,stun_co=1,alive=true,overextended_timer=0,poison_timer=0,iframes=0,telegraph_x=0,telegraph_y=0",
 {
 lastpos={0,0},
 side=e,
@@ -675,10 +679,11 @@ grid[t][e].creature=n
 if(n.poison_timer>0)n.take_damage(1,true)local n=tp(e,t)
 end
 n.take_damage=function(e,t)
-if(victory or defeat)return
+if(ended)return
 if not t then
-if(n.shield>0)n.shield=0n.shield_timer=0return
+if(n.shield_timer>0)n.shield_timer=0sfx(20,1)return
 end
+if(n==pl)for n=max(n.health-e+1,1),n.health do bounce_hp[n]=10end
 n.health-=e
 n.damage_time=5
 local e=tp(n.pos[1],n.pos[2])
@@ -742,6 +747,7 @@ end
 local e=n.update
 n.update=function()
 e()
+if(ended)return
 if(n.stun_time>0)return
 n.time+=1
 if n.overextended_timer<=0then
@@ -788,7 +794,7 @@ local t=tp(n.pos[1],n.pos[2])
 local e,t=t[1]+3,t[2]+10
 line(e,t,e+9,t,1)
 line(e,t,e+9*(n.health/n.max_health),t,9)
-if(n.shield>0)line(e,t,e+9*min(n.shield/6,1),t,7)
+if(n.shield_timer>0)line(e,t,e+9,t,7)
 palreset()
 if(n.abil_pattern and n.abil_timer==9and n.abil_pattern[n.abil_pattern_i])make_effect_simple(e+2,t-18,nil,134,0,-.25,12)
 end
@@ -806,7 +812,6 @@ t[n[1]]=n[2]
 end
 return make_monster(n[2],n[3],o,l,e,n[5],n[6],t)
 end
-tf=0
 function make_die(e)
 local n,t={},split(e,"/")
 for e=1,6do
@@ -822,7 +827,7 @@ local n=classes[selected_class_index]
 if(btnp(5)and dget(0)>=n[4]and dget(1)>=n[5])ssfx(12)scrnt(draw_newgame,n[3]\8,0,16,16,92,60)inmediasres,show_title,imr_pressed,imrtimer=false,false,false,0 begin_game(n[3],n[6])
 end
 function draw_newgame(t)
-camera(0,cos(min(tf/64,.5))*-64-64)
+camera(0,coslerp(tf,64,-128,0))
 sfn[[rectfill,0,0,128,128,7
 spr,146,27,7
 
@@ -885,11 +890,11 @@ print,choose your character,4,4,3
 local n,e=classes[selected_class_index],1
 if dget(1)<n[5]then
 e=8
-print("unlocked after "..n[5].." rounds ("..dget(1)..")",22,116,e)
+print("unlocked after "..n[5].." rounds ("..dget(1)..")",6,116,e)
 pal(split"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1")
 elseif dget(0)<n[4]then
 e=8
-print("unlocked after "..n[4].." wins ("..dget(0)..")",22,116,e)
+print("unlocked after "..n[4].." wins ("..dget(0)..")",18,116,e)
 pal(split"1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1")
 else
 local n="  to begin"
@@ -903,7 +908,6 @@ draw_die2d(t,12,42)
 if(tf%60>45)parse_ability"curse;0".draw_face(57,57,-1)
 palreset()
 print(n[2],100-#n[2]*2,42,e)
-tf+=1
 end
 function draw_gameplay()
 draw_time=(draw_time+1)%1024
@@ -963,31 +967,56 @@ sspr,32,100,24,4,74,111
 sspr,32,100,24,4,25,91
 ]]else rectfill(imrtimer*4-200,0,128,96,7)
 if(not pl)return
-if(not imr_pressed)if die3d.visible then rectfill(die3d.x,105,die3d.x+14,107,5)rectfill(die3d.x-1,106,die3d.x+15,106,5)local n,e,t=die_frames[die_time\die_spin%8+1],die3d.x-8,die3d.y-8pal(split"0,0,0,0,0,0,0")spr(n,e+1,t,2,2)spr(n,e-1,t,2,2)spr(n,e,t+1,2,2)spr(n,e,t-1,2,2)palreset()spr(n,e,t,2,2)die_time+=1elseif pl.current_ability~=nil then local n=pl.die[pl.current_ability]spr(76,die3d.x-7,die3d.y-7,3,2)n.draw_face(die3d.x-5,die3d.y-3)local n=n.name local e=print(n,0,-100)print(n,64-e/2+5,114,1)spr(130+draw_time\10%2,64-e/2-5,114)end
+if(not imr_pressed and not ended)if die3d.visible then local n,e,t=die_frames[die_time\die_spin%8+1],die3d.x-8,die3d.y-8temp_camera_sfn(die3d.x,0,[[rectfill,0, 105, 14, 107, 5
+rectfill,-1, 106, 15, 106, 5     
+]])function sprf(...)spr(n,...)end pal(split"0,0,0,0,0,0,0")temp_camera_sfn(-e,-t,[[sprf,1,0, 2, 2
+sprf,-1,0, 2, 2
+sprf,0,1, 2, 2
+sprf,0,-1, 2, 2
+palreset
+sprf,0,0, 2, 2
+]])die_time+=1elseif pl.current_ability~=nil and not ended then local n=pl.die[pl.current_ability]spr(76,die3d.x-7,die3d.y-7,3,2)n.draw_face(die3d.x-5,die3d.y-3)local n=n.name local e=print(n,0,-100)print(n,64-e/2+5,114,1)spr(130+draw_time\10%2,64-e/2-5,114)end
 if not inmediasres then
 local n=game_frames_frac/30/.00002
-if(n<night_time)spr(155,111,0)print(night_time-n,120,2,0)else spr(231,113,1)night_palette_imm=true is_night=true
-local n=6
-spr(132,3,1,1,2)
-local e=(pl.max_health+pl.shield)*7
-line(6,1,e+3,1,1)
-line(6,10,e+3,10,1)
-spr(132,e,1,1,2,true)
-for e=1,pl.max_health do
-if(e<=pl.health)spr(128,n,3)else spr(129,n,3)
-n+=7
+if(n<night_time)spr(155,110,1)print(night_time-n,119,3,0)else spr(231,115,1)night_palette_imm=not ended is_night=true
+local e=2
+for n=1,pl.max_health+1do
+local t=0
+if(bounce_hp[n]>0)bounce_hp[n]-=1t=sin(bounce_hp[n]/25)*4
+if n==pl.max_health+1and pl.shield_timer>0then
+if(pl.shield_timer>30or pl.shield_timer\2%3==0)spr(145,e,2+t)
+elseif n<=pl.health then
+spr(128,e,2+t)
+elseif n<=pl.max_health then
+spr(129,e,2+t)
 end
-if(pl.shield_timer>0)local e=1-pl.shield_timer/shield_time for t=1,pl.shield do spr(145,n,3)local e=e*6sspr(64,64+e,8,6-e,n,3+e)n+=7end
-if(victory)temp_camera(0,-min(victory_time,40),function()sfn[[rectfill,0,-5,128,29,0
-print,victory!,4,0,10
-print,the die trembles with energy,4,9,10
-print,from your defeated foes...,4,18,10
-]]end)
-if(defeat)temp_camera(0,-min(defeat_time,40),function()sfn[[rectfill,0,-5,128,29,0
-print,you are slain.,4,0,10
-print,the die now searches,4,9,10
-print,for a new champion,4,18,10
-]]end)
+e+=9
+end
+if(victory)local n=-coslerp(victory_time,60,-46,28)temp_camera_sfn(0,n,[[rectfill,0,-5,128,46,7
+rect,-1,-5,128,46,1
+fillp,0b0101101001011010.1
+rectfill,-1,47,127,48,1
+fillp
+print,victory!,48,0,1
+print,the die         with energy,8,13,2
+print,from your defeated foes...,8,21,2
+spr,97,26,-2
+spr,97,94,-2,1,1,1
+print,upgrade,14,36,12
+]])print("rattles",40+sin(tf\3*.39)*1.25,-n+sin(tf\3*1.9)*.75+13,1)spr(130+tf\10%2,4,-n+35)
+if(defeat)temp_camera_sfn(0,-coslerp(defeat_time,80,-46,38),[[rectfill,0,-5,128,46,6
+rect,-1,-5,128,46,1
+fillp,0b0101101001011010.1
+rectfill,-1,47,127,48,1
+fillp
+print,you are slain,38,0,0
+spr,203,4,-2
+spr,203,117,-2,1,1,1
+spr,203,4,35
+spr,203,117,35,1,1,1
+print,the die seeks out,30,18,8
+print,a new champion...,30,26,8
+]])
 end
 if(time_scale<1or pause_extend>0)and not victory then
 poke(24404,96)
@@ -1014,7 +1043,7 @@ spr,247,72,16,2,1
 end
 end
 function gameplay_tick()
-game_frames_frac+=.00002
+game_frames_frac+=ended and 0or.00002
 local e,t=0,{}
 for n=1,8do
 for o=1,4do
@@ -1029,15 +1058,12 @@ for n in all(t)do n.update()end
 for n in all(nongrid)do
 n.update()
 end
-if not victory and not defeat then
 for n in all(attack_runners)do
 n:update()
 if(not n.alive)del(attack_runners,n)
 end
-end
 if(e==0and not victory)victory=true victory_time=0
 if(pl.health<=0and not defeat)defeat=true defeat_time=0
-tf+=1
 if(rnd()<.5)make_creature_particle(128,rnd(60)+20,15,-3,rnd(52)+28)
 local n=0
 for e=1,4do
@@ -1052,15 +1078,16 @@ defeat=true
 end
 end
 function update_gameplay()
+ended=victory or defeat
 if victory then
 victory_time+=1
-if inmediasres and victory_time>65then
-show_title=true
-elseif victory_time>90then
+if inmediasres then
+if(victory_time>65)show_title=true
+if(victory_time>180)set_state"newgame"
+elseif victory_time>60and btnp(5)then
 dset(1,dget(1)+1)
-if(level==20)dset(0,dget(0)+1)state="win"else for n=1,6do player_abilities[n]=player_abilities[n].copy()end state="upgrade"tf=0
+if(level==20)dset(0,dget(0)+1)set_state"win"else for n=1,6do player_abilities[n]=player_abilities[n].copy()end set_state"upgrade"
 end
-if(victory_time>180and inmediasres)state="newgame"tf=0
 time_scale=1
 end
 if defeat then
@@ -1070,10 +1097,10 @@ for n in all(walls)do
 if(n[3]~=16and rnd()<.5)n[3]+=.25
 end
 time_scale=1
-if(defeat_time>120)run()
+if(defeat_time>240)set_state"newgame"
 end
 temp_runner=nil
-if pl.stun_time<=0and not victory and not defeat then
+if pl.stun_time<=0and not ended then
 move_target=nil
 if(btnp(0)and pl.pos[1]>1)move_target={pl.pos[1]-1,pl.pos[2]}
 if(btnp(1)and pl.pos[1]<8)move_target={pl.pos[1]+1,pl.pos[2]}
@@ -1099,15 +1126,15 @@ pl.animate_time=5
 throw()
 time_scale=1
 end
-if(btnp(4))victory=true
 end
 if time_scale>0then
 if(pause_extend>0)pause_extend-=1else gameplay_tick()
 else
 end
-if die3d.visible and not victory and not defeat then
+if die3d.visible and not ended then
 die3d.yv+=.3*pl.die_speed
 if die3d.y>100then
+if(die3d.yv>4)sfx(16,1)
 if(die3d.yv>1)for n=1,die3d.yv*10do local n=make_creature_particle(die3d.x+rnd(10)-5,106,5,rnd(1)-.5,106+rnd(3))n.yv=rnd(2)*-.5end
 die3d.yv=die3d.yv*-.35
 die3d.y=100
@@ -1150,7 +1177,6 @@ end
 end
 level=0
 function start_level()
-tf=0
 victory=false
 defeat=false
 draw_time=0
@@ -1164,6 +1190,10 @@ nongrid={}
 grid={}
 game_frames_frac=0
 pause_extend=0
+bounce_hp={}
+for n=1,max_hp+1do
+bounce_hp[n]=0
+end
 night_time=max(65-level*5,45)
 if(level==15)night_time=0
 if(level>=18)night_time=9999
@@ -1210,8 +1240,7 @@ if(inmediasres)spawn()imrtimer=0else do_level_intro()imrtimer=1000
 throw()
 end
 function throw()
-sfx(16,1)
-local n={160,162,164,166,168,170,172,174}
+local n=split"160,162,164,166,168,170,172,174"
 die_frames={}
 for e=1,8do
 local e=rnd(#n)\1+1
@@ -1265,7 +1294,6 @@ if(rnd()>.35)return rnd(n[e])else return rnd(n[e+1])
 end
 function update_upgrade()
 pl=nil
-tf+=1
 if current_upgrades==nil then
 current_upgrades={}
 local n={"hp",rnd(upgrade_mods),rnd(upgrade_mods),rnd(upgrade_mods),draw_random_abil(),draw_random_abil(),draw_random_abil()}
@@ -1289,13 +1317,13 @@ player_abilities=applied
 if(current_upgrades[selected_upgrade_index].kind=="hp")max_hp+=1
 current_upgrades=nil
 selected_upgrade_index=1
-state="gameplay"
 scrnt(draw_upgrade,4,n,22,23,4,n,7)
+set_state"gameplay"
 start_level()
 end
 end
 function draw_upgrade(t)
-camera(0,cos(min(tf/64,.5))*-64-64)
+camera(0,coslerp(tf,64,-128,0))
 sfn[[rectfill,30,0,128,128,7
 line,31,0,128,0,6
 
@@ -1389,11 +1417,10 @@ win={update=update_win,draw=draw_win}
 player_sprite=0
 function begin_game(n,e)
 player_abilities=make_die(e)
-reset()
 level=0
-state="gameplay"
+reset()
+set_state"gameplay"
 player_sprite=n
-tf=0
 start_level()
 end
 function _init()
@@ -1402,10 +1429,6 @@ cartdata"dievirus"
 menuitem(1,"clear wins",function()
 dset(0,0)
 end)
-for n=1,20do
-cls(7)
-flip()
-end
 inmediasres=true
 begin_game(0,"start;5/start;5/start;5/start;5/start;5/start;5")
 end
@@ -1418,6 +1441,11 @@ if(pal_override_imm)pal(pal_override_imm)pal_override_imm=nil
 end
 function _update()
 states[state].update()
+tf+=1
+end
+function set_state(n)
+state=n
+tf=0
 end
 __gfx__
 eeeeeee0099eeeeeeee0e000000eeeeeeeeee00000eeeeee22eeeeeee22eeeeeeeee99999eeeeeeeeeeceeffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
@@ -1484,22 +1512,22 @@ eeeeeeeeeeeeeee111eeee1111eeee1ee11eee1111eee11111ee1ee10ee000e0eeeeeeeeeeeeeeee
 eeeeee1111111111ee1111ee111eeeeee11eee11e11eeeeee11ee11ee000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 eeeeee111111111eeeeeeeee11111ee1e11ee1e1e111ee11e111eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeeeeeeeeee1111111e111eeeeeee111eeeee111eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-ee1eeeeeeeeeeeeee111111eeeeeeeeeeee1eeeee77ee77eeeeecceeee777eeee1111eeeee1777eeeeee11eeeeeeeeeeeeeeeeeeeeeeeeeeccccceeeee77ccee
-ee1eeeeeeeeeeeeee1f1f11ee111111eee1eeeee7cc77cc7eeeecceee77eeeee1cccc1eee1eeeeeeeeeeee1eeeeeeeeee7eeeeeeeeeeeeeeceeeceeecc77eecc
-e111eeeee888eeee111f115ee191911ee1eeeeee7cc77cc7eeecceeee7e77eee1cccc1ee1eeeeeeeeeeeeee1eeeeeeee7eeeeeeeeeeeeeeeececeeeeceeeeeec
-e111eeeeeeeeeeee11f1f15e111911eee1eeeeee7cc77cc7eeecceee77eeeeeee1cc1eee1ee11eeeeee11ee7eee11ee17ee11eeeeeeeeeeeeeceeeeeccee77cc
-11111eeeeeeeeeee111111ee119191eee1eeeeee7cc77cc7eeeeeeee7e777eeee1cc1eeeeeeeeeeeeeeeeee7eeeeeee11eeeeeee8eeeeeeeeeceeeeeeecc77ee
-11111eeeeeeeeeee555555ee111111eee1eeeeee7cc77cc7eecceeeeeeeeeeeeee11eeeeeeeeeeeeeeeeee7eeeeeee1ee1eeeeee8eeeeeeeeeceeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee1eeeeee7cc77cc7eecceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7771eeee111eee88eeeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee1eeeeeee77ee77eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8888eeeeeeeeeeeeeeeeeeee
-eecccceee1111eeeeeeeeeeeeeeeeeeeee1eeeeeee00eeeeee22eeeeee44eeeeee66eeeeeea9eeeeeecceeeeeeeeeeeeee77eeeee8eeeeeeeeeeeee1eeeeeeee
-cceeee771eeee1eeeeeeeeeeeeeeeeeeeee1eeeee00eeeeee22eeeeee44eeeeee66eeeeeea9eeeeeecceeeee0000000eee77eeee88eeeeeeeeeeeee1e11eeeee
-77eeee771eeee1eeeeee66eeeeeeeeeeeeeeeeee00eeeeee22eeeeee44eeeeee66eeeeeea9eeeeeecceeeeeee0eee0eeeee77eee88eeeeeeeeeeee1ee11eeeee
-77eeeecce1ee1eeeee66eeeeeeeeeeeeeeeeeeee0ee000ee2eee2eee4ee444ee6eee55ee9ee9e9eeceeccceeee0e0eee77777eeeeeeeeeeeeeeeee1eeeee11ee
-eecccceee1ee1eeee6eeeeeeeeeeeeeeeeeeeeeeeee0e0eeeee22eeeeeeee4eeeeeee5eeeee999eeeeecceeeeee0eeee77777eeeeeeeeeeeeeeee1eeeeee11ee
-eeeeeeeeee11eeeeeeeeee6ee3eeee3eeeeeeeeeeee0e0eeeeee2eeeeee44eeeeeee55eeeeeee9eeeeeeeceeee000eeeeeeeeeeeeeeeeeeee1ee1eeeeeeeeeee
-eeeeeeeeeeeeeeeeeeee6eee3e3ee3e3eeeeeeeeeee000eeeee222eeeee444eeeee555eeeeeee9eeeeeccceee00000eeeeeeeeeeeeeeeeeee111eeeeeeeeee11
-eeeeeeeeeeeeeeeeee66eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee0000000eeeeeeeeeeeeeeeee111eeeeeeeeeee11
+ccccccce8888888ee111111eeeeeeeeeeeeeeeeee77ee77eeeeecceeeeeeeeeeeeeeeeeeee1777eeeeee11eeeeeeeeeeeeeeeeeeeeeeeeeeccccceeeee77ccee
+c77777ce8ddddd8ee1f1f11ee111111eeeeeeeee7cc77cc7eeeecceeeeeeeeeeeeeeeeeee1eeeeeeeeeeee1eeeeeeeeee7eeeeeeeeeeeeeeceeeceeecc77eecc
+c7ccc7ce8eeeee8e111f115ee191911eeeeeeeee7cc77cc7eeecceeeeeeeeeeeeeeeeeee1eeeeeeeeeeeeee1eeeeeeee7eeeeeeeeeeeeeeeececeeeeceeeeeec
+c7ccc7ce8eeeee8e11f1f15e111911eeeeeeeeee7cc77cc7eeecceeeeeeeeeeeeeeeeeee1ee11eeeeee11ee7eee11ee17ee11eeeeeeeeeeeeeceeeeeccee77cc
+c7ccc7ce8eeeee8e111111ee119191eeeeeeeeee7cc77cc7eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7eeeeeee11eeeeeee8eeeeeeeeeceeeeeeecc77ee
+c77777ce8eeeee8e555555ee111111eeeeeeeeee7cc77cc7eecceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7eeeeeee1ee1eeeeee8eeeeeeeeeceeeeeeeeeeeee
+ccccccce8888888eeeeeeeeeeeeeeeeeeeeeeeee7cc77cc7eecceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7771eeee111eee88eeeeeeeeeeeeeeeeeeeeee
+dddddddedddddddeeeeeeeeeeeeeeeeeeeeeeeeee77ee77eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8888eeeeeeeeeeeeeeeeeeee
+eeccccee0000000eeeeeeeeeeeeeeeeeeeeeeeeeee00eeeeee22eeeeee44eeeeee66eeeeeea9eeeeeecceeeeeeeeeeeeee77eeeee8eeeeeeeeeeeee1eeeeeeee
+cceeee770077700eeeeeeeeeeeeeeeeeeeeeeeeee00eeeeee22eeeeee44eeeeee66eeeeeea9eeeeeecceeeee0000000eee77eeee88eeeeeeeeeeeee1e11eeeee
+77eeee770007000eeeee66eeeeeeeeeeeeeeeeee00eeeeee22eeeeee44eeeeee66eeeeeea9eeeeeecceeeeeee0eee0eeeee77eee88eeeeeeeeeeee1ee11eeeee
+77eeeecc0007000eee66eeeeeeeeeeeeeeeeeeee0ee000ee2eee2eee4ee444ee6eee55ee9ee9e9eeceeccceeee0e0eee77777eeeeeeeeeeeeeeeee1eeeee11ee
+eecccceed07770dee6eeeeeeeeeeeeeeeeeeeeeeeee0e0eeeee22eeeeeeee4eeeeeee5eeeee999eeeeecceeeeee0eeee77777eeeeeeeeeeeeeeee1eeeeee11ee
+eeeeeeeee00700eeeeeeee6ee3eeee3eeeeeeeeeeee0e0eeeeee2eeeeee44eeeeeee55eeeeeee9eeeeeeeceeee000eeeeeeeeeeeeeeeeeeee1ee1eeeeeeeeeee
+eeeeeeeeed000deeeeee6eee3e3ee3e3eeeeeeeeeee000eeeee222eeeee444eeeee555eeeeeee9eeeeeccceee00000eeeeeeeeeeeeeeeeeee111eeeeeeeeee11
+eeeeeeeeeedddeeeee66eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee0000000eeeeeeeeeeeeeeeee111eeeeeeeeeee11
 eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee5555eeeeeeeeeeeeeeeeeeeeeeeeeeeeeee71eeeeeeeeee77eeeeeeeeeeeeeeeee666eeeeee
 eeee5555577eeeeeeeeeeeee555eeeeeeeeeeee55eeeeeeeeee55555555eeeeeeeeeeeeeeeeeeeeeeeeeee77711eeeeeeeee7777eeeeeeeeeeeee6666666eeee
 eeee555557777eeeeeee555555577eeeeeeee5555555eeeeee75555555555eeeeeeeeee77777777eeeee77777711eeeeeee77777777eeeeeeee66666666666ee
@@ -1516,14 +1544,14 @@ eeeeee77777777eeeee7777777777eeeeeeee7777777777eeee777777771eeeeee7777777777777e
 eeeeeeee77777eeeeee77777777eeeeeeeeee777777777eeeeee77777711eeeeee7777777777777eee55555555555eeeeeee555555577eeeeeee55777777eeee
 eeeeeeeee7777eeeeeee7777eeeeeeeeeeeeee777777eeeeeeeee777771eeeeeee77777777eeeeeeeeee5555555eeeeeeeeeeeee555eeeeeeeeee55777eeeeee
 eeeeeeeeeeeeeeeeeeee77eeeeeeeeeeeeeeeee777eeeeeeeeeeeee771eeeeeeeeeeeeeeeeeeeeeeeeeeee555eeeeeeeeeeeeeeeeeeeeeeeeeeeee57eeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeef50eeeeeeeeeeeeef755eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-eeeee77f50eeeeeeeeee77ff5500eeeeeeeeee7fee5555eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeffffffeeeeeeeeeeeeeeeee6666666eeeeeeeeeeeeeeeeeeeee
-f7f7ffff550eeeeee7fffffff55550eeee7fffeeeeee55555eeeeeeeeeeeeeeeeeeeeeeeeeeee333333eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-fffffffff5555f5ffffffffff55555f5eeeeeeeeeeeeee5555555e5eeeeeeeeeeeeeeeee3ffff3fffffeeeeeeeeeeeeeeeee6666666eeeeeeeeeeeeeeeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee555eeeeeeeeeeeeeeeeeeeeeeeeeeeee3ffff3fffffeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-e7fff55eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee5555eeeeeeeeeeffffffffffffeeee333333fff33eeeeeeeeeeeee66666666666eeeeeeeeeeeeeeeeeeeee
-ffffff55555f5feee77f7ff5555eeeeeeeeeeeeeeeeeeeeeeeeeeeeeffffffffffffeeeeffffffff3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-fffffffffffffffffffffffffffff55eeeeeeeeeeeeeeeeeeeeeeeee333333333333eeeefffffff3eeeeeeeeeeeeeeee6e6e6e6e6e6eeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeef50eeeeeeeeeeeeef755eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeffffffeeeee60000006eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeee77f50eeeeeeeeee77ff5500eeeeeeeeee7fee5555eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeffffffeeeee00000000eeee6666666eeeeeeeeeeeeeeeeeeeee
+f7f7ffff550eeeeee7fffffff55550eeee7fffeeeeee55555eeeeeeeeeeeeeeeeeeeeeeeeeeee333333eeeee00600060eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+fffffffff5555f5ffffffffff55555f5eeeeeeeeeeeeee5555555e5eeeeeeeeeeeeeeeee3ffff3fffffeeeee00006000eeee6666666eeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee555eeeeeeeeeeeeeeeeeeeeeeeeeeeee3ffff3fffffeeeee00000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+e7fff55eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee5555eeeeeeeeeeffffffffffffeeee333333fff33eeeee6600000666666666666eeeeeeeeeeeeeeeeeeeee
+ffffff55555f5feee77f7ff5555eeeeeeeeeeeeeeeeeeeeeeeeeeeeeffffffffffffeeeeffffffff3eeeeeee66060606eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+fffffffffffffffffffffffffffff55eeeeeeeeeeeeeeeeeeeeeeeee333333333333eeeefffffff3eeeeeeee660606066e6e6e6e6e6eeeeeeeeeeeeeeeeeeeee
 eeeeeeeeee6666eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee555555555553eeeeff5555f3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeeeee5555eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee333333333333eeeeff5ff5f3eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeecec6666ecceceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefffffffffff5eeeeff5cf5f3ee6eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeeee
@@ -1532,22 +1560,22 @@ eee6c55666655666655cc6eeeeeeeeeeeeeeeeeeceeeeeeeeeeeeeeefffffffffff5eeeeff5cf5c3
 ece55666cc65566cc66556ceeeeeeeeeeeeeceeecceeeeeeeeeeeeeefffffffffff5eeeeff5cf5c3666eeeeeeeeeeeee666ee666eeeeeeeeeeeeeeeeeeeeeeee
 e5566666c66556666666655eeeeeeeceeeeecceccceeeeeeceeeeeeefffffffffff5eeeefcccf5c3666eeeeeeeeeeeee666666666666666666eeeeee66eeeeee
 566666666665566666666665ceeccecccecccccccccceccececeeeeefffffffffff5eeeefcccf5c366ceeeeeeeeeeeee666666666666666666666eee66666eee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeccceeeeeeeeeeeeecceeeeeeee7888ee55555555eeeeeeeeeeeeeeeeeeeffffffffeeeee6666666666666666eeeeeeee
-eeeeeeee66666666666666eeeeeeeeeecccceeceeeeecceecceeeceee788877e57577775eeeeeeeeeeeeeeeeeeeffffffffeeeee6777777777777776eeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeccecceecceeeeeceeee7888777757575575eeeeeeeeeeeeeeeeeee33333333eeeee6777777777777776eeeeeeee
-eeeee66e66666666666666e66eeeeeeeeeeeeceeceeeeeeeeeeeeeee7888777757575575eeeeeeeeeeeeeeeeeeefffffff35fff56777777777777776eeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeee7888777757577575eeeeeeeecceeeeeeeeefffffff355ff36777777777777776eeeeeeee
-66666666666666666666666666666eeeeeeeeceeceeeeeeeeeeeeeee7888777757555575ffffffffccffeeeeeee3333fff3333336777777777777776eeeeeeee
-eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeeee788877e57777775fcfffcffffffeeeeeeeee553fffffff56777777777777776eeeeeeee
-6e6e6e6e6e6e6e6e6e6e6e6e6e6e6eeeeeeeeceeceeeeeeeeeeeeeeeee7888ee555555553c333cc33333eeeeeeeeee553ffffff56777777777777776eeeeeeee
-eee50ee00ee5000e00eeee00eee0005eeeeeeceeceeeeeeeeee888eee600e00005eeeeee5c5555c55553eeeeeeeeeee53f5555f5677777777777777688eeeeee
-eee00ee00ee0000e00eeee00eee00005eeeeeceeceeeeeeeee88888eee00e00000eeeeee3c3333c33333eeeeeeeeeee53f5ff5f567777777777777768eeeeeee
-ee506e00ee50eeeeee8ee8eeeee00e00eeeecceeceeeeeeeee8ee88eee00e500eeeeeeeefcffffcffff5eeeeeeeeeee53f5ff5f567777777777777768eeeeeee
-ee000000ee000eeeeee00eeeeee00ee0eeeeecceceeeeeeeeeeee88e5e506e000eeeeeeefcffffcffff5eeeeeeeee6e53f5ff5f5677777777777777688eeeeee
-ee000005ee000eeeeee00eeeeee00ee0eeeeeeeeeeeeeeeeeee888ee0e605e0005eeeeeefcfffccffff5eeeeeeee66e53f5ff5f56666666666666666eeeeeeee
-e506e00ee50eeeeeee8ee8eeeee006e0eeeeeeeeeeeeeeeeeee88eee0ee00ee0eeeeeeeefcfffcfffff5eeeeeeee66ec3fcff5f55555555555555555eeeeeeee
-e00ee00ee00000ee00eeee00eee00000eeeeeeeeeeeeeeeeeeeeeeee0ee00ee00000eeeefffffcfffff5eeeeeeeec6eccfcfc5f55555555555555555eeeeeeee
-500e500ee00000ee00eeee00eee50000eeeeeeeeeeeeeeeeeee88eee0ee006e000005eeefffffcfffff5eeeeeeee6ceccfccccc55555555555555555eeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeccceeeeeeeeeeeeecceeeeeeee7888ee55555555eeeeeeeeeeeeeeeeeeeffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeee66666666666666eeeeeeeeeecccceeceeeeecceecceeeceee788877e57577775eeeeeeeeeeeeeeeeeeeffffffffeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeccecceecceeeeeceeee7888777757575575eeeeeeeeeeeeeeeeeee33333333eeeeeeeeeeeeeeeeeeeeeeeeeeeee
+eeeee66e66666666666666e66eeeeeeeeeeeeceeceeeeeeeeeeeeeee7888777757575575eeeeeeeeeeeeeeeeeeefffffff35fff5eeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeee7888777757577575eeeeeeeecceeeeeeeeefffffff355ff3eeeeeeeeeeeeeeeeeeeeeeee
+66666666666666666666666666666eeeeeeeeceeceeeeeeeeeeeeeee7888777757555575ffffffffccffeeeeeee3333fff333333eeeeeeeeeeeeeeeeeeeeeeee
+eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeceeceeeeeeeeeeeeeeee788877e57777775fcfffcffffffeeeeeeeee553fffffff5eeeeeeeeeeeeeeeeeeeeeeee
+6e6e6e6e6e6e6e6e6e6e6e6e6e6e6eeeeeeeeceeceeeeeeeeeeeeeeeee7888ee555555553c333cc33333eeeeeeeeee553ffffff5eeeeeeeeeeeeeeeeeeeeeeee
+eee50ee00ee5000e00eeee00eee0005eeeeeeceeceeeeeeeeee888eee600e00005eeeeee5c5555c55553eeeeeeeeeee53f5555f5eeeeeeeeeeeeeeee88eeeeee
+eee00ee00ee0000e00eeee00eee00005eeeeeceeceeeeeeeee88888eee00e00000eeeeee3c3333c33333eeeeeeeeeee53f5ff5f5eeeeeeeeeeeeeeee8eeeeeee
+ee506e00ee50eeeeee8ee8eeeee00e00eeeecceeceeeeeeeee8ee88eee00e500eeeeeeeefcffffcffff5eeeeeeeeeee53f5ff5f5eeeeeeeeeeeeeeee8eeeeeee
+ee000000ee000eeeeee00eeeeee00ee0eeeeecceceeeeeeeeeeee88e5e506e000eeeeeeefcffffcffff5eeeeeeeee6e53f5ff5f5eeeeeeeeeeeeeeee88eeeeee
+ee000005ee000eeeeee00eeeeee00ee0eeeeeeeeeeeeeeeeeee888ee0e605e0005eeeeeefcfffccffff5eeeeeeee66e53f5ff5f5eeeeeeeeeeeeeeeeeeeeeeee
+e506e00ee50eeeeeee8ee8eeeee006e0eeeeeeeeeeeeeeeeeee88eee0ee00ee0eeeeeeeefcfffcfffff5eeeeeeee66ec3fcff5f5eeeeeeeeeeeeeeeeeeeeeeee
+e00ee00ee00000ee00eeee00eee00000eeeeeeeeeeeeeeeeeeeeeeee0ee00ee00000eeeefffffcfffff5eeeeeeeec6eccfcfc5f5eeeeeeeeeeeeeeeeeeeeeeee
+500e500ee00000ee00eeee00eee50000eeeeeeeeeeeeeeeeeee88eee0ee006e000005eeefffffcfffff5eeeeeeee6ceccfccccc5eeeeeeeeeeeeeeeeeeeeeeee
 __gff__
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000
@@ -1568,12 +1596,12 @@ __sfx__
 011000001e24318243186431864318643186430000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 010a00001f11500700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700
 0110000021010260101a0130070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000000000000
-01110000240001800118001000002861300000000000c6130c6140000000001000010000100001000010000100001000010000100001000010000100001000010000100000000000000000000000000000000000
+011100002861300000000000c6130c614000000000100001000010000100001000010000100001000010000100001000010000100001000010000000000000000000000000000000000000000000000000000000
 010400001c41024411007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700
 010400001c41037321007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700
-011200001611112111111130000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-011100000000000001000010000100001000010000100001000010000100001000010000100001000010000100000000000000000000000000000000000000000000000000000000000000000000000000000000
-001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0115000010355000000f4450040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+010b00003056500005000050000500005000050000500005000050000500005000050000500005000050000500005000050000500005000050000500005000050000500005000050000500005000050000500005
+011500000040000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000

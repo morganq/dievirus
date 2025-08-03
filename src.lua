@@ -45,7 +45,7 @@ function _init()
     --    flip()
     --end    
 
-    --inmediasres = true
+    inmediasres = true
     begin_game(0, "start;5/start;5/start;5/start;5/start;5/start;5")
     --begin_game(0, "sling;1/sling;1/spear;1/spear;1/shield;1/sword;2")
     --set_state("win")
@@ -71,6 +71,7 @@ end
 
 function set_state(name)
     state = name
+    if name == "newgame" then music(12) end
     tf = 0
 end
 

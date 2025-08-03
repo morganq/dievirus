@@ -261,7 +261,7 @@ function gameplay_tick()
         defeat_time = 0
     end    
 
-    if rnd() < 0.5 then
+    if rnd() < 0.25 then
         make_creature_particle(128, rnd(60) + 20, 15, -3, rnd(52) + 28)
     end
 
@@ -301,7 +301,6 @@ function update_gameplay()
                     player_abilities[i] = player_abilities[i].copy()
                 end
                 set_state("upgrade")
-                music(12)
             end
         end
         time_scale = 1
@@ -445,7 +444,9 @@ end
 
 level = 0
 function start_level()
-    music(0)
+    if not inmediasres then
+        music(0)
+    end
     victory = false
     defeat = false
     draw_time = 0

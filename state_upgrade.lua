@@ -66,6 +66,7 @@ end
 function update_upgrade()
     pl = nil
     if current_upgrades == nil then
+        music(12)
         current_upgrades = {}
         local options = {"hp", rnd(upgrade_mods), rnd(upgrade_mods), rnd(upgrade_mods), draw_random_abil(), draw_random_abil(), draw_random_abil()}
         if level % 3 == 0 then

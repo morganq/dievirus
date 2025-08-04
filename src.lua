@@ -57,7 +57,7 @@ function _draw()
     pal(split"129,2,141,4,134,6,7,136,9,10,142,139,13,14,15,0",1)
     if night_palette_imm then
         pal(split"129,2,141,4,134,5,6,136,9,10,142,3,13,14,15,0",1)
-        night_palette_imm = false
+        night_palette_imm = false 
     end
     if pal_override_imm then
         pal(pal_override_imm)

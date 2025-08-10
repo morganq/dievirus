@@ -69,7 +69,8 @@ function update_upgrade()
         music(12)
         current_upgrades = {}
         local options = {"hp", rnd(upgrade_mods), rnd(upgrade_mods), rnd(upgrade_mods), draw_random_abil(), draw_random_abil(), draw_random_abil()}
-        if level % 3 == 0 then
+        -- after levels 1, 4, 7, 10, 13, 16, 19
+        if level % 3 == 1 then
             options = {"+1", "+1", "+1", "+1"}
         end
         local faces_options1 = split("11____,____11,__11__,1__1__,_2____,2_____,___2__,3-____,_1___1,_1__1_")

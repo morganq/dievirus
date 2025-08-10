@@ -60,12 +60,12 @@ end
 function ssfx(n)
 sfx(n,0)
 end
-function sandify(o,l,e,r,i,t,d)
+function sandify(o,l,e,i,r,t,d)
 for n=0,e do
 local a=n/e-.5
-for e=0,r do
+for e=0,i do
 local o=sget(o+n,l+e)
-if(o~=(d or 14))make_creature_particle(i+n,t+e,o,a/2,t+6+rnd(4))
+if(o~=(d or 14))make_creature_particle(r+n,t+e,o,a/2,t+6+rnd(4))
 end
 end
 end
@@ -97,12 +97,12 @@ end
 end
 function draw_pips(n,e,t,o)
 local l=n\5
-local r,n=n-l*5,0
+local i,n=n-l*5,0
 for l=1,l do
 rectfill(e,t-n-2,e+2,t-n,o)
 n+=4
 end
-for l=1,r do
+for l=1,i do
 rectfill(e,t-n,e+2,t-n,o)
 n+=2
 end
@@ -127,8 +127,8 @@ gridpatterns=split"64,66,68,64,64,66,68,64,70,72,66,74,70,72,66,74,74,66,72,70,7
 classes=smlu[[1,king,0,0,0,sling;1/sling;1/spear;1/spear;1/shield;1/sword;2
 2,queen,2,0,5,sword;2/shield;1/spear;1/slap;1/scythe;1;superclaim/scythe;2
 3,priestess,4,0,15,wave;1/wave;1/wall;0;stun/sword;1/bomb;2/shield;1
-4,engineer,6,1,0,turret;1/splash;1/cane;1/turret;1/rock;1/shield;1
-5,farmer,8,2,0,slap;1/shield;1/rock;0;growth/scythe;1/spear;1/sy.turret;1;claim
+4,engineer,6,1,0,hydra;1/splash;1/cane;1/hydra;1/rock;1/shield;1
+5,farmer,8,2,0,slap;1/shield;1/rock;0;growth/scythe;1/spear;1/sy.hydra;1;claim
 6,apothecary,10,3,0,bomb;1;poison/slap;2;poison/sword;1/bomb;1/cane;1/sling;1
 ]]
 all_abilities=smlu[[slap,104,attack,    0/0b0000010000000000.0000000000000000/0/0/0/0,0
@@ -141,25 +141,25 @@ spear,101,attack,   0/0b0000010000000000.0000000000000000/7/0/0/0/2,1
 wave,100,attack,    0/0b0000010000000000.0000000000000000/4/0/0/15/8/0/0,2
 bomb,107,attack,    0/0b0000000001001110.0100000000000000/0/0/0/35,2
 katana,158,attack,  0/0b1000010000100000.0000000000000000/0/0/0/0,2
-rico,105,attack,    0/0b0100000000000000.0000000000000000/5/-5/1/15/10/1/1,2
+rico,105,attack,    0/0b0100000000000000.0000000000000000/5/5/1/15/10/1/1,2
 sling,96,attack,    0/0b0100000000000000.0000000000000000/30/0/1/5/8,3
 scythe,102,attack,  0/0b1010111000000000.0000000000000000/0/0/0/0,3
 split,103,attack,   0/0b1010000000000000.0000000000000000/3/0/0/15,3
-bouncer,113,attack, 0/0b0000010000000000.0000000000000000/6/0/0/15/6/1/0,3
+bounce,113,attack, 0/0b0000010000000000.0000000000000000/6/0/0/15/9/1/0,3
 mortar,114,attack,  0/0b0000000000000000.0000011001100000/0/0/0/35/4/0/0/1/1,3
-wall,110,attack,    0/0b0000000000000000.1000000000000000/0/30/0/15/4/0/0/0/1,4
-double,111,attack,  0/0b0000010000000000.0000000000000000/6/0/0/15/8/0/0;30/0b0000010000000000.0000000000000000/6/0/0/15/8/0/0,4
+wall,110,attack,    0/0b0000000000000000.1000000000000000/0/30/0/15/4/0/0/0/1,3
+double,111,attack,  0/0b0000010000000000.0000000000000000/6/0/0/20/8/0/0;30/0b0000010000000000.0000000000000000/6/0/0/20/8/0/0,4
 pinch,116,attack,   0/0b0000000000000001.0000000000000000/0/-30/0/10/4/0/0/0/1;10/0b0000000000000000.1000000000000000/0/30/0/10/4/0/0/0/1,4
 s.bash,109,shield,  0/0b0100111000000000.0000000000000000/0/0/0/0,4
 3.rock,159,attack,  0/0b0000000000000100.0000000000000000/0/0/0/25;15/0b0000000000000100.0000000000000000/0/0/0/25;30/0b0000000000000100.0000000000000000/0/0/0/25,4
-turret,99,turret,wave,4
+hydra,99,turret,wave,4
 sling.f,96,attack,    0/0b0100010001000100.0100010001000100/0/0/1/1/8,5,9
-sp.turret,117,turret,split,5
+sp.hydra,117,turret,split,5
+bigwave,115,attack,     0/0b0000111100000000.0000000000000000/2/0/0/30/8/0/0/0/1,5
 wavewide1,100,attack,    0/0b0000011000000000.0000000000000000/4/0/0/15/8/0/0,-1
 wavewide2,100,attack,    0/0b0000110000000000.0000000000000000/4/0/0/15/8/0/0,-1
-bigwave,115,attack,     0/0b0000111100000000.0000000000000000/2/0/0/30/8/0/0/0/1,5
-sy.turret,118,turret,scythe,-1
-sl.turret,118,turret,sling,-1
+sy.hydra,118,turret,scythe,-1
+sl.hydra,118,turret,sling,-1
 curse,119,curse,,-1
 backrow1,0,attack,      0/0b0000000000000000.0000000000001111/0/0/0/30/4/0/0/1/1,-1
 backrow2,0,attack,      0/0b0000000000000000.0000000011111111/0/0/0/30/4/0/0/1/1,-1
@@ -176,14 +176,14 @@ fullscreen.a,107,attack,  0/0b1111111111111111.0111111111111111/0/0/0/35/32/0/0/
 fullscreen.b,107,attack,  0/0b1111111111111111.1111111111111110/0/0/0/35/32/0/0/1/1,-1
 fullscreen.c,107,attack,  0/0b1111111111111111.1111101111111111/0/0/0/35/32/0/0/1/1,-1
 fullscreen.d,107,attack,  0/0b1111111111111111.1111111111011111/0/0/0/35/32/0/0/1/1,-1
-d.turret,117,turret,rico,-1
-r1.turret,117,turret,rico.s1,-1
-r2.turret,117,turret,rico.s2,-1
-donut.turret,117,turret,donut,-1
+d.hydra,117,turret,rico,-1
+r1.hydra,117,turret,rico.s1,-1
+r2.hydra,117,turret,rico.s2,-1
+donut.hydra,117,turret,donut,-1
 start,246,attack,    0/0b0100000000000000.0000000000000000/30/0/1/5/8,-1
 ]]
 all_mods=smlu[[growth,120,3,+1 each use in%battle (max = 5)
-pierce,121,4,ignores shields
+pierce,121,4,breaks shield. double%damage if broken
 claim,122,6,claim the first tile%you hit
 superclaim,125,2,claim up to 2%of the tiles hit
 pause,123,2,time stands still%for a moment longer
@@ -196,24 +196,24 @@ snipe,255,5,+1 if standing%in back row
 local e,n=smlu[[harpy1,38,0,wave;1,4,60,flies=1,move_pattern=xx_,abil_pattern=__x
 dog1,36,0,sword;1;superclaim/sword;1,5,32,move_pattern=xx__,abil_pattern=__x_
 fox1,14,0,splash;1;claim/splash;1/splash;1,6,46,move_pattern=xxx_,abil_pattern=___x
-owl1,34,0,turret;1/turret;1/sling;1,8,65,flies=1,abil_pattern=_x
+owl1,34,0,hydra;1/hydra;1/sling;1,8,65,flies=1,abil_pattern=_x
 boss1,40,0,bomb;1/wave;1/shield;1/sword;1,15,15,flies=1,abil_pattern=____x_x____,move_pattern=xxxx_______
 scorpion1,32,0,bomb;1,8,99
 harpy2,38,1,wavewide1;2/wavewide2;2,8,50,flies=1,move_pattern=xx_,abil_pattern=__x
 dog2,36,1,sword;2/spear;2,10,32,abil_pattern=_x
 fox2,14,1,rico.s1;2/rico.s2;1/rico.s1;1/rico.s2;2,14,33,move_pattern=xxx_,abil_pattern=___x
-owl2,34,1,turret;2/sling;2/shield;1,10,55,flies=1,abil_pattern=_x
-scorpion2,32,1,backrow1;2/backrow2;2,15,66,abil_pattern=_x__
-boss2,42,0,pinch;2/mortar;2/double;2/shield;3,20,23,flies=1,abil_pattern=______x_x_x_,move_pattern=xxxx___x___x
+owl2,34,1,hydra;2/sling;2/shield;1,10,55,flies=1,abil_pattern=_x
+scorpion2,32,1,backrow1;1/backrow2;1,15,66,abil_pattern=_x__
+boss2,42,0,pinch;2/mortar;2/double;1/shield;3,20,23,flies=1,abil_pattern=______x_x_x_,move_pattern=xxxx___x___x
 dog3,36,1,sword;2;claim/spear;2/scythe;2,15,15,abil_pattern=_____xx_,move_pattern=xxx_____
 harpy3,38,2,bigwave;1/wave;1;stun/wave;3,13,45,flies=1,move_pattern=xx_,abil_pattern=__x
-fox3,14,2,rico2;2;poison/wave;2,20,28,move_pattern=xxx_,abil_pattern=___x
-owl3,34,1,r1.turret;3/r2.turret;3/shield;3,25,28,flies=1,abil_pattern=xx____,move_pattern=___x_x
-scorpion3,32,2,bomb;3;claim/shield;3,20,35,abil_pattern=_x_
-boss3,44,0,donut;4/rico2;3/crisscross;3,30,21,move_pattern=x___x___,abil_pattern=__x___x_
-boss4p,46,3,fullscreen;2;poison/turret;3/sling;3;poison/rico3;3/s.bash;2,30,28,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
+fox3,14,2,rico2;2/wave;2,20,33,move_pattern=xxx_,abil_pattern=___x
+owl3,34,1,r1.hydra;3/r2.hydra;3/shield;2,25,28,flies=1,abil_pattern=xx____,move_pattern=___x_x
+scorpion3,32,2,bomb;3;claim/shield;2,20,35,abil_pattern=_x_
+boss3,44,0,donut;4/rico2;3/crisscross;3,30,28,move_pattern=x___x___,abil_pattern=__x___x_
+boss4p,46,3,fullscreen;2;poison/hydra;3/sling;3;poison/rico3;3/s.bash;2,30,28,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
 boss4g,46,0,fullscreen;1/rico3;1;growth/shield;1;growth/scythe;3;claim;claim,30,24,move_pattern=xxx_xxx___,abil_pattern=___x_xx___
-boss4,46,4,fullscreen.a;1/fullscreen.b;1/fullscreen.c;1/fullscreen.d;1/sl.turret;3/s.bash;2,40,28,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
+boss4,46,4,fullscreen.a;1/fullscreen.b;1/fullscreen.c;1/fullscreen.d;1/sl.hydra;3/s.bash;2,40,28,move_pattern=xxx_xxx___xxx_xxx___,abil_pattern=___x_xx______x_xxx__
 ]],smlu([[harpy1/6
 harpy1,dog1/3
 fox1/4/0/2/2,fox1/5
@@ -224,26 +224,26 @@ dog2/4,dog1/3,dog1/2
 owl1,scorpion1
 fox2/4/0/2/2,fox2
 boss2
-harpy2,harpy2
+harpy2/7/0/2/2,harpy2/7/0/1/1,dog1/3,dog1/4
 dog2/3,dog2/4,scorpion2/8
 harpy3,fox2/4
 owl2/8,owl2
 boss3
-fox3,fox3,scorpion3
+fox3,fox2,scorpion3
 owl3/6,dog1/4
 dog3/2,dog3/4/0/2/2
 harpy3,harpy2/8/0/1/1,harpy2/6/0/1/1,harpy1/5/0/2/2,harpy1/7/0/2/2
 boss4
 ]],true)
-function draw_die2d(r,i,d,t,e)
+function draw_die2d(i,r,d,t,e)
 local o=true
 if(t and e.kind~="hp")o=tf\14%2==0
 local l=split"0,15,15,15,30,15,45,15,15,0,15,30"
 for n=1,6do
-temp_camera(-l[n*2-1]-i,-l[n*2]-d,function()
+temp_camera(-l[n*2-1]-r,-l[n*2]-d,function()
 if(e and not o and e.faces[n])sfn[[rectfill,-2,-1,11,10,12
 rectfill,-1,-2,10,11,12
-]]t[n].draw_face(0,0,n)else r[n].draw_face(0,0,n)
+]]t[n].draw_face(0,0,n)else i[n].draw_face(0,0,n)
 end)
 end
 end
@@ -312,8 +312,8 @@ local e=n.pos[1]-n.side
 if(e>=1and e<=8)n.move(e,n.pos[2])
 end
 end
-function make_damage_spot(n,r,o,l,e,t)
-local n=make_gridobj(n,r,1)
+function make_damage_spot(n,i,o,l,e,t)
+local n=make_gridobj(n,i,1)
 addfields(n,"decay=0",{
 side=l,
 damage=o,
@@ -349,15 +349,15 @@ if(n.side~=1)t=8
 if(has_mod(n.abil,"poison"))t=12
 if n.countdown>0then
 local n=1-n.countdown/n.countdown_max
-local r,i,n,e,o,l=6*n+2,4*n+2,e[1]+1,e[2]+1,e[1]+14,e[2]+11
-line(n,e,n+r,e,t)
-line(n,e,n,e+i,t)
-line(n,l,n+r,l,t)
-line(n,l,n,l-i,t)
-line(o,e,o-r,e,t)
-line(o,e,o,e+i,t)
-line(o,l,o-r,l,t)
-line(o,l,o,l-i,t)
+local i,r,n,e,o,l=6*n+2,4*n+2,e[1]+1,e[2]+1,e[1]+14,e[2]+11
+line(n,e,n+i,e,t)
+line(n,e,n,e+r,t)
+line(n,l,n+i,l,t)
+line(n,l,n,l-r,t)
+line(o,e,o-i,e,t)
+line(o,e,o,e+r,t)
+line(o,l,o-i,l,t)
+line(o,l,o,l-r,t)
 else
 if(n.decay<5)rectfill(e[1]+1,e[2]+1,e[1]+14,e[2]+11,t)
 end
@@ -431,7 +431,7 @@ if(has_mod(n,"rage")and pl.health<=pl.max_health/2)return n.pips+1
 end
 return n.pips
 end
-n.draw_face=function(e,t,r)
+n.draw_face=function(e,t,i)
 local o=n.name=="curse"and 8or 7
 rectfill(e,t-1,e+9,t+10,o)
 rectfill(e-1,t,e+10,t+9,o)
@@ -440,7 +440,7 @@ spr(n.image,e+1,t+1,1,1)
 pal(1,1)
 draw_mods(n.mods,e,t)
 draw_pips(n.get_pips(),e+7,t+9,12)
-if(r==4)spr(141,e-2,t+4)
+if(i==4)spr(141,e-2,t+4)
 end
 n.use=function(t,o,l,e)
 if(n.base=="none")return
@@ -451,26 +451,26 @@ if(has_mod(n,"growth")and n.pips<e)n.pips+=1n.original_pips+=1
 end
 return n
 end
-function abil_grid_spaces(o,l,r,i)
+function abil_grid_spaces(o,l,i,r)
 local t={}
 for n=0,7do
 for e=0,3do
 if get_bit(o,n*4+e%4)then
-local n,e=l+n*i,r+e-1
+local n,e=l+n*r,i+e-1
 if(n>=1and n<=8and e>=1and e<=4)add(t,{n,e})
 end
 end
 end
 return t
 end
-function abil_shield(n,e,t,o,l,r)
+function abil_shield(n,e,t,o,l,i)
 n.shield_timer=max(shield_time*e,n.shield_timer)
-local i=tp(o,l)
+local r=tp(o,l)
 if(n==pl)ssfx(15)
 bounce_hp[#bounce_hp]=10
-add(attack_runners,make_attack_runner(t.def,e,t,o,l,r))
+add(attack_runners,make_attack_runner(t.def,e,t,o,l,i))
 end
-function abil_attack(r,e,n,t,o,l)
+function abil_attack(i,e,n,t,o,l)
 add(attack_runners,make_attack_runner(n.def,e,n,t,o,l))
 end
 function abil_curse()
@@ -498,12 +498,12 @@ if(n.time>=450)n.kill()
 end
 return n
 end
-function abil_turret(n,t,o,l,r,e)
+function abil_turret(n,t,o,l,i,e)
 local n,o=e,make_ability(all_abilities[o.def],t,o.mods)
-local n=find_open_square_for(e,l,r,{{n,0},{-n,0},{0,-1},{0,1},{n,-1},{n,1},{-n,-1},{-n,1}})
+local n=find_open_square_for(e,l,i,{{n,0},{-n,0},{0,-1},{0,1},{n,-1},{n,1},{-n,-1},{-n,1}})
 if(n)local n=make_turret(t,n[1],n[2],o,e)
 end
-function make_attack_runner(n,r,i,d,a,t,l)
+function make_attack_runner(n,i,r,d,a,t,l)
 local n,e=split(n,";"),{}
 for n in all(n)do
 local n=split(n,"/")
@@ -526,7 +526,7 @@ local n=0
 function update(f)
 local o=false
 function damage_and_stop(n,e,o)
-if(l)add(s.fake_hit,{e,o})else make_damage_spot(e,o,r,t,n.telegraph,i)
+if(l)add(s.fake_hit,{e,o})else make_damage_spot(e,o,i,t,n.telegraph,r)
 if n.collides then
 local e=grid[o][e].creature
 if(e and e.side~=t)n.alive=false
@@ -589,16 +589,16 @@ s:update()
 end
 return s
 end
-function make_effect_simple(n,l,c,r,e,t,o,i,d,a,f)
+function make_effect_simple(n,l,c,i,e,t,o,r,d,a,f)
 e=e or 0
 t=t or-.2
 o=o or 30
 local n,l=make_nongrid(n,l),0
 n.draw=function()
 palreset()
-fillp(i)
+fillp(r)
 pal(12,tf\2%2==0and 7or 12)
-spr(r,n.pos[1],n.pos[2],d or 1,a or 1,f)
+spr(i,n.pos[1],n.pos[2],d or 1,a or 1,f)
 palreset()
 fillp()
 end
@@ -610,12 +610,12 @@ if(l>o)del(nongrid,n)
 end
 return n
 end
-function make_creature_particle(n,e,t,r,o)
+function make_creature_particle(n,e,t,i,o)
 local n,e,l=make_nongrid(n,e),-50+rnd(2),(rnd()-.5)*1.8
 addfields(n,"",{
 color=t,
 yv=l,
-xv=r+(.5-rnd())*.25
+xv=i+(.5-rnd())*.25
 })
 n.draw=function()
 pset(n.pos[1],n.pos[2],t)
@@ -656,9 +656,9 @@ n.clay_time=o>=40and 45or 15
 creature_index+=1
 n.draw=function()
 local e,t,o,l=tp(n.pos[1],n.pos[2]),n.spri,0,grid[n.pos[2]][n.pos[1]].space
-function ds(r,i)
+function ds(i,r)
 local d=n.side*-sin(n.overextended_timer/60)*3
-spr(t,e[1]+o+r+d+n.telegraph_x,e[2]+n.yo+i+l.offset_y+n.telegraph_y,2,2,n.side==-1)
+spr(t,e[1]+o+i+d+n.telegraph_x,e[2]+n.yo+r+l.offset_y+n.telegraph_y,2,2,n.side==-1)
 end
 if(n.clay_time>0)if t<12then pal(split"2,2,2,2,2,2,1,1,1,1,1,1,1,1,15,1")clip(0,e[2]+n.yo+max((n.clay_time-10)*4,-4),128,22)ds(n.clay_time\5,0)ds(-n.clay_time\6,0)ds(0,n.clay_time\7)ds(0,-n.clay_time\8)ds(0,0)clip()palreset()elseif t<40then ds(0,0)else ds(n.clay_time*n.clay_time*.125,n.clay_time*n.clay_time*-.25)end n.clay_time-=1return
 if(n.movetime>0)fillp(21845.75)
@@ -695,8 +695,9 @@ if(n.poison_timer>0)n.take_damage(1,true)local n=tp(e,t)
 end
 n.take_damage=function(e,t)
 if(ended)return
-if not t then
-if(n.shield_timer>0)n.shield_timer=0sfx(20,1)return
+if n.shield_timer>0then
+n.shield_timer=0
+if(t)e*=2else sfx(20,1)return
 end
 if(n==pl)for n=max(n.health-e+1,1),n.health do bounce_hp[n]=10end
 n.health-=e
@@ -724,11 +725,11 @@ die={}
 })
 return n
 end
-function make_monster(r,i,n,o,d,a,t,e)
+function make_monster(i,r,n,o,d,a,t,e)
 local l=false
 if(grid[o][n].creature)l=true
-local n=make_creature(n,o,-1,a,r)
-n.palette=monster_palettes[i]
+local n=make_creature(n,o,-1,a,i)
+n.palette=monster_palettes[r]
 n.abilities=d
 n.speed=t
 n.abil_timer=t\2
@@ -1244,7 +1245,7 @@ walls=smlu([[199,-8,16
 defeat_wall=0
 local n=n[level]
 for n in all(n)do
-local n,t,o,l,r=unpack(split(n,"/"))
+local n,t,o,l,i=unpack(split(n,"/"))
 x=flr(rnd(4))+5
 y=flr(rnd(4))+1
 if(inmediasres)x=6y=2n="dog1"
@@ -1252,7 +1253,7 @@ local n=parse_monster(e[n],x,y)
 n.favor_col=t
 n.time=o or 0
 n.abil_pattern_i=l or 0
-n.move_pattern_i=r or 0
+n.move_pattern_i=i or 0
 end
 if(inmediasres)spawn()imrtimer=0else do_level_intro()imrtimer=1000
 throw()
@@ -1316,7 +1317,7 @@ if current_upgrades==nil then
 music(12)
 current_upgrades={}
 local n={"hp",rnd(upgrade_mods),rnd(upgrade_mods),rnd(upgrade_mods),draw_random_abil(),draw_random_abil(),draw_random_abil()}
-if(level%3==0)n={"+1","+1","+1","+1"}
+if(level%3==1)n={"+1","+1","+1","+1"}
 local e=split"11____,____11,__11__,1__1__,_2____,2_____,___2__,3-____,_1___1,_1__1_"
 for o=1,4do
 local l=flr(rnd(#n)+1)
@@ -1421,11 +1422,23 @@ draw_die2d(player_abilities,50,65,state=="gameplay"and player_abilities or appli
 end
 end
 function update_win()
+if(tf==20)music(-1)sfx(20)
+if(tf>60and btnp(5))set_state"newgame"
 end
 function draw_win()
-cls()
-print("you win!!!",44,50,7)
-print("wins: "..dget(0),50,60,7)
+cls(1)
+sfn[[print,- you win -,42,8,7
+print,with die in hand you mount,8,28,6
+print,the steps of the ziggurat.,8,36,6
+print,here the curse can be,8,52,6
+print,lifted and with it the,8,60,6
+print,wretched power of the die.,8,68,6
+print,lift the curse... or maybe,8,84,6
+print,just one last roll?,8,92,6
+print,roll,102,116,12
+spr,132,92,116
+]]
+print("wins: "..dget(0),8,116,7)
 end
 states={
 newgame={update=update_newgame,draw=draw_newgame},
@@ -1532,12 +1545,12 @@ eeeeeeeeeeeeeee111eeee1111eeee1ee11eee1111eee11111ee1ee10ee000e0eeeeeeeeeeeeeeee
 eeeeee1111111111ee1111ee111eeeeee11eee11e11eeeeee11ee11ee000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 eeeeee111111111eeeeeeeee11111ee1e11ee1e1e111ee11e111eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 eeeeeeeeeeeeeeeeeeeeeeee1111111e111eeeeeee111eeeee111eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
-ccccccce8888888ee111111eeeeeeeeeeeeeeeeee77ee77eeeeecceeeeeeeeeeeeeeeeeeee1777eeeeee11eeeeeeeeeeeeeeeeeeeeeeeeeeccccceeeee77ccee
-c77777ce8ddddd8ee1f1f11ee111111eeeeeeeee7cc77cc7eeeecceeeeeeeeeeeeeeeeeee1eeeeeeeeeeee1eeeeeeeeee7eeeeeeeeeeeeeeceeeceeecc77eecc
-c7ccc7ce8eeeee8e111f115ee191911eeeeeeeee7cc77cc7eeecceeeeeeeeeeeeeeeeeee1eeeeeeeeeeeeee1eeeeeeee7eeeeeeeeeeeeeeeececeeeeceeeeeec
-c7ccc7ce8eeeee8e11f1f15e111911eeeeeeeeee7cc77cc7eeecceeeeeeeeeeeeeeeeeee1ee11eeeeee11ee7eee11ee17ee11eeeeeeeeeeeeeceeeeeccee77cc
-c7ccc7ce8eeeee8e111111ee119191eeeeeeeeee7cc77cc7eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7eeeeeee11eeeeeee8eeeeeeeeeceeeeeeecc77ee
-c77777ce8eeeee8e555555ee111111eeeeeeeeee7cc77cc7eecceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7eeeeeee1ee1eeeeee8eeeeeeeeeceeeeeeeeeeeee
+ccccccce8888888ee111111eeeeeeeeee666666ee77ee77eeeeecceeeeeeeeeeeeeeeeeeee1777eeeeee11eeeeeeeeeeeeeeeeeeeeeeeeeeccccceeeee77ccee
+c77777ce8ddddd8ee1f1f11ee111111ee606066e7cc77cc7eeeecceeeeeeeeeeeeeeeeeee1eeeeeeeeeeee1eeeeeeeeee7eeeeeeeeeeeeeeceeeceeecc77eecc
+c7ccc7ce8eeeee8e111f115ee191911e6660660e7cc77cc7eeecceeeeeeeeeeeeeeeeeee1eeeeeeeeeeeeee1eeeeeeee7eeeeeeeeeeeeeeeececeeeeceeeeeec
+c7ccc7ce8eeeee8e11f1f15e111911ee6606060e7cc77cc7eeecceeeeeeeeeeeeeeeeeee1ee11eeeeee11ee7eee11ee17ee11eeeeeeeeeeeeeceeeeeccee77cc
+c7ccc7ce8eeeee8e111111ee119191ee666666ee7cc77cc7eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7eeeeeee11eeeeeee8eeeeeeeeeceeeeeeecc77ee
+c77777ce8eeeee8e555555ee111111ee000000ee7cc77cc7eecceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7eeeeeee1ee1eeeeee8eeeeeeeeeceeeeeeeeeeeee
 ccccccce8888888eeeeeeeeeeeeeeeeeeeeeeeee7cc77cc7eecceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee7771eeee111eee88eeeeeeeeeeeeeeeeeeeeee
 dddddddedddddddeeeeeeeeeeeeeeeeeeeeeeeeee77ee77eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee8888eeeeeeeeeeeeeeeeeeee
 eeccccee0000000eeeeeeeeeeeeeeeeeeeeeeeeeee00eeeeee22eeeeee44eeeeee66eeeeeea9eeeeeecceeeeeeeeeeeeee77eeeee8eeeeeeeeeeeee1eeeeeeee
@@ -1620,7 +1633,7 @@ __sfx__
 010400001c41024411007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700
 010400001c41037321007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700007000070000700
 011200001611112111111130000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
-011100000000000001000010000100001000010000100001000010000100001000010000100001000010000100000000000000000000000000000000000000000000000000000000000000000000000000000000
+011f00000015300000000010015300000000010014300000000010014300000000010013300000000000013300000000000012300000000000012300000000000011300000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
